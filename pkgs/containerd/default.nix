@@ -1,43 +1,50 @@
 pkgs: {
   containerd = let
-    version = "1.7.0"; # or pick your version
-    srcRev = "v${version}";
+    version = "1.7.0";
+    rev = "v${version}";
   in
     pkgs.buildGoModule rec {
       pname = "containerd";
       inherit version;
 
-      # 1) Download containerd from GitHub
-      #    using a placeholder SRI hash so we can fix it after the first build:
       src = pkgs.fetchFromGitHub {
         owner = "containerd";
         repo = "containerd";
-        rev = srcRev;
+        rev = rev;
+        # Replace this if needed. If you see a mismatch, copy
+        # the correct SRI hash that Nix prints in the error.
         sha256 = "sha256-OHgakSNqIbXYDC7cTw2fy0HlElQMilDbSD5SSjbYJhc=";
       };
 
-      # 2) We will compile from the root module
-      #    containerd uses Go modules, so we need a vendorHash for dependencies.
-      vendorHash = null;
+      # containerd uses Go modules => we must provide a vendorHash or goModSha256
+      # If you don't have the real SRI hash yet, do:
+      #    vendorHash = pkgs.lib.fakeSha256;
+      # Then run a build once, take the printed hash from the error, and plug it back in.
+      vendorHash = pkgs.lib.fakeSha256;
 
-      # 3) The subPackages array typically just [ "." ] for containerd root.
-      #    containerd has multiple binaries (containerd, ctr, etc.), but they're in the same module.
-      subPackages = ["."];
+      # Each sub-package under cmd/ builds a main binary.
+      subPackages = [
+        "./cmd/containerd"
+        "./cmd/ctr"
+        "./cmd/containerd-shim-runc-v1"
+        "./cmd/containerd-shim-runc-v2"
+      ];
 
-      # 4) If we want to skip tests:
-      doCheck = false; # containerd tests can be slow or require special environment
+      doCheck = false; # containerd tests can be slow or require root privileges
 
-      # 5) Set environment variables or LDFLAGS if needed
-      #    containerd might have custom version injection with ldflags, but we can skip
-      #    or replicate what containerd's Makefile does:
       ldflagsArray = [
         "-s"
         "-w"
       ];
 
-      # 6) Final name of output
-      #    This derivation will produce 'bin/containerd', 'bin/containerd-shim',
-      #    'bin/containerd-shim-runc-v2', 'bin/ctr', etc.
+      # Copy the newly built binaries from $GOPATH/bin/ into $out/bin/
+      installPhase = ''
+        runHook preInstall
+        mkdir -p "$out/bin"
+        cp $GOPATH/bin/* "$out/bin/"
+        runHook postInstall
+      '';
+
       name = "${pname}-${version}";
     };
 }
