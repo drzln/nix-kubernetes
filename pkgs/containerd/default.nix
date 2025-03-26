@@ -13,12 +13,12 @@ pkgs: {
         owner = "containerd";
         repo = "containerd";
         rev = srcRev;
-        sha256 = pkgs.lib.fakeSha256;
+        sha256 = "sha256-OHgakSNqIbXYDC7cTw2fy0HlElQMilDbSD5SSjbYJhc=";
       };
 
       # 2) We will compile from the root module
       #    containerd uses Go modules, so we need a vendorHash for dependencies.
-      vendorHash = pkgs.lib.fakeSha256; # replace after first build attempt
+      vendorHash = null;
 
       # 3) The subPackages array typically just [ "." ] for containerd root.
       #    containerd has multiple binaries (containerd, ctr, etc.), but they're in the same module.
