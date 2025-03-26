@@ -17,8 +17,9 @@
           inherit system;
         };
       in {
-        packages = with import ./pkgs/etcd pkgs; {
-          inherit etcd etcdserver etcdctl etcdutl;
+        packages = with import ./pkgs/etcd pkgs;
+        with import ./pkgs/containerd pkgs; {
+          inherit etcd etcdserver etcdctl etcdutl containerd;
           default = etcd;
         };
       }
