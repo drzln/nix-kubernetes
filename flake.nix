@@ -18,7 +18,7 @@
         };
       in {
         packages = with import ./pkgs/etcd pkgs;
-        with import ./pkgs/cillium pkgs;
+        with import ./pkgs/cilium pkgs;
         with import ./pkgs/containerd pkgs; {
           inherit
             etcd
@@ -26,7 +26,7 @@
             etcdctl
             etcdutl
             containerd
-            cillium
+            cilium
             ;
           default = etcd;
         };
