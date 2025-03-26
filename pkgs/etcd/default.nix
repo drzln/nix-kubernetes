@@ -12,7 +12,7 @@ pkgs: rec {
     doCheck = false;
     vendorHash = "sha256-i60rKCmbEXkdFOZk2dTbG5EtYKb5eCBSyMcsTtnvATs=";
     modRoot = "./etcdutl";
-    CGO_ENABLED = "0";
+    env.CGO_ENABLED = "0";
   };
   etcdctl = pkgs.buildGoModule {
     pname = "etcdctl";
@@ -20,7 +20,7 @@ pkgs: rec {
     doCheck = false;
     vendorHash = "sha256-awl/4kuOjspMVEwfANWK0oi3RId6ERsFkdluiRaaXlA=";
     modRoot = "./etcdctl";
-    CGO_ENABLED = "0";
+    env.CGO_ENABLED = "0";
   };
   etcdserver = pkgs.buildGoModule {
     pname = "etcdserver";
@@ -28,7 +28,7 @@ pkgs: rec {
     doCheck = false;
     vendorHash = "sha256-vu5VKHnDbvxSd8qpIFy0bA88IIXLaQ5S8dVUJEwnKJA=";
     modRoot = "./server";
-    CGO_ENABLED = "0";
+    env.CGO_ENABLED = "0";
     postBuild = ''
       mv "$GOPATH"/bin/{server,etcd} || true
     '';
