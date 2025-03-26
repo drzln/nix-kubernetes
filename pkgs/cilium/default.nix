@@ -1,6 +1,6 @@
 pkgs: {
   cilium = let
-    rev = "main"; # Tracking the Cilium main branch
+    rev = "main";
     version = "main";
   in
     pkgs.buildGoModule rec {
@@ -11,97 +11,87 @@ pkgs: {
         owner = "cilium";
         repo = "cilium";
         rev = rev;
-        # Force mismatch => on first build, Nix will print the correct SRI for the main branch
+        # Intentional mismatch => Nix will fail once, printing the correct SRI
         sha256 = "sha256-OHgakSNqIbXYDC7cTw2fy0HlElQMilDbSD5SSjbYJhc=";
       };
 
-      # Force a mismatch so Nix shows the correct vendor hash
+      # Force mismatch => we'll see the correct vendorHash from Nix
       vendorHash = null;
 
-      # The main branch uses a single go.mod for all sub-packages:
-      # Here we specify each subdir that has a 'main.go' and build them.
-      #
-      # For a full eBPF-based deployment, you typically need:
-      #   - cilium-agent (daemon/)
-      #   - cilium-dbg (cilium-dbg/) [the in-container CLI]
-      #   - cilium-bugtool (bugtool/)
-      #   - cilium-operator (operator/)
-      #   - cilium-health + cilium-health-responder (cilium-health/)
-      #   - hubble-relay (hubble-relay/)
-      #   - clustermesh-apiserver + clustermesh-dbg (clustermesh-apiserver/)
-      #   - cilium-cni (plugins/cilium-cni/)
-      #   - cilium-docker (plugins/cilium-docker/) for Docker networks (optional in K8s)
+      # Cilium’s top-level go.mod covers these sub-packages:
+      # - cmd/cilium => main agent (binary named 'cilium')
+      # - cmd/operator => cilium-operator
+      # - cmd/bugtool => cilium-bugtool
+      # - cmd/health => cilium-health
+      # - cmd/health-responder => cilium-health-responder
+      # - cmd/hubble-relay => hubble-relay
+      # - cmd/clustermesh-apiserver => clustermesh-apiserver
+      # - cmd/clustermesh-dbg => clustermesh-dbg
+      # - plugins/cilium-cni => cilium-cni
+      # - plugins/cilium-docker => cilium-docker
+      # (No 'cilium-agent' folder. The 'cilium' binary is used for the agent.)
       subPackages = [
-        "./daemon"
-        "./cilium-dbg"
-        "./bugtool"
-        "./operator"
-        "./cilium-health"
-        "./cilium-health/responder"
-        "./hubble-relay"
-        "./clustermesh-apiserver"
-        "./clustermesh-apiserver/clustermesh-dbg"
+        "./cmd/cilium"
+        "./cmd/operator"
+        "./cmd/bugtool"
+        "./cmd/health"
+        "./cmd/health-responder"
+        "./cmd/hubble-relay"
+        "./cmd/clustermesh-apiserver"
+        "./cmd/clustermesh-dbg"
         "./plugins/cilium-cni"
         "./plugins/cilium-docker"
       ];
 
-      # We skip tests (they can be huge or require eBPF kernel environment).
-      doCheck = false;
+      doCheck = false; # tests require specialized eBPF environment
 
-      # Provide clang/llvm so BPF programs can be compiled if the build triggers that step
+      # If you want to compile BPF programs ahead of time, clang & llvm needed:
       nativeBuildInputs = [
-        pkgs.llvm
         pkgs.clang
+        pkgs.llvm
       ];
 
-      # Minimal LDFLAGS + disable VCS stamping to avoid 'no .git' issues in a Nix build
+      # Minimal LDFLAGS => strip + disable VCS stamping
       ldflagsArray = [
         "-s"
         "-w"
         "-buildvcs=false"
       ];
 
-      # We rename each built binary in installPhase => put them into $out/bin
       installPhase = ''
         runHook preInstall
         mkdir -p "$out/bin"
 
-        # Usually each subPackage produces a binary named after the subdir's last component
-        # We'll rename them to the standard final names:
-
-        # Agent => built as 'daemon'
-        [ -f "$GOPATH/bin/daemon" ] && cp "$GOPATH/bin/daemon" "$out/bin/cilium-agent"
-
-        # cilium-dbg => built as 'cilium-dbg'
-        [ -f "$GOPATH/bin/cilium-dbg" ] && cp "$GOPATH/bin/cilium-dbg" "$out/bin/"
-
-        # bugtool => built as 'bugtool'
-        [ -f "$GOPATH/bin/bugtool" ] && cp "$GOPATH/bin/bugtool" "$out/bin/cilium-bugtool"
-
-        # operator => built as 'operator'
-        [ -f "$GOPATH/bin/operator" ] && cp "$GOPATH/bin/operator" "$out/bin/cilium-operator"
-
-        # cilium-health => built as 'cilium-health'
-        [ -f "$GOPATH/bin/cilium-health" ] && cp "$GOPATH/bin/cilium-health" "$out/bin/"
-
-        # cilium-health-responder => built as 'responder'
-        if [ -f "$GOPATH/bin/responder" ]; then
-          cp "$GOPATH/bin/responder" "$out/bin/cilium-health-responder"
+        # The main agent is built as "cilium" => rename to "cilium-agent" for clarity
+        if [ -f "$GOPATH/bin/cilium" ]; then
+          cp "$GOPATH/bin/cilium" "$out/bin/cilium-agent"
         fi
 
-        # hubble-relay => built as 'hubble-relay'
-        [ -f "$GOPATH/bin/hubble-relay" ] && cp "$GOPATH/bin/hubble-relay" "$out/bin/"
+        # operator => built as "operator"
+        [ -f "$GOPATH/bin/operator" ] && cp "$GOPATH/bin/operator" "$out/bin/cilium-operator"
 
-        # clustermesh-apiserver => built as 'clustermesh-apiserver'
+        # bugtool => "bugtool"
+        [ -f "$GOPATH/bin/bugtool" ] && cp "$GOPATH/bin/bugtool" "$out/bin/cilium-bugtool"
+
+        # health => "health"
+        [ -f "$GOPATH/bin/health" ] && cp "$GOPATH/bin/health" "$out/bin/cilium-health"
+
+        # health-responder => "health-responder"
+        [ -f "$GOPATH/bin/health-responder" ] && cp "$GOPATH/bin/health-responder" "$out/bin/cilium-health-responder"
+
+        # hubble-relay => "hubble-relay"
+        [ -f "$GOPATH/bin/hubble-relay" ] && cp "$GOPATH/bin/hubble-relay" "$out/bin/hubble-relay"
+
+        # clustermesh-apiserver => "clustermesh-apiserver"
         [ -f "$GOPATH/bin/clustermesh-apiserver" ] && cp "$GOPATH/bin/clustermesh-apiserver" "$out/bin/"
 
-        # clustermesh-dbg => built as 'clustermesh-dbg'
+        # clustermesh-dbg => "clustermesh-dbg"
         [ -f "$GOPATH/bin/clustermesh-dbg" ] && cp "$GOPATH/bin/clustermesh-dbg" "$out/bin/"
 
-        # cilium-cni => built as 'cilium-cni'
+        # cilium-cni => "cilium-cni"
         [ -f "$GOPATH/bin/cilium-cni" ] && cp "$GOPATH/bin/cilium-cni" "$out/bin/"
 
-        # cilium-docker => built as 'cilium-docker'
+        # cilium-docker => "cilium-docker"
         [ -f "$GOPATH/bin/cilium-docker" ] && cp "$GOPATH/bin/cilium-docker" "$out/bin/"
 
         runHook postInstall
