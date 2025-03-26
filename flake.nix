@@ -2,7 +2,7 @@
   description = "kubernetes";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -11,12 +11,16 @@
     flake-utils,
     ...
   }:
-    flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = import nixpkgs {
-        inherit system;
-      };
-    in {
-      packages.hello = pkgs.hello;
-      packages.default = pkgs.hello;
-    });
+    flake-utils.lib.eachDefaultSystem (
+      system: let
+        pkgs = import nixpkgs {
+          inherit system;
+        };
+      in {
+        packages = with import ./pkgs/etcd pkgs; {
+          inherit etcd etcdserver etcdctl etcdutl;
+          default = etcd;
+        };
+      }
+    );
 }
