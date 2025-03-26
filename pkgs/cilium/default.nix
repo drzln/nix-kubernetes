@@ -1,7 +1,7 @@
 pkgs: {
   cilium = let
-    rev = "main"; # HEAD of main
-    version = "main";
+    rev = "v1.9.9"; # pinned release tag
+    version = "1.9.9";
   in
     pkgs.buildGoModule rec {
       pname = "cilium";
@@ -11,54 +11,40 @@ pkgs: {
         owner = "cilium";
         repo = "cilium";
         rev = rev;
-        # Force a mismatch => Nix will fail once, and you can copy the correct SRI
+        # Force mismatch => On first build, Nix prints the correct SRI
         sha256 = "sha256-OHgakSNqIbXYDC7cTw2fy0HlElQMilDbSD5SSjbYJhc=";
       };
 
-      # Force vendorHash mismatch => get correct SRI from logs
+      # We'll also let Nix fail for vendored deps, so we can fix them
       vendorHash = null;
 
-      # The single go.mod at the repo root. We specify each subdir containing main.go.
-      #
-      # Binaries:
-      # - daemon => main agent
+      # v1.9.9 sub-packages that exist:
+      # - daemon => agent
       # - operator => cilium-operator
       # - bugtool => cilium-bugtool
-      # - cilium-dbg => cilium-dbg
       # - cilium-health => cilium-health
       # - cilium-health/responder => cilium-health-responder
       # - hubble-relay => hubble-relay
       # - clustermesh-apiserver => clustermesh-apiserver
-      # - clustermesh-apiserver/dbg => clustermesh-dbg
+      # - clustermesh-apiserver/debug => clustermesh-apiserver-debug
       # - plugins/cilium-cni => cilium-cni
       # - plugins/cilium-docker => cilium-docker
+      # (No cilium-dbg subdir in 1.9.9, so skip that.)
       subPackages = [
-        # main agent
         "./daemon"
-        # operator
         "./operator"
-        # bugtool
         "./bugtool"
-        # cilium-dbg (an in-agent debug CLI)
-        "./cilium-dbg"
-        # cilium-health (main CLI)
         "./cilium-health"
-        # health responder
         "./cilium-health/responder"
-        # hubble-relay
         "./hubble-relay"
-        # clustermesh-apiserver
         "./clustermesh-apiserver"
-        "./clustermesh-apiserver/dbg"
-        # cni plugin
+        "./clustermesh-apiserver/debug"
         "./plugins/cilium-cni"
-        # docker plugin
         "./plugins/cilium-docker"
       ];
 
-      doCheck = false; # tests require eBPF + special environment
+      doCheck = false;
 
-      # If you want BPF compiled at build time, we need clang/llvm:
       nativeBuildInputs = [
         pkgs.clang
         pkgs.llvm
@@ -74,43 +60,38 @@ pkgs: {
         runHook preInstall
         mkdir -p "$out/bin"
 
-        # The agent is built as 'daemon' => rename to cilium-agent
-        if [ -f "$GOPATH/bin/daemon" ]; then
-          cp "$GOPATH/bin/daemon" "$out/bin/cilium-agent"
-        fi
+        # main agent => compiled as "daemon"
+        [ -f "$GOPATH/bin/daemon" ] && cp "$GOPATH/bin/daemon" "$out/bin/cilium-agent"
 
-        # cilium-operator => built as 'operator'
+        # operator => "operator"
         [ -f "$GOPATH/bin/operator" ] && cp "$GOPATH/bin/operator" "$out/bin/cilium-operator"
 
-        # cilium-bugtool => built as 'bugtool'
+        # bugtool => "bugtool"
         [ -f "$GOPATH/bin/bugtool" ] && cp "$GOPATH/bin/bugtool" "$out/bin/cilium-bugtool"
 
-        # cilium-dbg => built as 'cilium-dbg'
-        [ -f "$GOPATH/bin/cilium-dbg" ] && cp "$GOPATH/bin/cilium-dbg" "$out/bin/"
-
-        # cilium-health => built as 'cilium-health'
+        # cilium-health => "cilium-health"
         [ -f "$GOPATH/bin/cilium-health" ] && cp "$GOPATH/bin/cilium-health" "$out/bin/"
 
-        # cilium-health-responder => built as 'responder'
+        # cilium-health-responder => "responder"
         if [ -f "$GOPATH/bin/responder" ]; then
           cp "$GOPATH/bin/responder" "$out/bin/cilium-health-responder"
         fi
 
-        # hubble-relay => built as 'hubble-relay'
+        # hubble-relay => "hubble-relay"
         [ -f "$GOPATH/bin/hubble-relay" ] && cp "$GOPATH/bin/hubble-relay" "$out/bin/"
 
-        # clustermesh-apiserver => built as 'clustermesh-apiserver'
+        # clustermesh-apiserver => "clustermesh-apiserver"
         [ -f "$GOPATH/bin/clustermesh-apiserver" ] && cp "$GOPATH/bin/clustermesh-apiserver" "$out/bin/"
 
-        # clustermesh-dbg => built as 'dbg'
-        if [ -f "$GOPATH/bin/dbg" ]; then
-          cp "$GOPATH/bin/dbg" "$out/bin/clustermesh-dbg"
+        # clustermesh-apiserver/debug => "debug"
+        if [ -f "$GOPATH/bin/debug" ]; then
+          cp "$GOPATH/bin/debug" "$out/bin/clustermesh-apiserver-debug"
         fi
 
-        # cilium-cni => built as 'cilium-cni'
+        # cilium-cni => "cilium-cni"
         [ -f "$GOPATH/bin/cilium-cni" ] && cp "$GOPATH/bin/cilium-cni" "$out/bin/"
 
-        # cilium-docker => built as 'cilium-docker'
+        # cilium-docker => "cilium-docker"
         [ -f "$GOPATH/bin/cilium-docker" ] && cp "$GOPATH/bin/cilium-docker" "$out/bin/"
 
         runHook postInstall
