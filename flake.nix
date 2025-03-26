@@ -18,8 +18,16 @@
         };
       in {
         packages = with import ./pkgs/etcd pkgs;
+        with import ./pkgs/cillium pkgs;
         with import ./pkgs/containerd pkgs; {
-          inherit etcd etcdserver etcdctl etcdutl containerd;
+          inherit
+            etcd
+            etcdserver
+            etcdctl
+            etcdutl
+            containerd
+            cillium
+            ;
           default = etcd;
         };
       }
