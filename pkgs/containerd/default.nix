@@ -20,7 +20,7 @@ pkgs: {
       # If you don't have the real SRI hash yet, do:
       #    vendorHash = pkgs.lib.fakeSha256;
       # Then run a build once, take the printed hash from the error, and plug it back in.
-      vendorHash = pkgs.lib.fakeSha256;
+      vendorHash = null;
 
       # Each sub-package under cmd/ builds a main binary.
       subPackages = [
