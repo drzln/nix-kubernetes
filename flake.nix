@@ -26,7 +26,7 @@
             etcdctl
             etcdutl
             containerd
-            cilium
+            # cilium
             ;
           default = etcd;
         };
