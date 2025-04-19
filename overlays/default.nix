@@ -52,12 +52,12 @@
       owner = "kubernetes";
       repo = "kubernetes";
       rev = "v${version}";
-      hash = "sha256-Vp8U49fp0FowIuSSvbrMWjAKG2oDO1o0qO4izSnTR3U=";
+      hash = "sha256-P+z16GxzGYnq3UbBi3R71Sn6GVKzkhkF5pnUQVBlmdw=";
     };
-    vendorHash = "sha256-Vp8U49fp0FowIuSSvbrMWjAKG2oDO1o0qO4izSnTR3U=";
+    vendorHash = "sha256-XEilva/K2xGZHhrifaK/f4a3PGPb5dClOqv1dlJOTCM=";
 
     build = pname: path:
-      super.buildGo122Module {
+      super.buildGoModule {
         inherit version src vendorHash pname;
         subPackages = [path];
         ldflags = [
@@ -69,11 +69,11 @@
         doCheck = false;
       };
   in {
-    kube-apiserver = build "kube-apiserver" "./cmd/kube-apiserver";
-    kube-controller-manager = build "kube-controller-manager" "./cmd/kube-controller-manager";
-    kube-scheduler = build "kube-scheduler" "./cmd/kube-scheduler";
     kubelet = build "kubelet" "./cmd/kubelet";
-    kubectl = build "kubectl" "./cmd/kubectl";
+    # kube-apiserver = build "kube-apiserver" "./cmd/kube-apiserver";
+    # kube-controller-manager = build "kube-controller-manager" "./cmd/kube-controller-manager";
+    # kube-scheduler = build "kube-scheduler" "./cmd/kube-scheduler";
+    # kubectl = build "kubectl" "./cmd/kubectl";
   })
 
   # ────────────────────────────────────────────────────────────
