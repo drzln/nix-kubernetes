@@ -19,16 +19,17 @@
       in {
         packages = with import ./pkgs/etcd pkgs;
         with import ./pkgs/cilium pkgs;
-        with import ./pkgs/containerd pkgs; {
+        with import ./pkgs/containerd pkgs;
+        with pkgs; {
           inherit
             etcd
             etcdserver
             etcdctl
             etcdutl
             containerd
-            # cilium
+            cilium-cli
             ;
-          default = etcd;
+          default = pkgs.cilium-cli;
         };
       }
     );
