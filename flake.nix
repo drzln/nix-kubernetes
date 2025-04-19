@@ -25,6 +25,7 @@
           inherit
             kubelet
             kube-apiserver
+            kube-controller-manager
             etcdserver
             containerd
             cilium-cli
