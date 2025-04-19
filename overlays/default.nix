@@ -1,68 +1,95 @@
-# overlays/kubernetes-with-custom-etcd.nix
+# Combined overlays for nix-kubernetes
+# -------------------------------------------------------------
+# ▸ Custom etcd 3.5.9 (built from source)
+# ▸ Kubernetes 1.31.4 binaries (kube‑apiserver, scheduler, etc.)
+# ▸ (Optional) Cilium agent/operator overlay stub – uncomment later
+#
+# Put this file at overlays/default.nix and list it in `activeOverlays`
+# inside your flake.nix:
+#   activeOverlays = [ overlays/default.nix ];
+#
+# Edit the “REPLACEME” hashes once you run the first build.
+# -------------------------------------------------------------
 [
-  (
-    self: super: let
-      version = "3.5.9";
+  # ────────────────────────────────────────────────────────────
+  # Custom etcd build
+  (self: super: let
+    version = "3.5.9";
+    src = super.fetchFromGitHub {
+      owner = "etcd-io";
+      repo = "etcd";
+      rev = "v${version}";
+      hash = "sha256-Vp8U49fp0FowIuSSvbrMWjAKG2oDO1o0qO4izSnTR3U=";
+    };
 
-      src = super.fetchFromGitHub {
-        owner = "etcd-io";
-        repo = "etcd";
-        rev = "v${version}";
-        sha256 = "sha256-Vp8U49fp0FowIuSSvbrMWjAKG2oDO1o0qO4izSnTR3U=";
-      };
-
-      etcdserver = super.buildGoModule {
-        pname = "etcdserver";
+    common = pname: modRoot: vendorHash:
+      super.buildGoModule {
         inherit version src;
-        doCheck = false;
-        vendorHash = "sha256-vu5VKHnDbvxSd8qpIFy0bA88IIXLaQ5S8dVUJEwnKJA=";
-        modRoot = "./server";
+        pname = pname;
+        modRoot = modRoot;
+        vendorHash = vendorHash; # fake first → real after 1st build
         env = {CGO_ENABLED = "0";};
-        postBuild = ''
-          # Rename "server" to "etcd" if needed
-          mv "$GOPATH"/bin/{server,etcd} || true
-        '';
-      };
-
-      etcdctl = super.buildGoModule {
-        pname = "etcdctl";
-        inherit version src;
-        doCheck = false;
-        vendorHash = "sha256-awl/4kuOjspMVEwfANWK0oi3RId6ERsFkdluiRaaXlA=";
-        modRoot = "./etcdctl";
-        env = {CGO_ENABLED = "0";};
-      };
-
-      etcdutl = super.buildGoModule {
-        pname = "etcdutl";
-        inherit version src;
-        doCheck = false;
-        vendorHash = "sha256-i60rKCmbEXkdFOZk2dTbG5EtYKb5eCBSyMcsTtnvATs=";
-        modRoot = "./etcdutl";
-        env = {CGO_ENABLED = "0";};
-      };
-
-      # Combine everything into one package "etcd-3.5.9"
-      etcd = super.symlinkJoin {
-        name = "etcd-${version}";
-        paths = [etcdserver etcdctl etcdutl];
         doCheck = false;
       };
-    in {
-      # 1) Override the top-level 'etcd' to be your custom build.
-      inherit etcd;
 
-      # 2) Override Kubernetes so that it uses your custom etcd
-      #    instead of the default 'etcd3'.
-      #    This ensures Kubernetes references pkgs.etcd -> your custom build.
-      # kubernetes = super.kubernetes.override {
-      #   etcd3 = etcd;
-      # };
+    etcdserver = common "etcdserver" "./server" "sha256-vu5VKHnDbvxSd8qpIFy0bA88IIXLaQ5S8dVUJEwnKJA=";
+    etcdctl = common "etcdctl" "./etcdctl" "sha256-awl/4kuOjspMVEwfANWK0oi3RId6ERsFkdluiRaaXlA=";
+    etcdutl = common "etcdutl" "./etcdutl" "sha256-i60rKCmbEXkdFOZk2dTbG5EtYKb5eCBSyMcsTtnvATs=";
 
-      # You can also export them by name if you like:
-      # etcdserver = etcdserver;
-      # etcdctl = etcdctl;
-      # etcdutl = etcdutl;
-    }
-  )
+    etcd = super.symlinkJoin {
+      name = "etcd-${version}";
+      paths = [etcdserver etcdctl etcdutl];
+    };
+  in {
+    inherit etcd;
+  })
+
+  # ────────────────────────────────────────────────────────────
+  # Kubernetes binaries overlay
+  (self: super: let
+    version = "1.31.4"; # matches nixpkgs‑unstable today
+    src = super.fetchFromGitHub {
+      owner = "kubernetes";
+      repo = "kubernetes";
+      rev = "v${version}";
+      hash = "sha256-REPLACEME"; # <‑ nix will tell you the right hash
+    };
+    vendorHash = "sha256-REPLACEME";
+
+    build = pname: path:
+      super.buildGo122Module {
+        inherit version src vendorHash pname;
+        subPackages = [path];
+        ldflags = [
+          "-s"
+          "-w"
+          "-X"
+          "k8s.io/component-base/version.gitVersion=v${version}"
+        ];
+        doCheck = false;
+      };
+  in {
+    kube-apiserver = build "kube-apiserver" "./cmd/kube-apiserver";
+    kube-controller-manager = build "kube-controller-manager" "./cmd/kube-controller-manager";
+    kube-scheduler = build "kube-scheduler" "./cmd/kube-scheduler";
+    kubelet = build "kubelet" "./cmd/kubelet";
+    kubectl = build "kubectl" "./cmd/kubectl";
+  })
+
+  # ────────────────────────────────────────────────────────────
+  # Optional future overlay: build Cilium agent/operator images
+  # Uncomment & complete the hashes if you need fully hermetic images.
+  # (self: super: {
+  #   cilium-agent = /* buildGoModule … */;
+  #   cilium-operator = /* buildGoModule … */;
+  #   cilium-image = super.dockerTools.buildImage {
+  #     name = "cilium";
+  #     tag  = "1.17.3";
+  #     copyToRoot = super.buildEnv {
+  #       name = "cilium-root";
+  #       paths = [ self.cilium-agent self.cilium-operator ];
+  #     };
+  #     config.Cmd = [ "/cilium/bin/cilium-agent" ];
+  #   };
+  # })
 ]
