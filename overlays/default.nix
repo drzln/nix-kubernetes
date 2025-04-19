@@ -52,9 +52,9 @@
       owner = "kubernetes";
       repo = "kubernetes";
       rev = "v${version}";
-      hash = "sha256-P+z16GxzGYnq3UbBi3R71Sn6GVKzkhkF5pnUQVBlmdw=";
+      hash = "sha256-XEilva/K2xGZHhrifaK/f4a3PGPb5dClOqv1dlJOTCM=";
     };
-    vendorHash = "sha256-XEilva/K2xGZHhrifaK/f4a3PGPb5dClOqv1dlJOTCM=";
+    vendorHash = null;
 
     build = pname: path:
       super.buildGoModule {
