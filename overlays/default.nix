@@ -52,9 +52,9 @@
       owner = "kubernetes";
       repo = "kubernetes";
       rev = "v${version}";
-      hash = "sha256-REPLACEME"; # <‑ nix will tell you the right hash
+      hash = "sha256-Vp8U49fp0FowIuSSvbrMWjAKG2oDO1o0qO4izSnTR3U=";
     };
-    vendorHash = "sha256-REPLACEME";
+    vendorHash = "sha256-Vp8U49fp0FowIuSSvbrMWjAKG2oDO1o0qO4izSnTR3U=";
 
     build = pname: path:
       super.buildGo122Module {

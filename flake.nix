@@ -15,6 +15,7 @@
       system: let
         pkgs = import nixpkgs {
           inherit system;
+          overlays = import ./overlays;
         };
       in {
         packages = with import ./pkgs/etcd pkgs;
@@ -22,12 +23,13 @@
         with import ./pkgs/containerd pkgs;
         with pkgs; {
           inherit
-            etcd
+            kubelet
             etcdserver
-            etcdctl
-            etcdutl
             containerd
             cilium-cli
+            etcdctl
+            etcdutl
+            etcd
             runc
             ;
           default = pkgs.cilium-cli;
