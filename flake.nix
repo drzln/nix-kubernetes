@@ -26,6 +26,7 @@
             kubelet
             kube-apiserver
             kube-controller-manager
+            kube-scheduler
             etcdserver
             containerd
             cilium-cli
