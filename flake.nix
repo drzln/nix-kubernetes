@@ -24,6 +24,7 @@
         with pkgs; {
           inherit
             kubelet
+            kube-apiserver
             etcdserver
             containerd
             cilium-cli
