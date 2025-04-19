@@ -28,6 +28,7 @@
             etcdutl
             containerd
             cilium-cli
+            runc
             ;
           default = pkgs.cilium-cli;
         };
