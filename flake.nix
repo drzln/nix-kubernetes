@@ -24,6 +24,7 @@
         with pkgs; {
           inherit
             kubelet
+            kubectl
             kube-apiserver
             kube-controller-manager
             kube-scheduler

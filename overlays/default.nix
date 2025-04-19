@@ -73,7 +73,7 @@
     kube-apiserver = build "kube-apiserver" "./cmd/kube-apiserver";
     kube-controller-manager = build "kube-controller-manager" "./cmd/kube-controller-manager";
     kube-scheduler = build "kube-scheduler" "./cmd/kube-scheduler";
-    # kubectl = build "kubectl" "./cmd/kubectl";
+    kubectl = build "kubectl" "./cmd/kubectl";
   })
 
   # ────────────────────────────────────────────────────────────
