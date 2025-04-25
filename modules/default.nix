@@ -1,3 +1,49 @@
+# ╭────────────────────────────────────────────────────────────────────────────╮
+# │  blackmatter.components.kubernetes ─ QUICK-START CHEAT-SHEET              │
+# ╰────────────────────────────────────────────────────────────────────────────╯
+#
+# 1)  Single-node “all-in-one” dev laptop
+#
+#     imports = [ inputs.self.nixosModules.kubernetes ];
+#     blackmatter.components.kubernetes.enable = true;          # role defaults to "single"
+#
+# 2)  Dedicated control-plane VM with custom overlay and extra API flags
+#
+#     imports = [ inputs.self.nixosModules.kubernetes ];
+#     blackmatter.components.kubernetes = {
+#       enable = true;
+#       role   = "master";
+#       overlay = inputs.my-k8s-overlay;        # optional overlay
+#       extraApiArgs."feature-gates" = "MixedProtocolLBService=true";
+#     };
+#
+# 3)  Worker node that joins the cluster
+#
+#     imports = [ inputs.self.nixosModules.kubernetes ];
+#     blackmatter.components.kubernetes = {
+#       enable = true;
+#       role   = "worker";
+#       join.address = "10.0.0.5";
+#       join.token   = "abcdef.0123456789abcdef";
+#       join.caHash  = "sha256:deadbeef...";
+#     };
+#
+# 4)  Override etcd / containerd builds from your own derivations
+#
+#     blackmatter.components.kubernetes = {
+#       enable          = true;
+#       etcdPackage     = inputs.myEtcd.packages.${pkgs.system}.etcd;
+#       containerdPackage = inputs.myCtrd.packages.${pkgs.system}.containerd;
+#     };
+#
+# 5)  Open NodePorts <1024 (e.g., expose HTTP/HTTPS 80/443)
+#
+#     blackmatter.components.kubernetes.nodePortRange = "80-32767";
+#
+#  (Uncomment the service sections below to activate the real Kubernetes
+#   services—left commented so this file compiles even on systems that don’t
+#   want K8s yet.)
+#
 {
   lib,
   pkgs,
