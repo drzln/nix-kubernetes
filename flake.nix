@@ -4,13 +4,9 @@
   inputs = {
     nixpkgs      .url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils  .url = "github:numtide/flake-utils";
-
-    # working linter inputs
     nixpkgs-lint .url = "github:nix-community/nixpkgs-lint";
-    # pin statix at a tag to avoid GitHub HEAD lookup
     statix = {
       url = "github:oppiliappan/statix";
-
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
