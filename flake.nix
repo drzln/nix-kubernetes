@@ -4,13 +4,21 @@
   inputs = {
     nixpkgs      .url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils  .url = "github:numtide/flake-utils";
+
+    # working linter inputs
     nixpkgs-lint .url = "github:nix-community/nixpkgs-lint";
+    # pin statix at a tag to avoid GitHub HEAD lookup
+    statix = {
+      url = "github:srid/statix/v0.6.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
     self,
     nixpkgs,
     flake-utils,
+    statix,
     nixpkgs-lint,
     ...
   }: let
@@ -44,12 +52,18 @@
       };
 
       lintBin = "${nixpkgs-lint.packages.${system}.nixpkgs-lint}/bin/nixpkgs-lint";
+      statixBin = "${statix.packages.${system}.default}/bin/statix";
     in {
       packages = packages';
 
       checks = {
         nixpkgs-lint = pkgs.runCommand "nixpkgs-lint-check" {} ''
           ${lintBin} ${self}
+          touch $out
+        '';
+
+        statix = pkgs.runCommand "statix-check" {} ''
+          ${statixBin} check ${self}
           touch $out
         '';
       };
