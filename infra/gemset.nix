@@ -247,15 +247,15 @@
     version = "1.7.0";
   };
   pangea = {
-    dependencies = ["abstract-synthesizer" "aws-sdk-dynamodb" "aws-sdk-s3" "bigdecimal" "rexml" "terraform-synthesizer" "toml-rb" "tty-box" "tty-color" "tty-option" "tty-progressbar" "tty-table"];
+    dependencies = ["abstract-synthesizer" "aws-sdk-dynamodb" "aws-sdk-s3" "bigdecimal" "rexml" "terraform-synthesizer" "thor" "toml-rb" "tty-box" "tty-color" "tty-option" "tty-progressbar" "tty-table"];
     groups = ["default"];
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "09nbb9i8b2p6qkh97rqbp5ir17hch7rlp479wxz583jfxfwvq241";
+      sha256 = "1rymd5qkjjlqhldh62b6zp9qfff2fbc8ifg333zgl8aspwy3j0ix";
       type = "gem";
     };
-    version = "0.0.46";
+    version = "0.0.48";
   };
   parallel = {
     groups = ["default" "development"];
@@ -584,6 +584,16 @@
       type = "gem";
     };
     version = "0.0.26";
+  };
+  thor = {
+    groups = ["default"];
+    platforms = [];
+    source = {
+      remotes = ["https://rubygems.org"];
+      sha256 = "1nmymd86a0vb39pzj2cwv57avdrl6pl3lf5bsz58q594kqxjkw7f";
+      type = "gem";
+    };
+    version = "1.3.2";
   };
   toml-rb = {
     dependencies = ["citrus" "racc"];
