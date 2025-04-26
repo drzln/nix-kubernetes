@@ -69,7 +69,7 @@
           touch $out
         '';
         nmt-check = pkgs.runCommand "nmt-check" {} ''
-          ${pkgs.callPackage "${inputs.nmt}/default.nix" {}}/bin/nmt exec tests/k8s/options.nix
+          ${pkgs.callPackage "${nmt}/default.nix" {}}/bin/nmt exec tests/k8s/options.nix
           touch $out
         '';
       };
