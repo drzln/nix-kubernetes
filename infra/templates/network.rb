@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-template(:network, :apply) do
+template(:network) do
   product   = :betbe
   base_tags = { product: product }
 
