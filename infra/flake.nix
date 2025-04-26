@@ -21,7 +21,7 @@
       };
       rnix = ruby-nix.lib pkgs;
       rnix-env = rnix {
-        name = "nix-kubernetes";
+        name = "nix";
         gemset = ./gemset.nix;
       };
       env = rnix-env.env;
