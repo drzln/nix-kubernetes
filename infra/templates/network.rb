@@ -36,6 +36,7 @@ template(:network) do
     description 'Security group for kubernetes testing'
     tags base_tags.merge(Name: "#{product}_sg")
   end
+  sg_ref = "#{product}_sg"
 
   # Security Group Rules - Separate Resources
 
@@ -114,7 +115,7 @@ template(:network) do
     image_id ami
     instance_type instance_type
     key_name key_name_ref
-    vpc_security_group_ids [asg_sg_ref]
+    vpc_security_group_ids [sg_ref]
 
     # NixOS Cloud Init (Replace this with a valid NixOS config)
     # user_data = Base64.strict_encode64(<<-EOF
