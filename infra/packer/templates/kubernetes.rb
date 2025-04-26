@@ -7,22 +7,14 @@ require 'time'
 # AWS settings
 AMI_NAME = 'pangea-kubernetes-crio'
 AWS_REGION = 'us-east-1'
-TARGET_REGIONS = %w[us-west-1 us-west-2 eu-west-1].freeze # ✅ Regions to copy the AMI after creation
+TARGET_REGIONS = %w[us-west-1 us-west-2 eu-west-1].freeze
 GIT_HASH = `git rev-parse --short HEAD`.strip
 BUILD_VERSION = "#{Time.now.utc.strftime('%Y%m%d-%H%M%S')}-#{GIT_HASH.freeze}".freeze
-
-# Function to delete an AMI and its associated snapshot
 def delete_ami(ami_id, aws_region)
   puts "❌ Deleting AMI: #{ami_id}"
-
-  # Get associated snapshot ID
   snapshot_id = `aws ec2 describe-images --image-ids #{ami_id} --query "Images[0].BlockDeviceMappings[0].Ebs.SnapshotId" --region #{aws_region} --output text`.strip
-
-  # Deregister the AMI
   system("aws ec2 deregister-image --image-id #{ami_id} --region #{aws_region}")
   puts "✅ AMI #{ami_id} deregistered."
-
-  # Delete the snapshot if it exists
   return if snapshot_id == 'None'
 
   puts "❌ Deleting associated snapshot: #{snapshot_id}"
