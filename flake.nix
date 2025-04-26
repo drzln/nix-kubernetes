@@ -61,8 +61,7 @@
 
         statix = pkgs.runCommand "statix-check" {} ''
           ${statixBin} check \
-            --ignore W03 \
-            --ignore W04 \
+            --ignore W03 W04 \
           ${self}
           touch $out
         '';
