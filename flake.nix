@@ -68,6 +68,11 @@
           ${statixBin} check --ignore W03 W04 ${self}
           touch $out
         '';
+
+        nmt-check = pkgs.runCommand "nmt-check" {} ''
+          ${inputs.nmt.packages.${system}.nmt}/bin/nmt exec tests/k8s/options.nix
+          touch $out
+        '';
       };
     })
     // {
