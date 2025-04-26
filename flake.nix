@@ -80,6 +80,6 @@
     // {
       nixosModules.kubernetes = ./modules;
 
-      colmenaHive = import ./hive.nix;
+      colmenaHive = inputs.colmena.lib.makeHive (import ./hive.nix);
     };
 }
