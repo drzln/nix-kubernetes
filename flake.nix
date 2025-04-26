@@ -23,7 +23,7 @@
     nixpkgs-lint,
     nmt,
     ...
-  }: let
+  } @ inputs: let
     overlayList = import ./overlays;
   in
     flake-utils.lib.eachSystem ["x86_64-linux"] (system: let
