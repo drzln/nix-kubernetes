@@ -77,7 +77,7 @@ with lib;
     isWorker = cfg.role == "worker" || cfg.role == "single";
   in {
     options.blackmatter.components.kubernetes = {
-      enable = mkEnableOption "Activate Kubernetes on this host";
+      inherit enable;
 
       role = mkOption {
         type = types.enum ["master" "worker" "single"];
