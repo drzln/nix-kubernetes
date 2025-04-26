@@ -23,7 +23,7 @@
     nixpkgs-lint,
     nmt,
     ...
-  } @ inputs: let
+  } @ outputs: let
     overlayList = import ./overlays;
   in
     flake-utils.lib.eachSystem ["x86_64-linux"] (system: let
@@ -70,7 +70,7 @@
         '';
 
         nmt-check = pkgs.runCommand "nmt-check" {} ''
-          ${inputs.nmt.packages.${system}.nmt}/bin/nmt exec tests/k8s/options.nix
+          ${nmt.packages.${system}.nmt}/bin/nmt exec tests/k8s/options.nix
           touch $out
         '';
       };
