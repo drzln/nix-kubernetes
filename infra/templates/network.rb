@@ -183,7 +183,7 @@ template(:network) do
     min_size  0
     vpc_zone_identifier [web_subnet_ref]
     tag [{
-      key: 'Name',
+      key: :Name,
       value: product,
       propagate_at_launch: true
     }]
@@ -192,7 +192,7 @@ template(:network) do
     launch_template(
       {
         id: launch_template_ref,
-        version: '$Latest'
+        version: :$Latest
       }
     )
     desired_capacity 0
@@ -200,7 +200,7 @@ template(:network) do
     min_size  0
     vpc_zone_identifier [web_subnet_ref]
     tag [{
-      key: 'Name',
+      key: :Name,
       value: product,
       propagate_at_launch: true
     }]
