@@ -63,16 +63,6 @@
           touch $out
         '';
 
-        #           -        statix = pkgs.runCommand "statix-check" { } ''
-        # -          ${statixBin} check ${self}
-        # +        statix = pkgs.runCommand "statix-check" { } ''
-        # +          ${statixBin} check \
-        # +            --ignore W03 \
-        # +            --ignore W04 \
-        # +            ${self}
-        #            touch $out
-        #          '';
-
         statix = pkgs.runCommand "statix-check" {} ''
           ${statixBin} check \
             --ignore W03 \
