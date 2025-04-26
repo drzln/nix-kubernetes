@@ -50,7 +50,7 @@ inputs.colmena.lib.makeHive {
     deployment.tags = ["masters"];
   };
 
-  "worker-1" = {
+  "worker" = {
     pkgs,
     testOverlay,
     ...
@@ -78,12 +78,12 @@ inputs.colmena.lib.makeHive {
       };
     };
 
-    networking.hostName = "worker-1";
+    networking.hostName = "worker";
     deployment.targetHost = "192.168.1.11";
     deployment.tags = ["workers"];
   };
 
-  "worker-2" = {
+  "single" = {
     pkgs,
     testOverlay,
     ...
@@ -107,8 +107,8 @@ inputs.colmena.lib.makeHive {
       # join unused on a “single” node
     };
 
-    networking.hostName = "worker-2";
+    networking.hostName = "single";
     deployment.targetHost = "192.168.1.12";
-    deployment.tags = ["workers"];
+    deployment.tags = ["single"];
   };
 }
