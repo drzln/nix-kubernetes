@@ -109,7 +109,7 @@ template(:network) do
   end
 
   key_name_ref = "${aws_key_pair.#{product}_key.key_name}"
-  resource :aws_launch_template, "#{product}_nixos_lt" do
+  resource :aws_launch_template, product do
     name "#{product}-nixos-template"
     image_id ami
     instance_type instance_type
@@ -134,18 +134,23 @@ template(:network) do
     }]
   end
 
-  # launch_template_ref = "${aws_launch_template.#{product}_nixos_lt.id}"
-  # web_subnet_ref      = "${aws_subnet.#{product}_web_subnet.id}"
-  # resource :aws_autoscaling_group, "#{product}_nixos_asg" do
-  #   launch_template({ id: launch_template_ref, version: '$Latest' })
-  #   desired_capacity 0
-  #   max_size  0
-  #   min_size  0
-  #   vpc_zone_identifier [web_subnet_ref]
-  #   tag [{
-  #     key: 'Name',
-  #     value: "#{product}_nixos_asg",
-  #     propagate_at_launch: true
-  #   }]
-  # end
+  launch_template_ref = "${aws_launch_template.#{product}.id}"
+  web_subnet_ref      = "${aws_subnet.#{product}_public_subnet.id}"
+  resource :aws_autoscaling_group, product do
+    launch_template(
+      {
+        id: launch_template_ref,
+        version: '$Latest'
+      }
+    )
+    desired_capacity 0
+    max_size  0
+    min_size  0
+    vpc_zone_identifier [web_subnet_ref]
+    tag [{
+      key: 'Name',
+      value: product,
+      propagate_at_launch: true
+    }]
+  end
 end
