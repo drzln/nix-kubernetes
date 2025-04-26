@@ -21,19 +21,19 @@ inputs.colmena.lib.makeHive {
     # };
 
     "worker-1" = {
-      config,
-      pkgs,
-      ...
-    }: {
-      imports = [./modules];
-      blackmatter.components.kubernetes.enable = true;
-      networking.hostName = "worker-1";
-      system.stateVersion = "24.05";
-
-      deployment.targetHost = "192.168.1.11"; # <--- corrected
-      deployment.tags = ["workers"];
+      config = {
+        config,
+        pkgs,
+        ...
+      }: {
+        imports = [./modules];
+        blackmatter.components.kubernetes.enable = true;
+        networking.hostName = "worker-1";
+        system.stateVersion = "24.05";
+        deployment.targetHost = "192.168.1.11";
+        deployment.tags = ["workers"];
+      };
     };
-
     # worker-2 = {
     #   config,
     #   pkgs,
