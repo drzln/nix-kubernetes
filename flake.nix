@@ -31,7 +31,7 @@
         etcd = call ./pkgs/etcd;
         containerd = call ./pkgs/containerd;
         runc = call ./pkgs/runc;
-        cilium-cli = call ./pkgs/cilium;
+        # cilium-cli = call ./pkgs/cilium;
       in {
         packages = rec {
           inherit
