@@ -20,7 +20,7 @@ inputs.colmena.lib.makeHive {
     #   deployment.tags = ["masters"];
     # };
 
-    worker-1 = {
+    "worker-1" = {
       config,
       pkgs,
       ...
