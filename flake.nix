@@ -68,11 +68,11 @@
         '';
       };
 
-      devShells.default = pkgs.mkShell {
-        buildInputs = [
-          pkgs.nixpkgs-fmt
-          pkgs.git
-          pkgs.openssh
+      devShells.${system}.default = pkgs.mkShell {
+        buildInputs = with pkgs; [
+          nixpkgs-fmt
+          git
+          openssh
           colmena.packages.${system}.default
         ];
       };
