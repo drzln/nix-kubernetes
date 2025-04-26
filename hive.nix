@@ -1,6 +1,7 @@
 {inputs, ...}:
 inputs.colmena.lib.makeHive {
   meta.nixpkgs = import inputs.nixpkgs {system = "x86_64-linux";};
+
   defaults = {pkgs, ...}: {
     environment.systemPackages = with pkgs; [vim wget curl];
     system.stateVersion = "24.05";
@@ -10,9 +11,10 @@ inputs.colmena.lib.makeHive {
       options = ["mode=755"];
     };
     boot.loader.grub.enable = false;
-    _module.args.testOverlay = self: super: {}; # <- attrset fulfils type
+    _module.args.testOverlay = self: super: {};
   };
-  master = {
+
+  "master-1" = {
     pkgs,
     testOverlay,
     ...
@@ -30,11 +32,36 @@ inputs.colmena.lib.makeHive {
       kubeadmExtra = {apiServer = {timeoutForControlPlane = "10m0s";};};
       firewallOpen = true;
     };
-    networking.hostName = "master";
+    networking.hostName = "master-1";
     networking.firewall.allowedTCPPorts = [6443];
     deployment.targetHost = "192.168.1.10";
     deployment.tags = ["masters"];
   };
+
+  "master-2" = {
+    pkgs,
+    testOverlay,
+    ...
+  }: {
+    imports = [./modules];
+    blackmatter.components.kubernetes = {
+      enable = true;
+      role = "master";
+      overlay = testOverlay;
+      etcdPackage = pkgs.etcd;
+      containerdPackage = pkgs.containerd;
+      nodePortRange = "80-32000";
+      extraApiArgs = {"audit-log-maxage" = "15";};
+      extraKubeletOpts = "--fail-swap-on=false";
+      kubeadmExtra = {apiServer = {timeoutForControlPlane = "10m0s";};};
+      firewallOpen = true;
+    };
+    networking.hostName = "master-2";
+    networking.firewall.allowedTCPPorts = [6443];
+    deployment.targetHost = "192.168.1.20";
+    deployment.tags = ["masters"];
+  };
+
   "worker" = {
     pkgs,
     testOverlay,
@@ -51,7 +78,7 @@ inputs.colmena.lib.makeHive {
       extraApiArgs = {"profiling" = "false";};
       extraKubeletOpts = "--node-labels=node-role.kubernetes.io/worker=";
       kubeadmExtra = {nodeRegistration = {criSocket = "/run/containerd/containerd.sock";};};
-      firewallOpen = false; # keep host firewall disabled
+      firewallOpen = false;
       join = {
         address = "192.168.1.10:6443";
         token = "abcdef.0123456789abcdef";
