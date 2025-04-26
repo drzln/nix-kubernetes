@@ -4,7 +4,7 @@
 template(:packer) do
   product   = :packer
   base_tags = { product: product }
-  cidr_base = '10.1'
+  cidr_base = '10.2'
 
   # VPC Definition
   resource :aws_vpc, product do
