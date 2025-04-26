@@ -5,6 +5,12 @@ inputs.colmena.lib.makeHive {
   defaults = {pkgs, ...}: {
     environment.systemPackages = with pkgs; [vim wget curl];
     system.stateVersion = "24.05";
+    fileSystems."/" = {
+      device = "none";
+      fsType = "tmpfs";
+      options = ["mode=755"];
+    };
+    boot.loader.grub.enable = false;
   };
 
   master = {pkgs, ...}: {
