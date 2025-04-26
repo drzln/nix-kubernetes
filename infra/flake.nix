@@ -27,17 +27,17 @@
     in {
       packages = {
         inherit env ruby;
-        pangea = pangea.packages.${system}.pangea;
+        # pangea = pangea.packages.${system}.pangea;
       };
       devShells = rec {
         default = dev;
         dev = pkgs.mkShell {
           buildInputs = with pkgs; [
             pangea.packages.${system}.pangea
+            kubernetes-helm
             aws-nuke
             opentofu
             minikube
-            kubernetes-helm
             kubectl
             packer
             ruby
