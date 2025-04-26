@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 template(:network) do
-  product   = :betbe
+  product   = :kubernetes
   base_tags = { product: product }
 
   resource :aws_vpc, product do
