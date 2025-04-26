@@ -136,7 +136,59 @@ template(:network) do
 
   launch_template_ref = "${aws_launch_template.#{product}.id}"
   web_subnet_ref      = "${aws_subnet.#{product}_public_subnet.id}"
-  resource :aws_autoscaling_group, product do
+
+  resource :aws_autoscaling_group, "#{product}_master_1" do
+    launch_template(
+      {
+        id: launch_template_ref,
+        version: '$Latest'
+      }
+    )
+    desired_capacity 0
+    max_size  0
+    min_size  0
+    vpc_zone_identifier [web_subnet_ref]
+    tag [{
+      key: 'Name',
+      value: product,
+      propagate_at_launch: true
+    }]
+  end
+  resource :aws_autoscaling_group, "#{product}_master_2" do
+    launch_template(
+      {
+        id: launch_template_ref,
+        version: '$Latest'
+      }
+    )
+    desired_capacity 0
+    max_size  0
+    min_size  0
+    vpc_zone_identifier [web_subnet_ref]
+    tag [{
+      key: 'Name',
+      value: product,
+      propagate_at_launch: true
+    }]
+  end
+  resource :aws_autoscaling_group, "#{product}_worker_1" do
+    launch_template(
+      {
+        id: launch_template_ref,
+        version: '$Latest'
+      }
+    )
+    desired_capacity 0
+    max_size  0
+    min_size  0
+    vpc_zone_identifier [web_subnet_ref]
+    tag [{
+      key: 'Name',
+      value: product,
+      propagate_at_launch: true
+    }]
+  end
+  resource :aws_autoscaling_group, "#{product}_worker_2" do
     launch_template(
       {
         id: launch_template_ref,
