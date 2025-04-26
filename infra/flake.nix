@@ -1,11 +1,9 @@
 {
   description = "nix-kubernetes infra";
-
   inputs.nixpkgs.url = "github:NixOS/nixpkgs";
   inputs.ruby-nix.url = "github:inscapist/ruby-nix";
   inputs.flake-utils.url = "github:numtide/flake-utils";
-  inputs.pangea.url = "path:gems/pangea";
-
+  inputs.pangea.url = "github:drzln/pangea";
   outputs = {
     nixpkgs,
     ruby-nix,
