@@ -21,7 +21,7 @@
   }: let
     overlayList = import ./overlays;
   in
-    flake-utils.lib.eachDefaultSystem (system: let
+    flake-utils.lib.eachSystem ["x86_64-linux"] (system: let
       pkgs = import nixpkgs {
         inherit system;
         overlays = overlayList;
@@ -60,9 +60,7 @@
         '';
 
         statix = pkgs.runCommand "statix-check" {} ''
-          ${statixBin} check \
-            --ignore W03 W04 \
-          ${self}
+          ${statixBin} check --ignore W03 W04 ${self}
           touch $out
         '';
       };
