@@ -12,7 +12,6 @@
     flake-utils,
     ...
   }: let
-    # local overlays live in ./overlays (unchanged)
     overlayList = import ./overlays;
   in
     flake-utils.lib.eachDefaultSystem
@@ -23,9 +22,6 @@
           overlays = overlayList;
         };
       in {
-        ####################################################################
-        ##  Packages (unchanged paths: ./pkgs/etcd  ./pkgs/cilium  …)
-        ####################################################################
         packages = with import ./pkgs/etcd pkgs;
         with import ./pkgs/cilium pkgs;
         with import ./pkgs/containerd pkgs;
@@ -49,10 +45,7 @@
         };
       }
     )
-    # ────────────────────────────────────────────────────────────────────
-    #  Extra top-level outputs (NixOS module so other flakes/hosts can import)
-    # ────────────────────────────────────────────────────────────────────
     // {
-      nixosModules.kubernetes = ./modules/kubernetes; # <── new hotness
+      nixosModules.kubernetes = ./modules;
     };
 }
