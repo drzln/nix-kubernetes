@@ -9,6 +9,10 @@
       url = "github:oppiliappan/statix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    colmena = {
+      url = "github:zhaofengli/colmena";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -17,8 +21,9 @@
     flake-utils,
     statix,
     nixpkgs-lint,
+    colmena,
     ...
-  } @ outputs: let
+  } @ inputs: let
     overlayList = import ./overlays;
   in
     flake-utils.lib.eachSystem ["x86_64-linux"] (system: let
@@ -62,8 +67,19 @@
           touch $out
         '';
       };
+
+      devShells.default = pkgs.mkShell {
+        buildInputs = [
+          pkgs.nixpkgs-fmt
+          pkgs.git
+          pkgs.openssh
+          colmena.packages.${system}.default
+        ];
+      };
     })
     // {
       nixosModules.kubernetes = ./modules;
+
+      colmenaHive = import ./hive.nix;
     };
 }
