@@ -1,20 +1,19 @@
-# hive.nix
-{
+{inputs, ...}:
+inputs.colmena.lib.makeHive {
   meta = {
-    nixpkgs = import <nixpkgs> {};
+    nixpkgs = import inputs.nixpkgs {system = "x86_64-linux";};
   };
 
-  master = {
-    config,
-    pkgs,
-    ...
-  }: {
-    imports = [
-      ./modules
-    ];
-
-    kubernetes.enable = true;
-    networking.hostName = "master";
-    system.stateVersion = "24.05";
+  nodes = {
+    master = {
+      config,
+      pkgs,
+      ...
+    }: {
+      imports = [./modules/kubernetes];
+      blackmatter.components.kubernetes.enable = true;
+      networking.hostName = "master";
+      system.stateVersion = "24.05";
+    };
   };
 }
