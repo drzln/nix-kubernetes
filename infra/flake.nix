@@ -3,12 +3,10 @@
   inputs.nixpkgs.url = "github:NixOS/nixpkgs";
   inputs.ruby-nix.url = "github:inscapist/ruby-nix";
   inputs.flake-utils.url = "github:numtide/flake-utils";
-  inputs.pangea.url = "github:drzln/pangea";
   outputs = {
     nixpkgs,
     ruby-nix,
     flake-utils,
-    pangea,
     ...
   }:
     flake-utils.lib.eachDefaultSystem (system: let
@@ -27,13 +25,11 @@
     in {
       packages = {
         inherit env ruby;
-        # pangea = pangea.packages.${system}.pangea;
       };
       devShells = rec {
         default = dev;
         dev = pkgs.mkShell {
           buildInputs = with pkgs; [
-            pangea.packages.${system}.pangea
             kubernetes-helm
             aws-nuke
             opentofu
