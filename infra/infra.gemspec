@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
     rexml
     bundler
     toml-rb
+    pangea
     tty-box
     tty-color
     tty-table
