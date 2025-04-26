@@ -4,15 +4,15 @@
   inputs = {
     nixpkgs           .url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils       .url = "github:numtide/flake-utils";
-    # statix            .url = "github:srid/statix";
     nixpkgs-lint      .url = "github:nix-community/nixpkgs-lint";
+    # statix            .url = "github:srid/statix";
   };
 
   outputs = {
+    # statix,
     self,
     nixpkgs,
     flake-utils,
-    # statix,
     nixpkgs-lint,
     ...
   }: let
