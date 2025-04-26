@@ -63,7 +63,6 @@
           ${lintBin} ${self}
           touch $out
         '';
-
         statix = pkgs.runCommand "statix-check" {} ''
           ${statixBin} check --ignore W03 W04 ${self}
           touch $out
