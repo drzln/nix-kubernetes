@@ -68,7 +68,7 @@
         '';
         colmena = pkgs.runCommand "colmena-check" {} ''
           ${pkgs.colmena}/bin/colmena build \
-            -- --flake ${./hive.nix}
+            -f ${./hive.nix}
           touch $out
         '';
       };
