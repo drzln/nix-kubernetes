@@ -3,8 +3,6 @@
 
 require 'json'
 require 'time'
-
-# AWS settings
 AMI_NAME = 'pangea-kubernetes-crio'
 AWS_REGION = 'us-east-1'
 TARGET_REGIONS = %w[us-west-1 us-west-2 eu-west-1].freeze
@@ -23,15 +21,11 @@ def delete_ami(ami_id, aws_region)
 end
 
 def restrictive_deletes
-  # Step 1: Delete old AMI with the same name
   puts "🔍 Checking for existing AMI named '#{AMI_NAME}'..."
   existing_ami_id = `aws ec2 describe-images --filters "Name=name,Values=#{AMI_NAME}" --query "Images[0].ImageId" --region #{AWS_REGION} --output text`.strip
   delete_ami(existing_ami_id, AWS_REGION) unless existing_ami_id == 'None'
-
-  # Step 2: Delete any AMIs **not** named "pangea-kubernetes-crio"
   puts '🔍 Checking for other AMIs that should not exist...'
   other_amis = `aws ec2 describe-images --owners self --query "Images[?Name!='#{AMI_NAME}'].ImageId" --region #{AWS_REGION} --output text`.strip.split
-
   if other_amis.empty?
     puts '✅ No unwanted AMIs found.'
   else
@@ -39,11 +33,8 @@ def restrictive_deletes
       delete_ami(ami_id, AWS_REGION)
     end
   end
-
-  # Step 3: Find and delete all unattached EBS volumes
   puts '🔍 Checking for unattached EBS volumes...'
   unattached_volumes = `aws ec2 describe-volumes --filters "Name=status,Values=available" --query "Volumes[*].VolumeId" --region #{AWS_REGION} --output text`.strip.split
-
   if unattached_volumes.empty?
     puts '✅ No unattached EBS volumes found.'
   else
@@ -54,8 +45,6 @@ def restrictive_deletes
     end
   end
 end
-
-# Step 4: Generate the Packer JSON template as a Ruby hash
 packer_template = {
   variables: {
     aws_region: AWS_REGION,
@@ -115,26 +104,17 @@ packer_template = {
     # }
   ]
 }
-
-# Save the Packer template as JSON
 template_path = 'packer/templates/kubernetes/template.json'
 puts "💾 Writing Packer template to #{template_path}..."
 File.write(template_path, JSON.pretty_generate(packer_template))
-
-# Step 5: Run Packer to build the AMI
 puts '🚀 Running Packer build...'
 system('packer init packer/templates/kubernetes/packer.pkr.hcl')
 system('cd packer/templates/kubernetes && packer build template.json')
 puts '✅ Packer build completed!'
-
-# Step 6: Find the newly created AMI ID
 new_ami_id = `aws ec2 describe-images --filters "Name=name,Values=#{AMI_NAME}" --query "Images[0].ImageId" --region #{AWS_REGION} --output text`.strip
-
 if new_ami_id == 'None'
   puts '❌ Error: Could not find newly created AMI!'
   exit 1
 end
-
 puts "✅ New AMI created: #{new_ami_id}"
-
 puts "🎉 Deployment complete! New AMI ID: #{new_ami_id} is now available in #{AWS_REGION} and copied to #{TARGET_REGIONS.join(', ')}."
