@@ -1,6 +1,5 @@
 {
   description = "kubernetes";
-
   inputs = {
     nixpkgs      .url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils  .url = "github:numtide/flake-utils";
@@ -14,7 +13,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-
   outputs = {
     self,
     nixpkgs,
@@ -31,7 +29,6 @@
         inherit system;
         overlays = overlayList;
       };
-
       packages' = with import ./pkgs/etcd pkgs;
       with import ./pkgs/cilium pkgs;
       with import ./pkgs/containerd pkgs;
@@ -52,7 +49,6 @@
           ;
         default = pkgs.cilium-cli;
       };
-
       lintBin = "${nixpkgs-lint.packages.${system}.nixpkgs-lint}/bin/nixpkgs-lint";
       statixBin = "${statix.packages.${system}.default}/bin/statix";
     in {
@@ -67,7 +63,6 @@
           touch $out
         '';
       };
-
       devShells.default = pkgs.mkShell {
         buildInputs = with pkgs; [
           colmena.packages.${system}.colmena
@@ -79,7 +74,6 @@
     })
     // {
       nixosModules.kubernetes = ./modules;
-
       colmenaHive = import ./hive.nix {inherit inputs;};
     };
 }
