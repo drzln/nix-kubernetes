@@ -1,7 +1,7 @@
 # hive.nix
 {
   meta = {
-    nixpkgs = import ./nixpkgs.nix {};
+    nixpkgs = import <nixpkgs> {};
   };
 
   master = {
