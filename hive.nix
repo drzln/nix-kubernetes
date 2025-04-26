@@ -16,10 +16,8 @@ inputs.colmena.lib.makeHive {
       networking.firewall.allowedTCPPorts = [6443];
       system.stateVersion = "24.05";
 
-      deployment = {
-        targetHost = "192.168.1.10"; # <-- important
-        tags = ["masters"];
-      };
+      deployment.targetHost = "192.168.1.10"; # <--- corrected
+      deployment.tags = ["masters"];
     };
 
     worker-1 = {
@@ -32,10 +30,8 @@ inputs.colmena.lib.makeHive {
       networking.hostName = "worker-1";
       system.stateVersion = "24.05";
 
-      deployment = {
-        targetHost = "192.168.1.11"; # <-- important
-        tags = ["workers"];
-      };
+      deployment.targetHost = "192.168.1.11"; # <--- corrected
+      deployment.tags = ["workers"];
     };
 
     worker-2 = {
@@ -48,10 +44,8 @@ inputs.colmena.lib.makeHive {
       networking.hostName = "worker-2";
       system.stateVersion = "24.05";
 
-      deployment = {
-        targetHost = "192.168.1.12"; # <-- important
-        tags = ["workers"];
-      };
+      deployment.targetHost = "192.168.1.12"; # <--- corrected
+      deployment.tags = ["workers"];
     };
   };
 }
