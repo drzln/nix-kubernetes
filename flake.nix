@@ -70,10 +70,10 @@
 
       devShells.default = pkgs.mkShell {
         buildInputs = with pkgs; [
-          nixpkgs-fmt
-          git
-          openssh
           colmena.packages.${system}.colmena
+          nixpkgs-fmt
+          openssh
+          git
         ];
       };
     })
