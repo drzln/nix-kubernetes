@@ -252,10 +252,10 @@
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "1mgn54l3sr35rlqicjlyyy9wbwbd8svx9szpwr52yf36fgxpicsc";
+      sha256 = "1ynv6m81y9g8mbmsqyc9j8p4w1i5klcrqjpd3izwydgkszcbi7h4";
       type = "gem";
     };
-    version = "0.0.53";
+    version = "0.0.54";
   };
   parallel = {
     groups = ["default" "development"];
