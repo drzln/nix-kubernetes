@@ -1,0 +1,38 @@
+AllCops:
+  NewCops: enable # Automatically enable new cops introduced in new versions
+
+Metrics/BlockLength:
+  Enabled: true
+  ExcludedMethods: [] # No exclusions, check all methods
+  CountAsOne: ["array", "hash", "heredoc"] # Treat these as one line
+  Max: 200 # 🚀 Increase the max block length (adjust as needed)
+
+Metrics/MethodLength:
+  Max: 200 # 🚀 Increase the allowed method length
+
+Metrics/ClassLength:
+  Max: 500 # 🚀 Increase max class length to accommodate large classes
+
+Metrics/ModuleLength:
+  Max: 500 # 🚀 Increase module length for large modules
+
+Layout/LineLength:
+  Enabled: false
+
+Style/SpecialGlobalVars:
+  Enabled: false
+
+Style/RedundantInterpolation:
+  Enabled: false
+
+Lint/NonAtomicFileOperation:
+  Enabled: false
+
+Lint/OrAssignmentToConstant:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+# Optionally disable block length checks entirely:
+# Metrics/BlockLength:
+#   Enabled: false

@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative 'aws_utils'
+require_relative 'nuke_config'
+require_relative 'cleanup'
+
+# ✅ Main Execution
+begin
+  check_aws_nuke_installed
+  account_id = fetch_aws_account_id
+  account_alias = fetch_or_set_account_alias
+  generate_nuke_config(account_id, account_alias)
+  run_aws_nuke
+ensure
+  revoke_aws_credentials
+  cleanup_nuke_config
+end

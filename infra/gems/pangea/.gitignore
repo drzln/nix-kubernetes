@@ -1,0 +1,11 @@
+# direnv
+.envrc
+
+# direnv use flake
+.direnv
+
+# artifacts
+pkg
+
+# nix current build
+result

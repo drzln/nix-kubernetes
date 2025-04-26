@@ -1,0 +1,48 @@
+{
+  "variables": {
+    "aws_region": "us-east-1",
+    "instance_type": "t3.medium"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "ssh_username": "root",
+      "ami_name": "pangea-kubernetes-crio",
+      "ami_description": "A modern, secure Kubernetes AMI with CRI-O built using Packer and NixOS - Version 20250309-215251-5f16728b",
+      "region": "us-east-1",
+      "source_ami": "ami-08ee7b48673f8a214",
+      "instance_type": "m5.xlarge",
+      "launch_block_device_mappings": [
+        {
+          "device_name": "/dev/xvda",
+          "volume_size": 20,
+          "volume_type": "gp3"
+        }
+      ],
+      "ami_regions": [
+        "us-west-1",
+        "us-west-2",
+        "eu-west-1"
+      ],
+      "tags": {
+        "Name": "pangea-kubernetes-crio",
+        "Version": "20250309-215251-5f16728b"
+      },
+      "subnet_id": "subnet-03fa741ea3dfd69d8",
+      "vpc_id": "vpc-0d09bd50f08dd63f0"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "configuration.nix",
+      "destination": "/etc/nixos/configuration.nix"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo nixos-rebuild switch"
+      ]
+    }
+  ]
+}

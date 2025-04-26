@@ -1,0 +1,6 @@
+
+# never send nix package results
+result
+
+# nuke script is isolated so don't upload this
+aws-nuke-config.yml

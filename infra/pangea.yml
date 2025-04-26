@@ -1,0 +1,12 @@
+name: pleme
+namespaces:
+  # render templates against a namespace
+  # send templates against a namespace?
+  pleme:
+    name: pleme
+    state:
+      type: s3
+      config:
+        lock: pleme-state-lock
+        bucket: pleme-pangea-state
+        region: us-east-1

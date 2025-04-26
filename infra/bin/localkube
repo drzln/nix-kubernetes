@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative 'lib/kube_utils'
+require_relative 'lib/argo_cd'
+require_relative 'lib/networking'
+
+begin
+  install_minikube
+  start_minikube
+  configure_networking
+  install_argo_cd
+  expose_argo_cd
+ensure
+  puts '✅ Minikube setup complete. Run `kubectl get pods -A` to verify.'
+end
