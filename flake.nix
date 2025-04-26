@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs           .url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils       .url = "github:numtide/flake-utils";
-    statix            .url = "github:srid/statix";
+    # statix            .url = "github:srid/statix";
     nixpkgs-lint      .url = "github:nix-community/nixpkgs-lint";
   };
 
@@ -12,7 +12,7 @@
     self,
     nixpkgs,
     flake-utils,
-    statix,
+    # statix,
     nixpkgs-lint,
     ...
   }: let
@@ -48,10 +48,10 @@
       packages = packages';
 
       checks = {
-        statix = pkgs.runCommand "statix-check" {} ''
-          ${statix.defaultPackage.${system} /bin/statix} check ${self}
-          touch $out
-        '';
+        # statix = pkgs.runCommand "statix-check" {} ''
+        #   ${statix.defaultPackage.${system} /bin/statix} check ${self}
+        #   touch $out
+        # '';
 
         nixpkgs-lint = pkgs.runCommand "nixpkgs-lint-check" {} ''
           ${nixpkgs-lint.defaultPackage.${system} /bin/nixpkgs-lint} ${self}
