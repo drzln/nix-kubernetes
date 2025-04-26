@@ -92,7 +92,7 @@ inputs.colmena.lib.makeHive {
 
     blackmatter.components.kubernetes = {
       enable = true;
-      role = "single"; # all-in-one worker-master
+      role = "single";
       overlay = testOverlay;
       etcdPackage = pkgs.etcd;
       containerdPackage = pkgs.containerd;
@@ -100,7 +100,7 @@ inputs.colmena.lib.makeHive {
       nodePortRange = "10000-20000";
       extraApiArgs = {"enable-aggregator-routing" = "true";};
       extraKubeletOpts = "--cgroups-per-qos=false";
-      kubeadmExtra = {apiServerExtraSANs = ["worker-2.local"];};
+      kubeadmExtra = {apiServerExtraSANs = ["single.local"];};
 
       firewallOpen = true;
 
