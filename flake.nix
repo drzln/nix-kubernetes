@@ -68,14 +68,14 @@
         '';
       };
 
-      # devShells.${system}.default = pkgs.mkShell {
-      #   buildInputs = with pkgs; [
-      #     nixpkgs-fmt
-      #     git
-      #     openssh
-      #     colmena.packages.${system}.default
-      #   ];
-      # };
+      devShells.default = pkgs.mkShell {
+        buildInputs = with pkgs; [
+          nixpkgs-fmt
+          git
+          openssh
+          colmena.packages.${system}.colmena
+        ];
+      };
     })
     // {
       nixosModules.kubernetes = ./modules;
