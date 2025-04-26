@@ -1,5 +1,4 @@
-{inputs, ...}:
-inputs.colmena.lib.makeHive {
+{inputs, ...}: {
   meta = {
     nixpkgs = import inputs.nixpkgs {system = "x86_64-linux";};
   };
