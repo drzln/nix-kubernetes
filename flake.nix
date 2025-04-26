@@ -1,12 +1,13 @@
 {
-  description = "kubernetes";
+  description = "drzzln – custom Kubernetes builds & NixOS module";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs     .url = "github:nixos/nixpkgs/nixos-unstable";
+    flake-utils .url = "github:numtide/flake-utils";
   };
 
   outputs = {
+    self,
     nixpkgs,
     flake-utils,
     ...
@@ -16,12 +17,26 @@
         pkgs = import nixpkgs {
           inherit system;
           overlays = import ./overlays;
+          config = {allowUnfree = true;};
         };
+        call = path: pkgs.callPackage path {};
+        kubelet = call ./pkgs/kubelet;
+        kubectl = call ./pkgs/kubectl;
+        kube-apiserver = call ./pkgs/kube-apiserver;
+        kube-controller-manager = call ./pkgs/kube-controller-manager;
+        kube-scheduler = call ./pkgs/kube-scheduler;
+        etcdserver = call ./pkgs/etcd/server.nix;
+        etcdctl = call ./pkgs/etcd/ctl.nix;
+        etcdutl = call ./pkgs/etcd/utl.nix;
+        etcd = call ./pkgs/etcd; # meta-pkg
+        containerd = call ./pkgs/containerd;
+        runc = call ./pkgs/runc;
+        cilium-cli = call ./pkgs/cilium-cli;
       in {
-        packages = with import ./pkgs/etcd pkgs;
-        with import ./pkgs/cilium pkgs;
-        with import ./pkgs/containerd pkgs;
-        with pkgs; {
+        ################################################################
+        #  Expose derivations under `packages.<system>`
+        ################################################################
+        packages = rec {
           inherit
             kubelet
             kubectl
@@ -36,8 +51,11 @@
             etcd
             runc
             ;
-          default = pkgs.cilium-cli;
+          default = cilium-cli;
         };
       }
-    );
+    )
+    // {
+      nixosModules.kubernetes = import ./modules/kubernetes;
+    };
 }
