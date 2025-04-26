@@ -5,10 +5,6 @@
     nixpkgs      .url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils  .url = "github:numtide/flake-utils";
     nixpkgs-lint .url = "github:nix-community/nixpkgs-lint";
-    nmt = {
-      url = "github:jooooscha/nmt";
-      flake = false;
-    };
     statix = {
       url = "github:oppiliappan/statix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -21,7 +17,6 @@
     flake-utils,
     statix,
     nixpkgs-lint,
-    nmt,
     ...
   } @ outputs: let
     overlayList = import ./overlays;
@@ -67,16 +62,8 @@
           ${statixBin} check --ignore W03 W04 ${self}
           touch $out
         '';
-        nmt-check = pkgs.stdenv.mkDerivation {
-          name = "nmt-check";
-          src = nmt;
-          buildInputs = [pkgs.nix];
-          dontBuild = true;
-          installPhase = ''
-            mkdir -p $out
-            export PATH=$PATH:${pkgs.nix}/bin
-            nix-instantiate --eval -E "(import ./tests/k8s/options.nix {})"
-          '';
+        checks.x86_64-linux.module-eval = nixpkgs.lib.nixos.evalModules {
+          modules = [./tests/k8s/default.nix];
         };
       };
     })
