@@ -8,9 +8,9 @@ pkgs: {
       inherit version;
 
       src = pkgs.fetchFromGitHub {
+        inherit rev;
         owner = "containerd";
         repo = "containerd";
-        rev = rev;
         # Replace this if needed. If you see a mismatch, copy
         # the correct SRI hash that Nix prints in the error.
         sha256 = "sha256-OHgakSNqIbXYDC7cTw2fy0HlElQMilDbSD5SSjbYJhc=";

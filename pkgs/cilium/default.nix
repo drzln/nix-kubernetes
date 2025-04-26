@@ -10,9 +10,9 @@ pkgs: {
 
       # We'll reference cilium/cilium at v1.9.9
       src = pkgs.fetchFromGitHub {
+        inherit rev;
         owner = "cilium";
         repo = "cilium";
-        rev = rev;
         sha256 = pkgs.lib.fakeSha256; # mismatch => copy correct SRI
       };
 
