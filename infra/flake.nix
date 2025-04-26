@@ -30,11 +30,8 @@
         default = dev;
         dev = pkgs.mkShell {
           buildInputs = with pkgs; [
-            kubernetes-helm
             aws-nuke
             opentofu
-            minikube
-            kubectl
             packer
             ruby
             env
