@@ -67,6 +67,9 @@
           touch $out
         '';
         colmena = pkgs.runCommand "colmena-check" {} ''
+          export NIX_STATE_DIR=$PWD/state
+          export NIX_USER_PROFILE_DIR=$PWD/profiles
+          mkdir -p $NIX_STATE_DIR $NIX_USER_PROFILE_DIR
           ${pkgs.colmena}/bin/colmena build \
             -f ${./hive.nix}
           touch $out
