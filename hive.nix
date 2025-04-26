@@ -10,8 +10,8 @@ inputs.colmena.lib.makeHive {
       pkgs,
       ...
     }: {
-      imports = [./modules/kubernetes];
-      blackmatter.components.kubernetes.enable = true;
+      imports = [./modules];
+      kubernetes.enable = true;
       networking.hostName = "master";
       system.stateVersion = "24.05";
     };
