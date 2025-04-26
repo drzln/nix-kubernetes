@@ -2,10 +2,13 @@
   description = "kubernetes";
 
   inputs = {
-    nixpkgs      .url = "github:nixos/nixpkgs/nixos-unstable";  .flake = true
-    flake-utils  .url = "github:numtide/flake-utils";           .flake = true
-    nixpkgs-lint .url = "github:nix-community/nixpkgs-lint";    .flake = true
-    nmt          .url = "github:jooooscha/nmt";                 .flake = false
+    nixpkgs      .url = "github:nixos/nixpkgs/nixos-unstable";
+    flake-utils  .url = "github:numtide/flake-utils";
+    nixpkgs-lint .url = "github:nix-community/nixpkgs-lint";
+    nmt = {
+      url = "github:jooooscha/nmt";
+      flake = false;
+    };
     statix = {
       url = "github:oppiliappan/statix";
       inputs.nixpkgs.follows = "nixpkgs";
