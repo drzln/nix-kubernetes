@@ -35,17 +35,17 @@
       in {
         packages = rec {
           inherit
-            kubelet
-            kubectl
-            kube-apiserver
-            kube-controller-manager
-            kube-scheduler
-            etcdserver
-            containerd
+            # kubelet
+            # kubectl
+            # kube-apiserver
+            # kube-controller-manager
+            # kube-scheduler
+            # etcdserver
+            # containerd
             # cilium-cli
-            etcdctl
-            etcdutl
-            etcd
+            # etcdctl
+            # etcdutl
+            # etcd
             runc
             ;
           # default = cilium-cli;
