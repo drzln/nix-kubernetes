@@ -5,7 +5,7 @@ template(:network) do
   base_tags = { product: product }
 
   resource :aws_vpc, product do
-    cidr_block '10.0.0.0/16'
+    cidr_block '10.1.0.0/16'
     enable_dns_support true
     enable_dns_hostnames true
     tags base_tags.merge(
