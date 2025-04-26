@@ -10,7 +10,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     colmena = {
-      url = "github:zhaofengli/colmena";
+      url = "github:zhaofengli/colmena?=master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
