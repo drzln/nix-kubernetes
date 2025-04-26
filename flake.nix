@@ -42,13 +42,13 @@
             kube-scheduler
             etcdserver
             containerd
-            cilium-cli
+            # cilium-cli
             etcdctl
             etcdutl
             etcd
             runc
             ;
-          default = cilium-cli;
+          # default = cilium-cli;
         };
       }
     )
