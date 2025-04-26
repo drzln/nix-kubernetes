@@ -67,10 +67,17 @@
           ${statixBin} check --ignore W03 W04 ${self}
           touch $out
         '';
-        nmt-check = pkgs.runCommand "nmt-check" {} ''
-          ${pkgs.callPackage "${nmt}/default.nix" {}}/bin/nmt exec tests/k8s/options.nix
-          touch $out
-        '';
+        nmt-check = pkgs.stdenv.mkDerivation {
+          name = "nmt-check";
+          src = nmt;
+          buildInputs = [pkgs.nix];
+          dontBuild = true;
+          installPhase = ''
+            mkdir -p $out
+            export PATH=$PATH:${pkgs.nix}/bin
+            nix-instantiate --eval -E "(import ./tests/k8s/options.nix {})"
+          '';
+        };
       };
     })
     // {
