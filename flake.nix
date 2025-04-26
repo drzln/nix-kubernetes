@@ -28,14 +28,11 @@
         etcdserver = call ./pkgs/etcd/server.nix;
         etcdctl = call ./pkgs/etcd/ctl.nix;
         etcdutl = call ./pkgs/etcd/utl.nix;
-        etcd = call ./pkgs/etcd; # meta-pkg
+        etcd = call ./pkgs/etcd;
         containerd = call ./pkgs/containerd;
         runc = call ./pkgs/runc;
-        cilium-cli = call ./pkgs/cilium-cli;
+        cilium-cli = call ./pkgs/cilium;
       in {
-        ################################################################
-        #  Expose derivations under `packages.<system>`
-        ################################################################
         packages = rec {
           inherit
             kubelet
