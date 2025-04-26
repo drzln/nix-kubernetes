@@ -4,6 +4,8 @@
   inputs = {
     nixpkgs      .url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils  .url = "github:numtide/flake-utils";
+    statix       .url = "github:srid/statix";
+    nix-d-lints  .url = "github:NixOS/nix-d-lints";
   };
 
   outputs = {
