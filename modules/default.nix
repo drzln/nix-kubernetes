@@ -6,7 +6,7 @@
   ...
 }:
 with lib; let
-  cfg = config.blackmatter.components.kubernetes;
+  cfg = config.kubernetes;
   overlay = cfg.overlay or inputs.nix-kubernetes.overlays.default;
 
   pkgs' = import inputs.nixpkgs {
