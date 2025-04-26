@@ -53,6 +53,6 @@
       }
     )
     // {
-      nixosModules.kubernetes = import ./modules/kubernetes;
+      # nixosModules.kubernetes = import ./modules/kubernetes;
     };
 }
