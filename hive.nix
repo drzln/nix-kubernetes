@@ -4,23 +4,37 @@ inputs.colmena.lib.makeHive {
     nixpkgs = import inputs.nixpkgs {system = "x86_64-linux";};
   };
 
+  defaults = {
+    config,
+    pkgs,
+    ...
+  }: {
+    # Shared things all nodes inherit (optional):
+    environment.systemPackages = with pkgs; [vim wget curl];
+    system.stateVersion = "24.05";
+  };
+
   nodes = {
-    # master = {
-    #   config,
-    #   pkgs,
-    #   ...
-    # }: {
-    #   imports = [./modules];
-    #   blackmatter.components.kubernetes.enable = true;
-    #   networking.hostName = "master";
-    #   networking.firewall.allowedTCPPorts = [6443];
-    #   system.stateVersion = "24.05";
-    #
-    #   deployment.targetHost = "192.168.1.10"; # <--- corrected
-    #   deployment.tags = ["masters"];
-    # };
+    "master" = {
+      deployment.targetHost = "192.168.1.10";
+      deployment.tags = ["masters"];
+
+      config = {
+        config,
+        pkgs,
+        ...
+      }: {
+        imports = [./modules];
+        blackmatter.components.kubernetes.enable = true;
+        networking.hostName = "master";
+        networking.firewall.allowedTCPPorts = [6443];
+      };
+    };
 
     "worker-1" = {
+      deployment.targetHost = "192.168.1.11";
+      deployment.tags = ["workers"];
+
       config = {
         config,
         pkgs,
@@ -29,23 +43,22 @@ inputs.colmena.lib.makeHive {
         imports = [./modules];
         blackmatter.components.kubernetes.enable = true;
         networking.hostName = "worker-1";
-        system.stateVersion = "24.05";
-        deployment.targetHost = "192.168.1.11";
-        deployment.tags = ["workers"];
       };
     };
-    # worker-2 = {
-    #   config,
-    #   pkgs,
-    #   ...
-    # }: {
-    #   imports = [./modules];
-    #   blackmatter.components.kubernetes.enable = true;
-    #   networking.hostName = "worker-2";
-    #   system.stateVersion = "24.05";
-    #
-    #   deployment.targetHost = "192.168.1.12"; # <--- corrected
-    #   deployment.tags = ["workers"];
-    # };
+
+    "worker-2" = {
+      deployment.targetHost = "192.168.1.12";
+      deployment.tags = ["workers"];
+
+      config = {
+        config,
+        pkgs,
+        ...
+      }: {
+        imports = [./modules];
+        blackmatter.components.kubernetes.enable = true;
+        networking.hostName = "worker-2";
+      };
+    };
   };
 }
