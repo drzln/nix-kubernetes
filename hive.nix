@@ -7,43 +7,32 @@ inputs.colmena.lib.makeHive {
     system.stateVersion = "24.05";
   };
 
-  master = {
-    deployment = {
-      targetHost = "192.168.1.10";
-      tags = ["masters"];
-    };
+  master = {pkgs, ...}: {
+    imports = [./modules];
 
-    config = {pkgs, ...}: {
-      imports = [./modules];
-      blackmatter.components.kubernetes.enable = true;
-      networking.hostName = "master";
-      networking.firewall.allowedTCPPorts = [6443];
-    };
+    blackmatter.components.kubernetes.enable = true;
+    networking.hostName = "master";
+    networking.firewall.allowedTCPPorts = [6443];
+
+    deployment.targetHost = "192.168.1.10";
+    deployment.tags = ["masters"];
   };
 
-  "worker-1" = {
-    deployment = {
-      targetHost = "192.168.1.11";
-      tags = ["workers"];
-    };
+  "worker-1" = {pkgs, ...}: {
+    imports = [./modules];
+    blackmatter.components.kubernetes.enable = true;
+    networking.hostName = "worker-1";
 
-    config = {pkgs, ...}: {
-      imports = [./modules];
-      blackmatter.components.kubernetes.enable = true;
-      networking.hostName = "worker-1";
-    };
+    deployment.targetHost = "192.168.1.11";
+    deployment.tags = ["workers"];
   };
 
-  "worker-2" = {
-    deployment = {
-      targetHost = "192.168.1.12";
-      tags = ["workers"];
-    };
+  "worker-2" = {pkgs, ...}: {
+    imports = [./modules];
+    blackmatter.components.kubernetes.enable = true;
+    networking.hostName = "worker-2";
 
-    config = {pkgs, ...}: {
-      imports = [./modules];
-      blackmatter.components.kubernetes.enable = true;
-      networking.hostName = "worker-2";
-    };
+    deployment.targetHost = "192.168.1.12";
+    deployment.tags = ["workers"];
   };
 }
