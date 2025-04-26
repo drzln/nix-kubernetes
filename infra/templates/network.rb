@@ -9,9 +9,7 @@ template(:network) do
     enable_dns_support true
     enable_dns_hostnames true
     tags base_tags.merge(
-      {
-        Name: "#{product}_vpc"
-      }
+      Name: "#{product}_vpc"
     )
   end
 
