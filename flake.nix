@@ -66,6 +66,10 @@
           ${statixBin} check --ignore W03 W04 ${self}
           touch $out
         '';
+        colmena = pkgs.runCommand "colmena-check" {} ''
+          ${pkgs.colmena}/bin/colmena build
+          touch $out
+        '';
       };
 
       devShells.default = pkgs.mkShell {
