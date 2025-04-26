@@ -9,7 +9,8 @@
     nixpkgs-lint .url = "github:nix-community/nixpkgs-lint";
     # pin statix at a tag to avoid GitHub HEAD lookup
     statix = {
-      url = "github:srid/statix/v0.6.0";
+      url = "github:oppiliappan/statix";
+
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
