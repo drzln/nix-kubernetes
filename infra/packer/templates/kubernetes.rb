@@ -74,7 +74,7 @@ packer_template = {
       type: 'amazon-ebs',
       ssh_username: 'root',
       ami_name: AMI_NAME,
-      ami_description: "A modern, secure Kubernetes AMI with CRI-O built using Packer and NixOS - Version #{BUILD_VERSION}",
+      ami_description: "nix-kubernetes images #{BUILD_VERSION}",
       region: 'us-east-1',
       source_ami: 'ami-08ee7b48673f8a214',
       instance_type: 'm5.xlarge',
