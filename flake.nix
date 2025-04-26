@@ -2,14 +2,12 @@
   description = "kubernetes";
 
   inputs = {
-    nixpkgs           .url = "github:nixos/nixpkgs/nixos-unstable";
-    flake-utils       .url = "github:numtide/flake-utils";
-    nixpkgs-lint      .url = "github:nix-community/nixpkgs-lint";
-    # statix            .url = "github:srid/statix";
+    nixpkgs      .url = "github:nixos/nixpkgs/nixos-unstable";
+    flake-utils  .url = "github:numtide/flake-utils";
+    nixpkgs-lint .url = "github:nix-community/nixpkgs-lint";
   };
 
   outputs = {
-    # statix,
     self,
     nixpkgs,
     flake-utils,
@@ -44,17 +42,14 @@
           ;
         default = pkgs.cilium-cli;
       };
+
+      lintBin = "${nixpkgs-lint.packages.${system}.nixpkgs-lint}/bin/nixpkgs-lint";
     in {
       packages = packages';
 
       checks = {
-        # statix = pkgs.runCommand "statix-check" {} ''
-        #   ${statix.defaultPackage.${system} /bin/statix} check ${self}
-        #   touch $out
-        # '';
-
         nixpkgs-lint = pkgs.runCommand "nixpkgs-lint-check" {} ''
-          ${nixpkgs-lint.defaultPackage.${system} /bin/nixpkgs-lint} ${self}
+          ${lintBin} ${self}
           touch $out
         '';
       };
