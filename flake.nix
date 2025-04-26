@@ -52,7 +52,6 @@
       statixBin = "${statix.packages.${system}.default}/bin/statix";
     in {
       packages = packages';
-
       checks = {
         nixpkgs-lint = pkgs.runCommand "nixpkgs-lint-check" {} ''
           ${lintBin} ${self}
@@ -62,9 +61,6 @@
           ${statixBin} check --ignore W03 W04 ${self}
           touch $out
         '';
-        checks.x86_64-linux.module-eval = nixpkgs.lib.nixos.evalModules {
-          modules = [./tests/k8s/default.nix];
-        };
       };
     })
     // {

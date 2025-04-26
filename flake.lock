@@ -131,28 +131,11 @@
         "type": "github"
       }
     },
-    "nmt": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1709382952,
-        "narHash": "sha256-n/BvuWVcQxaXCU30feNRqWWqabhIIO2+tRFnhLIhjiQ=",
-        "owner": "jooooscha",
-        "repo": "nmt",
-        "rev": "86a09994d1007c39a1f4d386e3caea9b4681d9d6",
-        "type": "github"
-      },
-      "original": {
-        "owner": "jooooscha",
-        "repo": "nmt",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
         "nixpkgs-lint": "nixpkgs-lint",
-        "nmt": "nmt",
         "statix": "statix"
       }
     },
