@@ -105,24 +105,29 @@ rescue StandardError
   probe_ssh(ip, user, key)
 end
 
-asg_names.each do |name|
-  log "Processing ASG #{name}"
-  ensure_asg_exists(asg, name) or abort! "ASG #{name} not found in AWS"
-  log "Scaling #{name} → 1"
-  scale_asg(asg, name, 1)
+begin
+  asg_names.each do |name|
+    log "Scaling #{name} → 1"
+    scale_asg(asg, name, 1)
 
-  log 'Waiting for instance…'
-  sleep 20
+    log 'Waiting for instance…'
+    inst_id, ip = wait_for_instance(asg, ec2, name, opts[:wait])
+    log "Instance #{inst_id} ready at #{ip}"
 
-  inst_id, ip = wait_for_instance(asg, ec2, name, opts[:wait])
-  log "Instance #{inst_id} ready at #{ip}"
-
-  log 'Probing SSH…'
-  if (host = probe_ssh(ip, opts[:user], opts[:key]))
+    log 'Probing SSH…'
+    host = probe_ssh(ip, opts[:user], opts[:key]) or abort! "SSH failed to #{ip}"
     log "SSH OK: #{host}"
-  else
-    abort! "SSH failed to #{ip}"
   end
-end
 
-log 'All done – every ASG scaled to 1 and reachable via SSH'
+  log 'All ASGs verified via SSH'
+ensure
+  asg_names.each do |name|
+    log "Tearing down – scaling #{name} → 0"
+    begin
+      scale_asg(asg, name, 0)
+    rescue Aws::Errors::ServiceError => e
+      log "Could not scale #{name} down: #{e.message}"
+    end
+  end
+  log 'Cleanup complete (desired_capacity=0 for all ASGs)'
+end
