@@ -44,6 +44,7 @@ Gem::Specification.new do |spec|
     aws-sdk-s3
     tty-progressbar
     aws-sdk-dynamodb
+    aws-sdk-autoscaling
     abstract-synthesizer
     terraform-synthesizer
   ].each do |dep|
