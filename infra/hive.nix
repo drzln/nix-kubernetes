@@ -27,6 +27,8 @@ inputs.colmena.lib.makeHive {
     services.cloud-init.enable = true;
     services.cloud-init.network.enable = true;
     services.amazon-ec2-agent.enable = true;
+    services.openssh.enable = true;
+    services.openssh.settings.PermitRootLogin = "prohibit-password";
     blackmatter.components.kubernetes = {
       enable = true;
       role = "master";
@@ -54,6 +56,8 @@ inputs.colmena.lib.makeHive {
     services.cloud-init.enable = true;
     services.cloud-init.network.enable = true;
     services.amazon-ec2-agent.enable = true;
+    services.openssh.enable = true;
+    services.openssh.settings.PermitRootLogin = "prohibit-password";
     blackmatter.components.kubernetes = {
       enable = true;
       role = "master";
@@ -81,6 +85,8 @@ inputs.colmena.lib.makeHive {
     services.cloud-init.enable = true;
     services.cloud-init.network.enable = true;
     services.amazon-ec2-agent.enable = true;
+    services.openssh.enable = true;
+    services.openssh.settings.PermitRootLogin = "prohibit-password";
     blackmatter.components.kubernetes = {
       enable = true;
       role = "worker-1";
@@ -111,6 +117,8 @@ inputs.colmena.lib.makeHive {
     services.cloud-init.enable = true;
     services.cloud-init.network.enable = true;
     services.amazon-ec2-agent.enable = true;
+    services.openssh.enable = true;
+    services.openssh.settings.PermitRootLogin = "prohibit-password";
     blackmatter.components.kubernetes = {
       enable = true;
       role = "worker-2";
