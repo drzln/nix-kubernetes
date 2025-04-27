@@ -3,4 +3,6 @@
 
 require 'json'
 
-puts JSON.pretty_generate(JSON[`pangea show templates/network.rb`])
+puts JSON.pretty_generate(
+  JSON[`pangea show templates/network.rb`]
+)
