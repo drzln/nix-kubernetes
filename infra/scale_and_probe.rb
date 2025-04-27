@@ -129,7 +129,7 @@ begin
     probe_ssh(ip: ip, key_path: opts[:key], wait: opts[:wait])
   end
   log 'All ASGs reachable via SSH ✔'
-  system('rm -rf dyanamic-nodes.nix')
+  system('rm -rf dynamic-nodes.nix')
   system('colmena build')
   system('ruby fetch_ips.rb')
   sleep 20
@@ -143,5 +143,6 @@ ensure
       log("Could not scale #{name}: #{$ERROR_INFO}")
     end
   end
+  system 'rm -rf dynamic-nodes.nix'
   log 'Cleanup complete'
 end
