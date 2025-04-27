@@ -36,7 +36,7 @@ template(:network) do
     description 'Security group for kubernetes testing'
     tags base_tags.merge(Name: "#{product}_sg")
   end
-  sg_ref = "#{product}_sg"
+  sg_ref = "${aws_security_group.#{product}_sg.id}"
 
   # Security Group Rules - Separate Resources
 
