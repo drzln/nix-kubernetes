@@ -103,13 +103,13 @@ begin
 
 # ─── always scale back to zero ───────────────────────────────
 ensure
-  # asg_names.each do |name|
-  #   log "Tearing down – scaling #{name} → 0"
-  #   begin
-  #     scale_asg(asg, name, 0)
-  #   rescue Aws::Errors::ServiceError => e
-  #     log "Could not scale #{name} down: #{e.message}"
-  #   end
-  # end
+  asg_names.each do |name|
+    log "Tearing down – scaling #{name} → 0"
+    begin
+      scale_asg(asg, name, 0)
+    rescue Aws::Errors::ServiceError => e
+      log "Could not scale #{name} down: #{e.message}"
+    end
+  end
   log 'Cleanup complete (desired_capacity = 0 for all ASGs)'
 end
