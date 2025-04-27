@@ -1,32 +1,55 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# ─────────────────────────────────────────────────────────────
-# scale_and_probe.rb
-#
-# * Renders a Terraform-style plan straight from:
-#       pangea show templates/network.rb
-# * Detects all aws_autoscaling_group resources
-# * Scales each ASG → 1, waits for a public IP, SSH-checks as root
-# * Runs the colmena pipeline (build → fetch_ips → apply)
-# * ALWAYS scales every ASG back to zero (even on failure)
-# ─────────────────────────────────────────────────────────────
-
 require 'json'
 require 'optparse'
+require 'time'
 require 'aws-sdk-autoscaling'
 require 'aws-sdk-ec2'
 require 'net/ssh'
-require 'time'
+require 'English' # ← gives us $CHILD_STATUS
 
-# ─── helpers ─────────────────────────────────────────────────
-def log(msg) = warn("[#{Time.now.iso8601}] #{msg}")
+# ─── helpers ──────────────────────────────────────────────────────────
+def log(msg) = warn "[#{Time.now.iso8601}] #{msg}"
+def abort!(msg) = log("ERROR: #{msg}")
+exit 1
 
-def abort!(msg)
-  log("ERROR: #{msg}")
-  exit 1
-end
+DEFAULT_KEY = File.expand_path(
+  "#{ENV.fetch('HOME', nil)}/.ssh/id_rsa"
+).freeze
+DEFAULT_WAIT  = 300
+PLAN_COMMAND  = 'pangea show templates/network.rb'
 
+# ─── CLI ──────────────────────────────────────────────────────────────
+opts = {
+  key: DEFAULT_KEY,
+  wait: DEFAULT_WAIT,
+  region: ENV.fetch('AWS_REGION', 'us-east-1')
+}
+OptionParser.new do |o|
+  o.banner = 'Usage: ruby scale_and_probe.rb [OPTIONS]'
+  o.on('-k', '--ssh-key PATH') { |v| opts[:key] = v }
+  o.on('-w', '--wait SECS', Integer) { |v| opts[:wait] = v }
+  o.on('-r', '--region NAME') { |v| opts[:region] = v }
+end.parse!
+
+abort! "SSH key #{opts[:key]} not readable" unless File.readable?(opts[:key])
+
+# ─── render plan JSON ─────────────────────────────────────────────────
+plan_json = `#{PLAN_COMMAND}`
+abort! "Command “#{PLAN_COMMAND}” failed" unless $CHILD_STATUS&.success?
+
+plan       = JSON.parse(plan_json, symbolize_names: true)
+asg_defs   = plan.dig(:resource, :aws_autoscaling_group) || {}
+asg_names  = asg_defs.keys
+abort! 'No aws_autoscaling_group resources found' if asg_names.empty?
+log "ASGs: #{asg_names.join(', ')}"
+
+# ─── AWS clients ─────────────────────────────────────────────────────
+asg  = Aws::AutoScaling::Client.new(region: opts[:region])
+ec2  = Aws::EC2::Client.new(region: opts[:region])
+
+# ─── functions ───────────────────────────────────────────────────────
 def scale_asg(client, name, size)
   client.update_auto_scaling_group(
     auto_scaling_group_name: name,
@@ -36,119 +59,80 @@ def scale_asg(client, name, size)
   )
 end
 
-def wait_for_instance(asg_client, ec2_client, group_name, timeout)
+def wait_for_instance(asg_c, ec2_c, name, timeout)
   deadline = Time.now + timeout
   loop do
-    asg = asg_client.describe_auto_scaling_groups(
-      auto_scaling_group_names: [group_name]
+    grp = asg_c.describe_auto_scaling_groups(
+      auto_scaling_group_names: [name]
     ).auto_scaling_groups.first
 
-    instance_id = asg.instances.find { |i| i.lifecycle_state == 'InService' }&.instance_id
-    if instance_id
-      info = ec2_client.describe_instances(instance_ids: [instance_id])
-                       .reservations[0].instances[0]
-      ip   = info.public_ip_address
-      return [instance_id, ip] if ip
+    inst_id = grp.instances.find { |i| i.lifecycle_state == 'InService' }&.instance_id
+    if inst_id
+      inst = ec2_c.describe_instances(instance_ids: [inst_id])
+                  .reservations[0].instances[0]
+      ip   = inst.public_ip_address
+      return [inst_id, ip] if ip
     end
-
-    raise 'timeout waiting for public IP' if Time.now >= deadline
+    raise Timeout::Error if Time.now >= deadline
 
     sleep 5
   end
 end
 
-def probe_ssh(ip:, key_path:, max_wait:)
-  deadline   = Time.now + max_wait
-  backoff    = 5
-  last_error = nil
-
+def probe_ssh(ip:, key_path:, wait:)
+  deadline = Time.now + wait
+  backoff  = 5
+  last_err = nil
   loop do
-    begin
-      hostname = Net::SSH.start(
-        ip, 'root',
-        keys: [File.expand_path(key_path)],
-        non_interactive: true,
-        verify_host_key: :never, # disable StrictHostKeyChecking
-        auth_methods: %w[publickey],
-        timeout: 10
-      ) { |ssh| ssh.exec!('hostname').strip }
+    host = Net::SSH.start(
+      ip, 'root',
+      keys: [key_path],
+      keys_only: true,
+      use_agent: false,
+      non_interactive: true,
+      verify_host_key: :never,
+      auth_methods: %w[publickey],
+      timeout: 10
+    ) { |ssh| ssh.exec!('hostname').strip }
+    log "SSH OK -> #{host.inspect}"
+    return host
+  rescue Net::SSH::AuthenticationFailed,
+         Net::SSH::Disconnect,
+         Net::SSH::ConnectionTimeout,
+         Errno::ECONNREFUSED,
+         Errno::ETIMEDOUT,
+         SocketError => e
+    last_err = e
+    secs_left = (deadline - Time.now).ceil
+    raise last_err if secs_left <= 0
 
-      log "SSH OK (root@#{ip}) → hostname=#{hostname}"
-      return hostname
-    rescue Net::SSH::AuthenticationFailed,
-           Net::SSH::Disconnect,
-           Net::SSH::ConnectionTimeout,
-           Errno::ETIMEDOUT,
-           Errno::ECONNREFUSED, # ← new: connection refused
-           SocketError => e
-      last_error = e
-      remaining  = (deadline - Time.now).to_i
-      log "SSH not ready (#{e.class}: #{e.message}) – " \
-          "retrying in #{backoff}s (#{remaining}s left)"
-    end
-
-    raise last_error if Time.now >= deadline
-
+    log "SSH not ready (#{e.class}) – retrying in #{backoff}s (#{secs_left}s left)"
     sleep backoff
-    backoff = [backoff * 1.5, 30].min # exponential backoff up to 30 s
+    backoff = [(backoff * 1.5).ceil, 30].min
   end
 end
 
-# ─── CLI options ─────────────────────────────────────────────
-opts = { key: '~/.ssh/id_rsa', wait: 300 }
-OptionParser.new do |o|
-  o.banner = 'Usage: scale_and_probe.rb --ssh-key KEYFILE [--wait SECONDS]'
-  o.on('-k', '--ssh-key PATH', 'Private key for root SSH') { |v| opts[:key] = v }
-  o.on('-w', '--wait SECONDS', Integer,
-       'Max seconds to wait for each EC2 instance (default 300)') { |v| opts[:wait] = v }
-end.parse!
-
-abort!('Private key file not found or unreadable') unless File.readable?(File.expand_path(opts[:key]))
-
-# ─── Get plan JSON directly from Pangea ─────────────────────
-plan_json = `pangea show templates/network.rb`
-abort!('pangea show produced no output') if plan_json.empty?
-
-plan      = JSON.parse(plan_json, symbolize_names: true)
-asg_defs  = plan.dig(:resource, :aws_autoscaling_group) || {}
-asg_names = asg_defs.keys
-abort!('No aws_autoscaling_group resources found') if asg_names.empty?
-log "Autoscaling groups: #{asg_names.join(', ')}"
-
-# ─── AWS clients ─────────────────────────────────────────────
-region      = ENV.fetch('AWS_REGION', 'us-east-1')
-asg_client  = Aws::AutoScaling::Client.new(region: region)
-ec2_client  = Aws::EC2::Client.new(region: region)
-
-# ─── Main workflow ───────────────────────────────────────────
+# ─── main workflow ───────────────────────────────────────────────────
 begin
   asg_names.each do |name|
     log "Scaling #{name} → 1"
-    scale_asg(asg_client, name, 1)
+    scale_asg(asg, name, 1)
 
-    log 'Waiting for running instance with public IP…'
-    instance_id, public_ip = wait_for_instance(asg_client, ec2_client, name, opts[:wait])
-    log "Instance #{instance_id} available at #{public_ip}"
+    log 'Waiting for instance…'
+    inst_id, ip = wait_for_instance(asg, ec2, name, opts[:wait])
+    log "Instance #{inst_id} @ #{ip}"
 
-    log 'Probing SSH as root…'
-    probe_ssh(ip: public_ip, key_path: opts[:key], max_wait: opts[:wait])
+    probe_ssh(ip: ip, key_path: opts[:key], wait: opts[:wait])
   end
-
-  log 'All ASGs verified via SSH – running colmena pipeline'
-  system('colmena build') || abort!('colmena build failed')
-  system('rm -f dynamic-nodes.nix')
-  system('ruby fetch_ips.rb')    || abort!('fetch_ips.rb failed')
-  system('colmena apply')        || abort!('colmena apply failed')
-
-# ─── Always scale back to 0 ─────────────────────────────────
+  log 'All ASGs reachable via SSH ✔'
 ensure
   asg_names.each do |name|
     log "Scaling #{name} back to 0"
     begin
-      scale_asg(asg_client, name, 0)
-    rescue Aws::Errors::ServiceError => e
-      log "Failed to scale #{name}: #{e.message}"
+      scale_asg(asg, name, 0)
+    rescue StandardError
+      log("Could not scale #{name}: #{$ERROR_INFO}")
     end
   end
-  log 'Cleanup complete – desired_capacity = 0 for all ASGs'
+  log 'Cleanup complete'
 end
