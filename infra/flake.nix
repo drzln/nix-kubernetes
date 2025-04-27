@@ -37,8 +37,8 @@
             env
           ];
           shellHook = ''
-            export AWS_REGION=us-east-1
             export PANGEA_NAMESPACE=pleme
+            export AWS_REGION=us-east-1
             export AWS_PROFILE=pleme
             export PATH=$PATH:bin
           '';
