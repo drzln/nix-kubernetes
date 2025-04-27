@@ -92,7 +92,7 @@ def wait_for_instance(asg_client, ec2_client, group, timeout)
     sleep 5
   end
 rescue StandardError
-  nil
+  wait_for_instance(asg_client, ec2_client, group, timeout)
 end
 
 def probe_ssh(ip, user, key)
