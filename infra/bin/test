@@ -66,25 +66,50 @@ def wait_for_instance(asg, ec2, group_name, timeout)
   end
 end
 
-def probe_ssh(host_ip, ssh_user, ssh_key_path)
-  Net::SSH.start(
-    host_ip,
-    ssh_user,
-    keys: [File.expand_path(ssh_key_path)],
-    non_interactive: true,
-    timeout: 10
-  ) do |ssh_session|
-    puts "trying #{ssh_session}"
-    return ssh_session.exec!('hostname').strip
-  end
-rescue Net::SSH::AuthenticationFailed,
-       Net::SSH::ConnectionTimeout,
-       Errno::ETIMEDOUT,
-       Errno::ECONNREFUSED
-  sleep 1
-  probe_ssh(host_ip, ssh_user, ssh_key_path)
-end
+DEFAULT_USERS = %w[ec2-user ubuntu nixos root].freeze
 
+def probe_ssh(ip, key_path:, users: DEFAULT_USERS, max_wait: 300)
+  deadline   = Time.now + max_wait
+  backoff    = 5 # first sleep in seconds
+  last_error = nil
+  attempt    = 0
+
+  loop do
+    users.each do |user|
+      attempt += 1
+      log "SSH-probe ##{attempt} → #{user}@#{ip} (timeout in #{(deadline - Time.now).to_i}s)"
+      begin
+        host = Net::SSH.start(
+          ip, user,
+          keys: [File.expand_path(key_path)],
+          non_interactive: true,
+          verify_host_key: :never, # ← no StrictHostKeyChecking
+          auth_methods: %w[publickey],
+          timeout: 10
+        ) { |ssh| ssh.exec!('hostname').strip }
+
+        log "SSH OK (#{user}@#{ip}) → host=#{host.inspect}"
+        return host
+      rescue Net::SSH::AuthenticationFailed => e
+        log "Auth failed for #{user}@#{ip} (#{e.message})"
+        last_error = e
+      rescue Net::SSH::ConnectionTimeout,
+             Net::SSH::Disconnect,
+             Errno::ETIMEDOUT,
+             SocketError => e
+        log "SSH not ready yet: #{e.class} – will retry"
+        last_error = e
+      end
+    end
+
+    break if Time.now >= deadline
+
+    sleep backoff
+    backoff = [backoff * 1.5, 30].min # exponential up to 30 s
+  end
+
+  raise(last_error || "SSH timeout – #{ip} unreachable after #{max_wait}s")
+end
 # ─── main workflow ───────────────────────────────────────────
 begin
   asg_names.each do |name|
@@ -107,13 +132,13 @@ begin
 
 # ─── always scale back to zero ───────────────────────────────
 ensure
-  asg_names.each do |name|
-    log "Tearing down – scaling #{name} → 0"
-    begin
-      scale_asg(asg, name, 0)
-    rescue Aws::Errors::ServiceError => e
-      log "Could not scale #{name} down: #{e.message}"
-    end
-  end
+  # asg_names.each do |name|
+  #   log "Tearing down – scaling #{name} → 0"
+  #   begin
+  #     scale_asg(asg, name, 0)
+  #   rescue Aws::Errors::ServiceError => e
+  #     log "Could not scale #{name} down: #{e.message}"
+  #   end
+  # end
   log 'Cleanup complete (desired_capacity = 0 for all ASGs)'
 end
