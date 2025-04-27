@@ -47,7 +47,8 @@ end.parse!
 
 # ─── load plan & extract ASG names ───────────────────────────
 plan = JSON[`pangea show templates/network.rb`, symbolize_names: true]
-asg_defs = plan.dig('resource', 'aws_autoscaling_group') || {}
+puts JSON.pretty_generate(plan)
+asg_defs = plan.dig(:resource, :aws_autoscaling_group) || {}
 asg_names = asg_defs.keys
 abort! 'No autoscaling groups in plan' if asg_names.empty?
 log "Found ASGs in plan: #{asg_names.join(', ')}"
