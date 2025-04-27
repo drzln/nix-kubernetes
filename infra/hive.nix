@@ -23,7 +23,7 @@ inputs.colmena.lib.makeHive {
     testOverlay,
     ...
   }: {
-    imports = [../modules];
+    imports = [../../modules];
     blackmatter.components.kubernetes = {
       enable = true;
       role = "master";
