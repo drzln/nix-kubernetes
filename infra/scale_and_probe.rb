@@ -131,15 +131,16 @@ begin
   system('rm -rf dyanamic-nodes.nix')
   system('colmena build')
   system('ruby fetch_ips.rb')
-  # system('colmena apply')
+  sleep 20
+  system('colmena apply')
 ensure
-  # asg_names.each do |name|
-  #   log "Scaling #{name} back to 0"
-  #   begin
-  #     scale_asg(asg, name, 0)
-  #   rescue StandardError
-  #     log("Could not scale #{name}: #{$ERROR_INFO}")
-  #   end
-  # end
+  asg_names.each do |name|
+    log "Scaling #{name} back to 0"
+    begin
+      scale_asg(asg, name, 0)
+    rescue StandardError
+      log("Could not scale #{name}: #{$ERROR_INFO}")
+    end
+  end
   log 'Cleanup complete'
 end
