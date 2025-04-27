@@ -11,8 +11,11 @@ require 'English' # ← gives us $CHILD_STATUS
 
 # ─── helpers ──────────────────────────────────────────────────────────
 def log(msg) = warn "[#{Time.now.iso8601}] #{msg}"
-def abort!(msg) = log("ERROR: #{msg}")
-exit 1
+
+def abort!(m)
+  log("ERROR: #{m}")
+  exit 1
+end
 
 DEFAULT_KEY = File.expand_path(
   "#{ENV.fetch('HOME', nil)}/.ssh/id_rsa"
