@@ -128,6 +128,10 @@ begin
     probe_ssh(ip: ip, key_path: opts[:key], wait: opts[:wait])
   end
   log 'All ASGs reachable via SSH ✔'
+  system('rm -rf dyanamic-nodes.nix')
+  system('colmena build')
+  system('ruby fetch_ips.rb')
+  system('colmena apply')
 ensure
   asg_names.each do |name|
     log "Scaling #{name} back to 0"
