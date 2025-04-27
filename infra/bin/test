@@ -101,7 +101,8 @@ def probe_ssh(ip, user, key)
     ssh.exec!('hostname').strip
   end
 rescue StandardError
-  nil
+  sleep 5
+  probe_ssh(ip, user, key)
 end
 
 asg_names.each do |name|
