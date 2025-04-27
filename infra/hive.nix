@@ -24,7 +24,7 @@ inputs.colmena.lib.makeHive {
     ...
   }: {
     imports = [inputs.self.nixosModules.kubernetes];
-    services.cloud-init.enable = true;
+    services.cloud-init.enable = false;
     services.cloud-init.network.enable = true;
     # services.amazon-ec2-agent.enable = true;
     services.amazon-ssm-agent.enable = true;
@@ -54,7 +54,7 @@ inputs.colmena.lib.makeHive {
     ...
   }: {
     imports = [inputs.self.nixosModules.kubernetes];
-    services.cloud-init.enable = true;
+    services.cloud-init.enable = false;
     services.cloud-init.network.enable = true;
     # services.amazon-ec2-agent.enable = true;
     services.amazon-ssm-agent.enable = true;
@@ -84,7 +84,7 @@ inputs.colmena.lib.makeHive {
     ...
   }: {
     imports = [inputs.self.nixosModules.kubernetes];
-    services.cloud-init.enable = true;
+    services.cloud-init.enable = false;
     services.cloud-init.network.enable = true;
     # services.amazon-ec2-agent.enable = true;
     services.amazon-ssm-agent.enable = true;
@@ -117,7 +117,7 @@ inputs.colmena.lib.makeHive {
     ...
   }: {
     imports = [inputs.self.nixosModules.kubernetes];
-    services.cloud-init.enable = true;
+    services.cloud-init.enable = false;
     services.cloud-init.network.enable = true;
     services.amazon-ssm-agent.enable = true;
     # services.amazon-ec2-agent.enable = true;
