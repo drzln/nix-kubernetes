@@ -52,6 +52,7 @@
       };
     })
     // {
+      nixosModules.kubernetes = ../modules;
       colmenaHive = import ./hive.nix {inherit inputs;};
     };
 }
