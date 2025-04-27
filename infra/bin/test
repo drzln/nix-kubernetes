@@ -46,7 +46,7 @@ OptionParser.new do |o|
 end.parse!
 
 # ─── load plan & extract ASG names ───────────────────────────
-plan = JSON.parse(File.read(opts[:plan]))
+plan = JSON[`pangea show templates/network.rb`, symbolize_names: true]
 asg_defs = plan.dig('resource', 'aws_autoscaling_group') || {}
 asg_names = asg_defs.keys
 abort! 'No autoscaling groups in plan' if asg_names.empty?
