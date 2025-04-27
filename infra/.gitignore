@@ -1,4 +1,3 @@
-dynamic-nodes.nix
 # never send nix package results
 result
 
