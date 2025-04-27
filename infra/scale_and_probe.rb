@@ -4,15 +4,12 @@
 # ─────────────────────────────────────────────────────────────
 # scale_and_probe.rb
 #
-# • Reads the rendered Terraform-style JSON produced by
-#     pangea show templates/network.rb
-# • Finds every aws_autoscaling_group
-# • Scales each group to *one* instance
-# • Waits until an instance is InService and has a public IP
-# • Logs-in as **root** using the _single_ key you pass with --ssh-key
-# • Runs `hostname` to prove SSH works
-# • Executes:   colmena build  →  ruby fetch_ips.rb  →  colmena apply
-# • Ensures **all** ASGs are scaled back to zero, even on failure
+# * Renders a Terraform-style plan straight from:
+#       pangea show templates/network.rb
+# * Detects all aws_autoscaling_group resources
+# * Scales each ASG → 1, waits for a public IP, SSH-checks as root
+# * Runs the colmena pipeline (build → fetch_ips → apply)
+# * ALWAYS scales every ASG back to zero (even on failure)
 # ─────────────────────────────────────────────────────────────
 
 require 'json'
@@ -30,8 +27,8 @@ def abort!(msg)
   exit 1
 end
 
-def scale_asg(asg_client, name, size)
-  asg_client.update_auto_scaling_group(
+def scale_asg(client, name, size)
+  client.update_auto_scaling_group(
     auto_scaling_group_name: name,
     min_size: size,
     max_size: size,
@@ -42,20 +39,19 @@ end
 def wait_for_instance(asg_client, ec2_client, group_name, timeout)
   deadline = Time.now + timeout
   loop do
-    # ask the ASG about its instances
     asg = asg_client.describe_auto_scaling_groups(
       auto_scaling_group_names: [group_name]
     ).auto_scaling_groups.first
 
     instance_id = asg.instances.find { |i| i.lifecycle_state == 'InService' }&.instance_id
     if instance_id
-      ec2  = ec2_client.describe_instances(instance_ids: [instance_id])
-      inst = ec2.reservations[0].instances[0]
-      ip   = inst.public_ip_address
+      info = ec2_client.describe_instances(instance_ids: [instance_id])
+                       .reservations[0].instances[0]
+      ip   = info.public_ip_address
       return [instance_id, ip] if ip
     end
 
-    raise 'timeout waiting for EC2 public IP' if Time.now >= deadline
+    raise 'timeout waiting for public IP' if Time.now >= deadline
 
     sleep 5
   end
@@ -65,13 +61,14 @@ def probe_ssh(ip:, key_path:, max_wait:)
   deadline   = Time.now + max_wait
   backoff    = 5
   last_error = nil
+
   loop do
     begin
       hostname = Net::SSH.start(
         ip, 'root',
         keys: [File.expand_path(key_path)],
         non_interactive: true,
-        verify_host_key: :never, # disables StrictHostKeyChecking
+        verify_host_key: :never, # disable StrictHostKeyChecking
         auth_methods: %w[publickey],
         timeout: 10
       ) { |ssh| ssh.exec!('hostname').strip }
@@ -82,45 +79,46 @@ def probe_ssh(ip:, key_path:, max_wait:)
            Net::SSH::Disconnect,
            Net::SSH::ConnectionTimeout,
            Errno::ETIMEDOUT,
+           Errno::ECONNREFUSED, # ← new: connection refused
            SocketError => e
       last_error = e
-      log "SSH not ready (#{e.class}: #{e.message}) – retrying in #{backoff}s"
+      remaining  = (deadline - Time.now).to_i
+      log "SSH not ready (#{e.class}: #{e.message}) – " \
+          "retrying in #{backoff}s (#{remaining}s left)"
     end
+
     raise last_error if Time.now >= deadline
 
     sleep backoff
-    backoff = [backoff * 1.5, 30].min
+    backoff = [backoff * 1.5, 30].min # exponential backoff up to 30 s
   end
 end
 
 # ─── CLI options ─────────────────────────────────────────────
-opts = {
-  key: '~/.ssh/id_rsa',
-  wait: 300
-}
+opts = { key: '~/.ssh/id_rsa', wait: 300 }
 OptionParser.new do |o|
   o.banner = 'Usage: scale_and_probe.rb --ssh-key KEYFILE [--wait SECONDS]'
-  o.on('-k', '--ssh-key PATH', 'Private key used for root SSH') { |v| opts[:key] = v }
+  o.on('-k', '--ssh-key PATH', 'Private key for root SSH') { |v| opts[:key] = v }
   o.on('-w', '--wait SECONDS', Integer,
-       'Maximum seconds to wait for an EC2 instance (default 300)') { |v| opts[:wait] = v }
+       'Max seconds to wait for each EC2 instance (default 300)') { |v| opts[:wait] = v }
 end.parse!
 
-abort!('Private key file not found') unless File.readable?(File.expand_path(opts[:key]))
+abort!('Private key file not found or unreadable') unless File.readable?(File.expand_path(opts[:key]))
 
-# ─── Obtain plan JSON directly from `pangea show …` ──────────
+# ─── Get plan JSON directly from Pangea ─────────────────────
 plan_json = `pangea show templates/network.rb`
-abort! 'pangea show failed or returned empty output' if plan_json.empty?
+abort!('pangea show produced no output') if plan_json.empty?
 
 plan      = JSON.parse(plan_json, symbolize_names: true)
 asg_defs  = plan.dig(:resource, :aws_autoscaling_group) || {}
 asg_names = asg_defs.keys
-abort! 'No autoscaling groups found in plan output' if asg_names.empty?
-log "Autoscaling groups found: #{asg_names.join(', ')}"
+abort!('No aws_autoscaling_group resources found') if asg_names.empty?
+log "Autoscaling groups: #{asg_names.join(', ')}"
 
 # ─── AWS clients ─────────────────────────────────────────────
-region = ENV.fetch('AWS_REGION', 'us-east-1')
-asg_client = Aws::AutoScaling::Client.new(region: region)
-ec2_client = Aws::EC2::Client.new(region: region)
+region      = ENV.fetch('AWS_REGION', 'us-east-1')
+asg_client  = Aws::AutoScaling::Client.new(region: region)
+ec2_client  = Aws::EC2::Client.new(region: region)
 
 # ─── Main workflow ───────────────────────────────────────────
 begin
@@ -128,21 +126,21 @@ begin
     log "Scaling #{name} → 1"
     scale_asg(asg_client, name, 1)
 
-    log 'Waiting for instance to become InService + public IP…'
+    log 'Waiting for running instance with public IP…'
     instance_id, public_ip = wait_for_instance(asg_client, ec2_client, name, opts[:wait])
-    log "Instance #{instance_id} ready at #{public_ip}"
+    log "Instance #{instance_id} available at #{public_ip}"
 
-    log 'Establishing SSH as root…'
+    log 'Probing SSH as root…'
     probe_ssh(ip: public_ip, key_path: opts[:key], max_wait: opts[:wait])
   end
 
-  log 'All ASGs validated via SSH – running colmena pipeline'
+  log 'All ASGs verified via SSH – running colmena pipeline'
   system('colmena build') || abort!('colmena build failed')
   system('rm -f dynamic-nodes.nix')
   system('ruby fetch_ips.rb')    || abort!('fetch_ips.rb failed')
   system('colmena apply')        || abort!('colmena apply failed')
 
-# ─── Always scale back to zero ───────────────────────────────
+# ─── Always scale back to 0 ─────────────────────────────────
 ensure
   asg_names.each do |name|
     log "Scaling #{name} back to 0"
@@ -152,5 +150,5 @@ ensure
       log "Failed to scale #{name}: #{e.message}"
     end
   end
-  log 'Cleanup complete – all ASGs set to desired_capacity = 0'
+  log 'Cleanup complete – desired_capacity = 0 for all ASGs'
 end
