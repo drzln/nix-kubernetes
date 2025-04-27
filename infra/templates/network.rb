@@ -38,6 +38,15 @@ template(:network) do
   end
   sg_ref = "${aws_security_group.#{product}_sg.id}"
 
+  resource :aws_security_group_rule, "#{product}_sg" do
+    security_group_id lb_sg_ref
+    type :ingress
+    from_port 22
+    to_port 22
+    protocol :tcp
+    cidr_blocks ['0.0.0.0/0']
+  end
+
   # Security Group Rules - Separate Resources
 
   ## Load Balancer: Allow HTTP/HTTPS from the internet
