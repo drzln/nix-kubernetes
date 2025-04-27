@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
     rexml
     pangea
     bundler
+    ed25519
     toml-rb
     net-ssh
     tty-box
@@ -44,6 +45,7 @@ Gem::Specification.new do |spec|
     tty-option
     aws-sdk-s3
     aws-sdk-ec2
+    bcrypt_pbkdf
     tty-progressbar
     aws-sdk-dynamodb
     aws-sdk-autoscaling

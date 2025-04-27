@@ -126,6 +126,16 @@
     };
     version = "0.2.0";
   };
+  bcrypt_pbkdf = {
+    groups = ["default"];
+    platforms = [];
+    source = {
+      remotes = ["https://rubygems.org"];
+      sha256 = "04rb3rp9bdxn1y3qiflfpj7ccwb8ghrfbydh5vfz1l9px3fpg41g";
+      type = "gem";
+    };
+    version = "1.1.1";
+  };
   bigdecimal = {
     groups = ["default"];
     platforms = [];
@@ -187,8 +197,18 @@
     };
     version = "1.6.1";
   };
+  ed25519 = {
+    groups = ["default"];
+    platforms = [];
+    source = {
+      remotes = ["https://rubygems.org"];
+      sha256 = "0zb2dr2ihb1qiknn5iaj1ha1w9p7lj9yq5waasndlfadz225ajji";
+      type = "gem";
+    };
+    version = "1.3.0";
+  };
   infra = {
-    dependencies = ["abstract-synthesizer" "aws-sdk-autoscaling" "aws-sdk-dynamodb" "aws-sdk-ec2" "aws-sdk-s3" "net-ssh" "pangea" "rexml" "terraform-synthesizer" "toml-rb" "tty-box" "tty-color" "tty-option" "tty-progressbar" "tty-table"];
+    dependencies = ["abstract-synthesizer" "aws-sdk-autoscaling" "aws-sdk-dynamodb" "aws-sdk-ec2" "aws-sdk-s3" "bcrypt_pbkdf" "ed25519" "net-ssh" "pangea" "rexml" "terraform-synthesizer" "toml-rb" "tty-box" "tty-color" "tty-option" "tty-progressbar" "tty-table"];
     groups = ["default"];
     platforms = [];
     source = {
