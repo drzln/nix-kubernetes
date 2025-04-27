@@ -31,6 +31,8 @@ template(:network) do
     tags base_tags.merge(Name: "#{product}_public_subnet")
   end
 
+  web_subnet_ref = "${aws_subnet.#{product}_public_subnet.id}"
+
   resource :aws_route_table, "#{product}_public_rt" do
     vpc_id vpc_id_ref
     tags base_tags.merge(Name: "#{product}_public_rt")
