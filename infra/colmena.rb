@@ -2,9 +2,7 @@
 # frozen_string_literal: true
 
 begin
-  system('ruby fetch_ips.rb')
-  system('colmena build')
-  system('colmena apply')
+  system('colmena apply --parallel 1')
 ensure
   asg_names.each do |name|
     log "Scaling #{name} back to 0"
