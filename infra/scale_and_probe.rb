@@ -117,6 +117,7 @@ end
 
 # ─── main workflow ───────────────────────────────────────────────────
 begin
+  system 'pangea apply templates/network.rb'
   asg_names.each do |name|
     log "Scaling #{name} → 1"
     scale_asg(asg, name, 1)
