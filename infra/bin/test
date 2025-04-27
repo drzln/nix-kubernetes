@@ -6,7 +6,7 @@
 #   AWS_REGION=us-east-1 ruby scale_and_probe.rb \
 #       --plan terraform-plan.json \
 #       --ssh-key ~/.ssh/cluster.pem \
-#       --user ec2-user
+#       --user root
 #
 # • Reads the *rendered* Terraform-style JSON (like the one pasted)
 # • Finds every aws_autoscaling_group
@@ -32,7 +32,7 @@ end
 opts = {
   plan: 'plan.json',
   key: '~/.ssh/id_rsa',
-  user: 'ec2-user',
+  user: 'root',
   wait: 300
 }
 
