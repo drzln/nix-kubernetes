@@ -1,6 +1,5 @@
 {
   inputs,
-  lib,
   dynamicHosts ? import ./dynamic-nodes.nix // {},
   ...
 }:
