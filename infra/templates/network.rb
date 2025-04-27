@@ -228,12 +228,18 @@ template(:network) do
     max_size  0
     min_size  0
     vpc_zone_identifier [web_subnet_ref]
-    tag [{
-      key: :Name,
-      value: product,
-      colmena: 'worker-1',
-      propagate_at_launch: true
-    }]
+    tag [
+      {
+        key: :colmena,
+        value: 'worker-1',
+        propagate_at_launch: true
+      },
+      {
+        key: :Name,
+        value: product,
+        propagate_at_launch: true
+      }
+    ]
   end
 
   resource :aws_autoscaling_group, "#{product}_worker_2" do
@@ -248,11 +254,17 @@ template(:network) do
     max_size  0
     min_size  0
     vpc_zone_identifier [web_subnet_ref]
-    tag [{
-      key: :Name,
-      value: product,
-      colmena: 'worker-2',
-      propagate_at_launch: true
-    }]
+    tag [
+      {
+        key: :colmena,
+        value: 'worker-2',
+        propagate_at_launch: true
+      },
+      {
+        key: :Name,
+        value: product,
+        propagate_at_launch: true
+      }
+    ]
   end
 end
