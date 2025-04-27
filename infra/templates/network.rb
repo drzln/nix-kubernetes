@@ -179,6 +179,7 @@ template(:network) do
     tag [{
       key: 'Name',
       value: product,
+      colmena: 'master-1',
       propagate_at_launch: true
     }]
   end
@@ -198,6 +199,7 @@ template(:network) do
     tag [{
       key: 'Name',
       value: product,
+      colmena: 'master-2',
       propagate_at_launch: true
     }]
   end
@@ -217,6 +219,7 @@ template(:network) do
     tag [{
       key: :Name,
       value: product,
+      colmena: 'worker-1',
       propagate_at_launch: true
     }]
   end
@@ -236,6 +239,7 @@ template(:network) do
     tag [{
       key: :Name,
       value: product,
+      colmena: 'worker-2',
       propagate_at_launch: true
     }]
   end
