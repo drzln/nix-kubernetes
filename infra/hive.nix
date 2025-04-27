@@ -10,8 +10,9 @@ inputs.colmena.lib.makeHive {
   defaults = {pkgs, ...}: {
     environment.systemPackages = with pkgs; [vim wget curl];
     system.stateVersion = "24.05";
-    systemd.services.nixos-upgrade.enable = lib.mkForce false;
-    systemd.timers.nixos-upgrade.enable = lib.mkForce false;
+    nix.settings.lock-protocol-timeout = 300; # seconds, default is 30
+    # systemd.services.nixos-upgrade.enable = lib.mkForce false;
+    # systemd.timers.nixos-upgrade.enable = lib.mkForce false;
     fileSystems."/" = {
       device = "/dev/xvda1"; # first EBS volume
       fsType = "ext4";
