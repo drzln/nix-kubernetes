@@ -2,25 +2,29 @@
 # frozen_string_literal: true
 
 # ─────────────────────────────────────────────────────────────
-#  Scales every Auto-Scaling Group defined in a rendered-plan JSON
-#  to 1, waits for an instance, probes it over SSH, then (optionally)
-#  runs a Colmena build / apply workflow and finally scales back to 0.
+#  1.   Renders a Terraform-style JSON plan with
+#         pangea show <TEMPLATE>
+#  2.   Finds every aws_autoscaling_group in that plan
+#  3.   Scales each group to 1, waits for an instance,
+#       probes it over SSH (public-key auth)
+#  4.   Runs   colmena build → fetch_ips.rb → colmena apply
+#  5.   Regardless of outcome, scales every ASG back to 0
 #
-#  Usage example
-#  ─────────────
-#    AWS_REGION=us-east-1 ruby scale_and_probe.rb                        \
-#        --plan terraform-plan.json                                      \
-#        --ssh-key ~/.ssh/cluster.pem                                    \
-#        --user ec2-user                                                 \
+#  Example
+#  ───────
+#    AWS_REGION=us-east-1 ruby scale_and_probe.rb               \
+#        --template templates/network.rb                        \
+#        --ssh-key ~/.ssh/cluster.pem                           \
+#        --user ec2-user                                        \
 #        --wait 600
 # ─────────────────────────────────────────────────────────────
 
 require 'json'
 require 'optparse'
+require 'time'
 require 'aws-sdk-autoscaling'
 require 'aws-sdk-ec2'
 require 'net/ssh'
-require 'time'
 
 # ─── helpers ─────────────────────────────────────────────────
 def log(msg) = warn("[#{Time.now.iso8601}] #{msg}")
@@ -30,9 +34,9 @@ def abort!(msg)
   exit 1
 end
 
-# ─── CLI parsing ─────────────────────────────────────────────
+# ─── CLI options ────────────────────────────────────────────
 opts = {
-  plan: 'plan.json',
+  template: 'templates/network.rb', # Ruby template passed to `pangea show`
   key: '~/.ssh/id_rsa',
   user: 'root',
   wait: 300
@@ -40,32 +44,29 @@ opts = {
 
 OptionParser.new do |o|
   o.banner = 'scale_and_probe.rb [options]'
-  o.on('-p', '--plan FILE',        'Rendered TF-style JSON') { |v| opts[:plan] = v }
-  o.on('-k', '--ssh-key PATH',     'Private key for SSH')    { |v| opts[:key]  = v }
-  o.on('-u', '--user NAME',        'SSH login user')         { |v| opts[:user] = v }
-  o.on('-w', '--wait SECS', Integer, 'Max seconds to wait')    { |v| opts[:wait] = v }
+  o.on('-t', '--template FILE', 'Pangea template (Ruby)')     { |v| opts[:template] = v }
+  o.on('-k', '--ssh-key PATH',  'Private key for SSH')        { |v| opts[:key]  = v }
+  o.on('-u', '--user NAME',     'Primary SSH login user')     { |v| opts[:user] = v }
+  o.on('-w', '--wait SECS', Integer, 'Max seconds to wait')     { |v| opts[:wait] = v }
 end.parse!
 
-# ─── Load the JSON plan ──────────────────────────────────────
-plan_json =
-  if File.file?(opts[:plan])
-    File.read(opts[:plan])
-  else
-    abort!("Plan file #{opts[:plan]} not found")
-  end
+# ─── Render the plan with `pangea show` ─────────────────────
+log "Rendering plan with: pangea show #{opts[:template]}"
+plan_json = `pangea show #{opts[:template]}`
+abort!('`pangea show` failed or returned empty output') if plan_json.nil? || plan_json.empty?
 
 plan      = JSON.parse(plan_json, symbolize_names: true)
 asg_defs  = plan.dig(:resource, :aws_autoscaling_group) || {}
 asg_names = asg_defs.keys
-abort! 'No autoscaling groups in plan' if asg_names.empty?
-log "Found ASGs: #{asg_names.join(', ')}"
+abort! 'No autoscaling groups found in rendered plan' if asg_names.empty?
+log "Discovered ASGs: #{asg_names.join(', ')}"
 
-# ─── AWS clients ─────────────────────────────────────────────
-region = ENV.fetch('AWS_REGION', 'us-east-1')
+# ─── AWS clients ────────────────────────────────────────────
+region  = ENV.fetch('AWS_REGION', 'us-east-1')
 asg_cli = Aws::AutoScaling::Client.new(region:)
 ec2_cli = Aws::EC2::Client.new(region:)
 
-# ─── AWS helpers ─────────────────────────────────────────────
+# ─── AWS helpers ────────────────────────────────────────────
 def scale_asg(client, name, size)
   client.update_auto_scaling_group(
     auto_scaling_group_name: name,
@@ -82,84 +83,87 @@ def wait_for_instance(asg_cli, ec2_cli, group_name, timeout)
       auto_scaling_group_names: [group_name]
     ).auto_scaling_groups.first
 
-    inst_id = asg_info&.instances&.find { |i| i.lifecycle_state == 'InService' }&.instance_id
-    if inst_id
-      inst = ec2_cli.describe_instances(instance_ids: [inst_id])
+    instance_id = asg_info&.instances&.find { |i| i.lifecycle_state == 'InService' }&.instance_id
+    if instance_id
+      inst = ec2_cli.describe_instances(instance_ids: [instance_id])
                     .reservations[0].instances[0]
-      return [inst_id, inst.public_ip_address] if inst.public_ip_address
+      ip = inst.public_ip_address
+      return [instance_id, ip] if ip
     end
-    raise 'timeout' if Time.now > deadline
+    raise 'Timeout waiting for instance' if Time.now > deadline
 
     sleep 5
   end
 end
 
-# ─── SSH probing ─────────────────────────────────────────────
+# ─── SSH probing ────────────────────────────────────────────
 DEFAULT_USERS = %w[ec2-user ubuntu nixos root].freeze
 
-def probe_ssh(ip, key_path:, users:, max_wait:)
-  deadline   = Time.now + max_wait
-  backoff    = 5
-  last_error = nil
-  attempt    = 0
+def probe_ssh(ip:, key_path:, preferred_user:, max_wait:)
+  users       = ([preferred_user] + DEFAULT_USERS).uniq
+  deadline    = Time.now + max_wait
+  backoff     = 5
+  last_error  = nil
+  attempt     = 0
 
   loop do
     users.each do |user|
       attempt += 1
       log "SSH attempt ##{attempt} → #{user}@#{ip}"
       begin
-        host = Net::SSH.start(
+        hostname = Net::SSH.start(
           ip, user,
           keys: [File.expand_path(key_path)],
+          verify_host_key: :never, # disable StrictHostKeyChecking
           non_interactive: true,
-          verify_host_key: :never, # disables StrictHostKeyChecking
           auth_methods: %w[publickey],
           timeout: 10
         ) { |ssh| ssh.exec!('hostname').strip }
 
-        log "SSH OK (#{user}@#{ip}) → hostname=#{host}"
-        return host
+        log "SSH OK (#{user}@#{ip}) → hostname=#{hostname}"
+        return hostname
       rescue Net::SSH::AuthenticationFailed => e
-        log "Auth failed for #{user}@#{ip} (#{e.message})"
+        log "Auth fail for #{user}@#{ip}: #{e.message}"
         last_error = e
       rescue Net::SSH::ConnectionTimeout, Net::SSH::Disconnect,
              Errno::ETIMEDOUT, SocketError => e
-        log "SSH not ready: #{e.class}"
+        log "SSH not ready (#{e.class})"
         last_error = e
       end
     end
+
     break if Time.now >= deadline
 
     sleep backoff
     backoff = [backoff * 1.5, 30].min
   end
-  raise(last_error || "SSH timeout: #{ip} not reachable")
+  raise(last_error || "SSH timeout: #{ip} unreachable")
 end
 
-# ─── Main workflow ───────────────────────────────────────────
+# ─── Main workflow ──────────────────────────────────────────
 begin
   asg_names.each do |name|
     log "Scaling #{name} → 1"
     scale_asg(asg_cli, name, 1)
 
-    inst_id, ip = wait_for_instance(asg_cli, ec2_cli, name, opts[:wait])
-    log "Instance #{inst_id} up @ #{ip}"
+    instance_id, ip = wait_for_instance(asg_cli, ec2_cli, name, opts[:wait])
+    log "Instance #{instance_id} ready at #{ip}"
 
     probe_ssh(
-      ip,
+      ip: ip,
       key_path: opts[:key],
-      users: [opts[:user]] + DEFAULT_USERS,
+      preferred_user: opts[:user],
       max_wait: opts[:wait]
     )
   end
 
-  log 'All ASGs verified via SSH – running Colmena workflow'
+  log 'All ASGs reachable – running Colmena workflow'
   system('colmena build')
   system('rm -f dynamic-nodes.nix')
   system('ruby fetch_ips.rb')
   system('colmena apply')
 
-# ─── Always scale back to 0 ──────────────────────────────────
+# ─── Always scale back down ─────────────────────────────────
 ensure
   asg_names.each do |name|
     log "Scaling #{name} back to 0"
@@ -167,5 +171,5 @@ ensure
   rescue Aws::Errors::ServiceError => e
     log "Could not scale #{name} down: #{e.message}"
   end
-  log 'Cleanup complete (desired_capacity = 0 for all ASGs)'
+  log 'Cleanup complete (all ASGs desired_capacity=0)'
 end
