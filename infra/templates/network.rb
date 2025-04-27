@@ -5,7 +5,7 @@ template(:network) do
   base_tags     = { product: product }
   base_cidr     = '10.2'
   ami           = 'ami-08ee7b48673f8a214'
-  instance_type = 't3.micro'
+  instance_type = 'c5.xlarge'
 
   resource :aws_vpc, product do
     cidr_block "#{base_cidr}.0.0/16"
