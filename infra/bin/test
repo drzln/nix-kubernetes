@@ -108,6 +108,8 @@ asg_names.each do |name|
   scale_asg(asg, name, 1)
 
   log 'Waiting for instance…'
+  sleep 10
+
   inst_id, ip = wait_for_instance(asg, ec2, name, opts[:wait])
   log "Instance #{inst_id} ready at #{ip}"
 
