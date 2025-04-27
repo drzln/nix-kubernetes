@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   end
 
   %w[
+    net
     rexml
     bundler
     toml-rb
