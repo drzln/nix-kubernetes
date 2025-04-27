@@ -5,8 +5,8 @@
 }:
 inputs.colmena.lib.makeHive {
   meta.nixpkgs = import inputs.nixpkgs {system = "x86_64-linux";};
-  meta.deployment.order = ["master-1" "master-2" "worker-1" "worker-2"];
   defaults = {pkgs, ...}: {
+    deployment.order = ["master-1" "master-2" "worker-1" "worker-2"];
     environment.systemPackages = with pkgs; [vim wget curl];
     system.stateVersion = "24.05";
     nix.settings.lock-protocol-timeout = 300; # seconds, default is 30
