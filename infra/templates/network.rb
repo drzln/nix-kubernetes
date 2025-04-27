@@ -166,6 +166,7 @@ template(:network) do
       propagate_at_launch: true
     }]
   end
+
   resource :aws_autoscaling_group, "#{product}_master_2" do
     name "#{product}_master_2"
     launch_template(
@@ -184,6 +185,7 @@ template(:network) do
       propagate_at_launch: true
     }]
   end
+
   resource :aws_autoscaling_group, "#{product}_worker_1" do
     name "#{product}_worker_1"
     launch_template(
@@ -202,6 +204,7 @@ template(:network) do
       propagate_at_launch: true
     }]
   end
+
   resource :aws_autoscaling_group, "#{product}_worker_2" do
     name "#{product}_worker_2"
     launch_template(
