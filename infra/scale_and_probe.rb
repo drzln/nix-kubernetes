@@ -131,7 +131,7 @@ begin
   system('rm -rf dyanamic-nodes.nix')
   system('colmena build')
   system('ruby fetch_ips.rb')
-  system('colmena apply')
+  # system('colmena apply')
 ensure
   asg_names.each do |name|
     log "Scaling #{name} back to 0"
