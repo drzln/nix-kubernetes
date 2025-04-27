@@ -42,6 +42,7 @@ Gem::Specification.new do |spec|
     tty-table
     tty-option
     aws-sdk-s3
+    aws-sdk-ec2
     tty-progressbar
     aws-sdk-dynamodb
     aws-sdk-autoscaling
