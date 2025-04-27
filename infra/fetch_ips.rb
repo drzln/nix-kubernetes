@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
+
 require 'json'
 require 'aws-sdk-ec2'
 
@@ -18,6 +19,7 @@ ips =
   ec2.describe_instances(filters:).reservations.flat_map(&:instances).each_with_object({}) do |inst, acc|
     node_name_tag = inst.tags.detect { |t| t.key == NODE_TAG_KEY }
     next unless node_name_tag && inst.public_ip_address
+
     acc[node_name_tag.value] = inst.public_ip_address
   end
 
