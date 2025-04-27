@@ -22,7 +22,6 @@ require 'aws-sdk-autoscaling'
 require 'aws-sdk-ec2'
 require 'net/ssh'
 
-# ─── helpers ─────────────────────────────────────────────────
 def log(msg) = warn("[#{Time.now.iso8601}] #{msg}")
 
 def abort!(message)
@@ -30,13 +29,13 @@ def abort!(message)
   exit 1
 end
 
-# ─── parse CLI ───────────────────────────────────────────────
 opts = {
   plan: 'plan.json',
   key: '~/.ssh/id_rsa',
   user: 'ec2-user',
   wait: 300
 }
+
 OptionParser.new do |o|
   o.banner = 'scale_and_probe.rb [options]'
   o.on('-p', '--plan FILE', 'Rendered TF JSON') { |v| opts[:plan] = v }
@@ -45,23 +44,22 @@ OptionParser.new do |o|
   o.on('-w', '--wait SECS', Integer, 'Max wait for instances') { |v| opts[:wait] = v }
 end.parse!
 
-# ─── load plan & extract ASG names ───────────────────────────
 plan = JSON[`pangea show templates/network.rb`, symbolize_names: true]
 puts JSON.pretty_generate(plan)
 asg_defs = plan.dig(:resource, :aws_autoscaling_group) || {}
 asg_names = asg_defs.keys
 abort! 'No autoscaling groups in plan' if asg_names.empty?
 log "Found ASGs in plan: #{asg_names.join(', ')}"
-
-# ─── AWS clients ─────────────────────────────────────────────
 region = ENV.fetch('AWS_REGION', 'us-east-1')
 asg = Aws::AutoScaling::Client.new(region:)
 ec2 = Aws::EC2::Client.new(region:)
-
-# ─── functions ───────────────────────────────────────────────
 def ensure_asg_exists(asg_client, name)
-  asg_client.describe_auto_scaling_groups(auto_scaling_group_names: [name])
-            .auto_scaling_groups.first
+  results = asg_client
+            .describe_auto_scaling_groups
+  results.to_hash[:auto_scaling_groups].each do |group|
+    return true if group[:auto_scaling_group_name].to_s.eql?(name)
+  end
+  false
 rescue Aws::AutoScaling::Errors::ServiceError
   nil
 end
