@@ -130,10 +130,10 @@ begin
   end
   log 'All ASGs reachable via SSH ✔'
   system('rm -rf dynamic-nodes.nix')
-  system('colmena build')
   system('ruby fetch_ips.rb')
-  sleep 20
-  system('colmena apply')
+  system('colmena build')
+  # sleep 20
+  # system('colmena apply')
 ensure
   asg_names.each do |name|
     log "Scaling #{name} back to 0"
