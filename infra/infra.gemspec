@@ -33,11 +33,11 @@ Gem::Specification.new do |spec|
   end
 
   %w[
-    net
     rexml
+    pangea
     bundler
     toml-rb
-    pangea
+    net-ssh
     tty-box
     tty-color
     tty-table
