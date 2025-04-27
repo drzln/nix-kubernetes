@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-system 'pangea show templates/network.rb'
+require 'json'
+
+puts JSON.pretty_generate(JSON[`pangea show templates/network.rb`])
