@@ -1,90 +1,63 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# ─────────────────────────────────────────────────────────────
-# Usage:
-#   AWS_REGION=us-east-1 ruby scale_and_probe.rb \
-#       --plan terraform-plan.json \
-#       --ssh-key ~/.ssh/cluster.pem \
-#       --user root
-#
-# • Reads the *rendered* Terraform-style JSON (like the one pasted)
-# • Finds every aws_autoscaling_group
-# • Verifies that the group exists in AWS
-# • Scales   min/desired/max → 1
-# • Waits until an instance is InService + has a public IP
-# • SSH-es in and runs `hostname`
-# ─────────────────────────────────────────────────────────────
-
 require 'json'
 require 'optparse'
 require 'aws-sdk-autoscaling'
 require 'aws-sdk-ec2'
 require 'net/ssh'
+require 'time'
 
 def log(msg) = warn("[#{Time.now.iso8601}] #{msg}")
 
-def abort!(message)
-  log("ERROR: #{message}")
+def abort!(msg)
+  log("ERROR: #{msg}")
   exit 1
 end
 
-opts = {
-  plan: 'plan.json',
-  key: '~/.ssh/id_rsa',
-  user: 'root',
-  wait: 300
-}
-
+# ─── CLI ─────────────────────────────────────────────────────
+opts = { plan: 'plan.json', key: '~/.ssh/id_rsa', user: 'root', wait: 300 }
 OptionParser.new do |o|
-  o.banner = 'scale_and_probe.rb [options]'
-  o.on('-p', '--plan FILE', 'Rendered TF JSON') { |v| opts[:plan] = v }
-  o.on('-k', '--ssh-key PATH', 'Private key for SSH') { |v| opts[:key] = v }
-  o.on('-u', '--user NAME', 'SSH user') { |v| opts[:user] = v }
-  o.on('-w', '--wait SECS', Integer, 'Max wait for instances') { |v| opts[:wait] = v }
+  o.on('-p', '--plan FILE')       { |v| opts[:plan] = v }
+  o.on('-k', '--ssh-key PATH')    { |v| opts[:key]  = v }
+  o.on('-u', '--user NAME')       { |v| opts[:user] = v }
+  o.on('-w', '--wait SECS', Integer) { |v| opts[:wait] = v }
 end.parse!
 
-plan = JSON[`pangea show templates/network.rb`, symbolize_names: true]
-puts JSON.pretty_generate(plan)
-asg_defs = plan.dig(:resource, :aws_autoscaling_group) || {}
+# ─── Parse plan (replace by your own JSON path/command) ─────
+plan      = JSON.parse(`pangea show templates/network.rb`, symbolize_names: true)
+asg_defs  = plan.dig(:resource, :aws_autoscaling_group) || {}
 asg_names = asg_defs.keys
 abort! 'No autoscaling groups in plan' if asg_names.empty?
-log "Found ASGs in plan: #{asg_names.join(', ')}"
-region = ENV.fetch('AWS_REGION', 'us-east-1')
-asg = Aws::AutoScaling::Client.new(region:)
-ec2 = Aws::EC2::Client.new(region:)
-def ensure_asg_exists(asg_client, name)
-  results = asg_client
-            .describe_auto_scaling_groups
-  results.to_hash[:auto_scaling_groups].each do |group|
-    puts group[:auto_scaling_group_name]
-    return true if group[:auto_scaling_group_name].to_s.eql?(name.to_s)
-  end
-  false
-rescue Aws::AutoScaling::Errors::ServiceError
-  nil
-end
+log "Found ASGs: #{asg_names.join(', ')}"
 
-def scale_asg(asg_client, group, size)
-  asg_client.update_auto_scaling_group(
-    auto_scaling_group_name: group,
+region = ENV.fetch('AWS_REGION', 'us-east-1')
+asg  = Aws::AutoScaling::Client.new(region:)
+ec2  = Aws::EC2::Client.new(region:)
+
+# ─── helpers ─────────────────────────────────────────────────
+def scale_asg(client, name, size)
+  client.update_auto_scaling_group(
+    auto_scaling_group_name: name,
     min_size: size,
     max_size: size,
     desired_capacity: size
   )
 end
 
-def wait_for_instance(asg_client, ec2_client, group, timeout)
+# keep the *name* string separate from the response object  ↓↓↓
+def wait_for_instance(asg, ec2, group_name, timeout)
   deadline = Time.now + timeout
   loop do
-    group = asg_client.describe_auto_scaling_groups(
-      auto_scaling_group_names: [group]
+    resp = asg.describe_auto_scaling_groups(
+      auto_scaling_group_names: [group_name]
     ).auto_scaling_groups.first
-    inst_id = group.instances.find { |i| i.lifecycle_state == 'InService' }&.instance_id
+
+    inst_id = resp.instances.find { |i| i.lifecycle_state == 'InService' }&.instance_id
     if inst_id
-      inst = ec2_client.describe_instances(instance_ids: [inst_id])
-                       .reservations[0].instances[0]
-      ip = inst.public_ip_address
+      inst = ec2.describe_instances(instance_ids: [inst_id])
+                .reservations[0].instances[0]
+      ip   = inst.public_ip_address
       return [inst_id, ip] if ip
     end
     raise 'timeout' if Time.now > deadline
@@ -94,14 +67,13 @@ def wait_for_instance(asg_client, ec2_client, group, timeout)
 end
 
 def probe_ssh(ip, user, key)
-  Net::SSH.start(ip, user, keys: [File.expand_path(key)], non_interactive: true, timeout: 10) do |ssh|
-    ssh.exec!('hostname').strip
-  end
+  Net::SSH.start(ip, user, keys: [File.expand_path(key)],
+                           non_interactive: true, timeout: 10) { |ssh| ssh.exec!('hostname').strip }
 rescue StandardError
-  sleep 5
-  probe_ssh(ip, user, key)
+  nil
 end
 
+# ─── main workflow ───────────────────────────────────────────
 begin
   asg_names.each do |name|
     log "Scaling #{name} → 1"
@@ -115,8 +87,9 @@ begin
     host = probe_ssh(ip, opts[:user], opts[:key]) or abort! "SSH failed to #{ip}"
     log "SSH OK: #{host}"
   end
-
   log 'All ASGs verified via SSH'
+
+# ─── always scale back to zero ───────────────────────────────
 ensure
   asg_names.each do |name|
     log "Tearing down – scaling #{name} → 0"
@@ -126,5 +99,5 @@ ensure
       log "Could not scale #{name} down: #{e.message}"
     end
   end
-  log 'Cleanup complete (desired_capacity=0 for all ASGs)'
+  log 'Cleanup complete (desired_capacity = 0 for all ASGs)'
 end
