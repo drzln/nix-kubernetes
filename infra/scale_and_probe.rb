@@ -116,31 +116,15 @@ def probe_ssh(ip:, key_path:, wait:)
 end
 
 # ─── main workflow ───────────────────────────────────────────────────
-begin
-  asg_names.each do |name|
-    log "Scaling #{name} → 1"
-    scale_asg(asg, name, 1)
+system 'pangea apply templates/network.rb'
+asg_names.each do |name|
+  log "Scaling #{name} → 1"
+  scale_asg(asg, name, 1)
 
-    log 'Waiting for instance…'
-    inst_id, ip = wait_for_instance(asg, ec2, name, opts[:wait])
-    log "Instance #{inst_id} @ #{ip}"
+  log 'Waiting for instance…'
+  inst_id, ip = wait_for_instance(asg, ec2, name, opts[:wait])
+  log "Instance #{inst_id} @ #{ip}"
 
-    probe_ssh(ip: ip, key_path: opts[:key], wait: opts[:wait])
-  end
-  log 'All ASGs reachable via SSH ✔'
-  system('rm -rf dyanamic-nodes.nix')
-  system('colmena build')
-  system('ruby fetch_ips.rb')
-  sleep 20
-  system('colmena apply')
-ensure
-  asg_names.each do |name|
-    log "Scaling #{name} back to 0"
-    begin
-      scale_asg(asg, name, 0)
-    rescue StandardError
-      log("Could not scale #{name}: #{$ERROR_INFO}")
-    end
-  end
-  log 'Cleanup complete'
+  probe_ssh(ip: ip, key_path: opts[:key], wait: opts[:wait])
 end
+log 'All ASGs reachable via SSH ✔'
