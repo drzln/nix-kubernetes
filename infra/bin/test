@@ -1,8 +1,123 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'json'
+# ─────────────────────────────────────────────────────────────
+# Usage:
+#   AWS_REGION=us-east-1 ruby scale_and_probe.rb \
+#       --plan terraform-plan.json \
+#       --ssh-key ~/.ssh/cluster.pem \
+#       --user ec2-user
+#
+# • Reads the *rendered* Terraform-style JSON (like the one pasted)
+# • Finds every aws_autoscaling_group
+# • Verifies that the group exists in AWS
+# • Scales   min/desired/max → 1
+# • Waits until an instance is InService + has a public IP
+# • SSH-es in and runs `hostname`
+# ─────────────────────────────────────────────────────────────
 
-puts JSON.pretty_generate(
-  JSON[`pangea show templates/network.rb`, symbolize_names: true]
-)
+require 'json'
+require 'optparse'
+require 'aws-sdk-autoscaling'
+require 'aws-sdk-ec2'
+require 'net/ssh'
+
+# ─── helpers ─────────────────────────────────────────────────
+def log(msg) = warn("[#{Time.now.iso8601}] #{msg}")
+
+def abort!(message)
+  log("ERROR: #{message}")
+  exit 1
+end
+
+# ─── parse CLI ───────────────────────────────────────────────
+opts = {
+  plan: 'plan.json',
+  key: '~/.ssh/id_rsa',
+  user: 'ec2-user',
+  wait: 300
+}
+OptionParser.new do |o|
+  o.banner = 'scale_and_probe.rb [options]'
+  o.on('-p', '--plan FILE', 'Rendered TF JSON') { |v| opts[:plan] = v }
+  o.on('-k', '--ssh-key PATH', 'Private key for SSH') { |v| opts[:key] = v }
+  o.on('-u', '--user NAME', 'SSH user') { |v| opts[:user] = v }
+  o.on('-w', '--wait SECS', Integer, 'Max wait for instances') { |v| opts[:wait] = v }
+end.parse!
+
+# ─── load plan & extract ASG names ───────────────────────────
+plan = JSON.parse(File.read(opts[:plan]))
+asg_defs = plan.dig('resource', 'aws_autoscaling_group') || {}
+asg_names = asg_defs.keys
+abort! 'No autoscaling groups in plan' if asg_names.empty?
+log "Found ASGs in plan: #{asg_names.join(', ')}"
+
+# ─── AWS clients ─────────────────────────────────────────────
+region = ENV.fetch('AWS_REGION', 'us-east-1')
+asg = Aws::AutoScaling::Client.new(region:)
+ec2 = Aws::EC2::Client.new(region:)
+
+# ─── functions ───────────────────────────────────────────────
+def ensure_asg_exists(asg_client, name)
+  asg_client.describe_auto_scaling_groups(auto_scaling_group_names: [name])
+            .auto_scaling_groups.first
+rescue Aws::AutoScaling::Errors::ServiceError
+  nil
+end
+
+def scale_asg(asg_client, group, size)
+  asg_client.update_auto_scaling_group(
+    auto_scaling_group_name: group.auto_scaling_group_name,
+    min_size: size,
+    max_size: size,
+    desired_capacity: size
+  )
+end
+
+def wait_for_instance(asg_client, ec2_client, group, timeout)
+  deadline = Time.now + timeout
+  loop do
+    group = asg_client.describe_auto_scaling_groups(
+      auto_scaling_group_names: [group.auto_scaling_group_name]
+    ).auto_scaling_groups.first
+    inst_id = group.instances.find { |i| i.lifecycle_state == 'InService' }&.instance_id
+    if inst_id
+      inst = ec2_client.describe_instances(instance_ids: [inst_id])
+                       .reservations[0].instances[0]
+      ip = inst.public_ip_address
+      return [inst_id, ip] if ip
+    end
+    raise 'timeout' if Time.now > deadline
+
+    sleep 5
+  end
+end
+
+def probe_ssh(ip, user, key)
+  Net::SSH.start(ip, user, keys: [File.expand_path(key)], non_interactive: true, timeout: 10) do |ssh|
+    ssh.exec!('hostname').strip
+  end
+rescue StandardError
+  nil
+end
+
+# ─── main loop ───────────────────────────────────────────────
+asg_names.each do |name|
+  log "Processing ASG #{name}"
+  group = ensure_asg_exists(asg, name) or abort! "ASG #{name} not found in AWS"
+  log "Scaling #{name} → 1"
+  scale_asg(asg, group, 1)
+
+  log 'Waiting for instance…'
+  inst_id, ip = wait_for_instance(asg, ec2, group, opts[:wait])
+  log "Instance #{inst_id} ready at #{ip}"
+
+  log 'Probing SSH…'
+  if (host = probe_ssh(ip, opts[:user], opts[:key]))
+    log "SSH OK: #{host}"
+  else
+    abort! "SSH failed to #{ip}"
+  end
+end
+
+log 'All done – every ASG scaled to 1 and reachable via SSH'
