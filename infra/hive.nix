@@ -66,7 +66,7 @@ inputs.colmena.lib.makeHive {
     deployment.tags = ["masters"];
   };
 
-  "worker" = {
+  "worker-1" = {
     pkgs,
     testOverlay,
     ...
@@ -74,7 +74,7 @@ inputs.colmena.lib.makeHive {
     imports = [inputs.self.nixosModules.kubernetes];
     blackmatter.components.kubernetes = {
       enable = true;
-      role = "worker";
+      role = "worker-1";
       overlay = testOverlay;
       etcdPackage = pkgs.etcd;
       containerdPackage = pkgs.containerd;
@@ -84,17 +84,16 @@ inputs.colmena.lib.makeHive {
       kubeadmExtra = {nodeRegistration = {criSocket = "/run/containerd/containerd.sock";};};
       firewallOpen = false;
       join = {
-        address = "192.168.1.10:6443";
+        address = "${dynamicHosts.master-1 or "192.168.1.10";}:6443";
         token = "abcdef.0123456789abcdef";
         caHash = "sha256:deadbeefcafebabe0123456789abcdef0123456789abcdef0123456789abcd";
       };
     };
-    networking.hostName = "worker";
-    deployment.targetHost = dynamicHosts.worker or "192.168.1.11";
+    networking.hostName = "worker-1";
+    deployment.targetHost = dynamicHosts.worker-1 or "192.168.1.11";
     deployment.tags = ["workers"];
   };
-
-  "single" = {
+  "worker-2" = {
     pkgs,
     testOverlay,
     ...
@@ -102,18 +101,23 @@ inputs.colmena.lib.makeHive {
     imports = [inputs.self.nixosModules.kubernetes];
     blackmatter.components.kubernetes = {
       enable = true;
-      role = "single";
+      role = "worker-2";
       overlay = testOverlay;
       etcdPackage = pkgs.etcd;
       containerdPackage = pkgs.containerd;
-      nodePortRange = "10000-20000";
-      extraApiArgs = {"enable-aggregator-routing" = "true";};
-      extraKubeletOpts = "--cgroups-per-qos=false";
-      kubeadmExtra = {apiServerExtraSANs = ["single.local"];};
-      firewallOpen = true;
+      nodePortRange = "30000-32767";
+      extraApiArgs = {"profiling" = "false";};
+      extraKubeletOpts = "--node-labels=node-role.kubernetes.io/worker=";
+      kubeadmExtra = {nodeRegistration = {criSocket = "/run/containerd/containerd.sock";};};
+      firewallOpen = false;
+      join = {
+        address = "${dynamicHosts.master-2 or "192.168.1.10";}:6443";
+        token = "abcdef.0123456789abcdef";
+        caHash = "sha256:deadbeefcafebabe0123456789abcdef0123456789abcdef0123456789abcd";
+      };
     };
-    networking.hostName = "single";
-    deployment.targetHost = dynamicHosts.single or "192.168.1.12";
-    deployment.tags = ["single"];
+    networking.hostName = "worker-2";
+    deployment.targetHost = dynamicHosts.worker-1 or "192.168.1.11";
+    deployment.tags = ["workers"];
   };
 }
