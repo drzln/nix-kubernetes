@@ -24,6 +24,9 @@ inputs.colmena.lib.makeHive {
     ...
   }: {
     imports = [inputs.self.nixosModules.kubernetes];
+    services.cloud-init.enable = true;
+    services.cloud-init.network.enable = true;
+    services.amazon-ec2-agent.enable = true;
     blackmatter.components.kubernetes = {
       enable = true;
       role = "master";
@@ -48,6 +51,9 @@ inputs.colmena.lib.makeHive {
     ...
   }: {
     imports = [inputs.self.nixosModules.kubernetes];
+    services.cloud-init.enable = true;
+    services.cloud-init.network.enable = true;
+    services.amazon-ec2-agent.enable = true;
     blackmatter.components.kubernetes = {
       enable = true;
       role = "master";
@@ -72,6 +78,9 @@ inputs.colmena.lib.makeHive {
     ...
   }: {
     imports = [inputs.self.nixosModules.kubernetes];
+    services.cloud-init.enable = true;
+    services.cloud-init.network.enable = true;
+    services.amazon-ec2-agent.enable = true;
     blackmatter.components.kubernetes = {
       enable = true;
       role = "worker-1";
@@ -99,6 +108,9 @@ inputs.colmena.lib.makeHive {
     ...
   }: {
     imports = [inputs.self.nixosModules.kubernetes];
+    services.cloud-init.enable = true;
+    services.cloud-init.network.enable = true;
+    services.amazon-ec2-agent.enable = true;
     blackmatter.components.kubernetes = {
       enable = true;
       role = "worker-2";
