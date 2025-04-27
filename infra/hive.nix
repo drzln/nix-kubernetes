@@ -1,6 +1,6 @@
 {
   inputs,
-  dynamicHosts ? import ./dynamic-nodes.nix or {},
+  dynamicHosts ? import ./dynamic-nodes.nix // {},
   ...
 }:
 inputs.colmena.lib.makeHive {
