@@ -27,6 +27,7 @@ inputs.colmena.lib.makeHive {
     services.cloud-init.enable = true;
     services.cloud-init.network.enable = true;
     # services.amazon-ec2-agent.enable = true;
+    services.amazon-ssm-agent.enable = true;
     services.openssh.enable = true;
     services.openssh.settings.PermitRootLogin = "prohibit-password";
     blackmatter.components.kubernetes = {
@@ -56,6 +57,7 @@ inputs.colmena.lib.makeHive {
     services.cloud-init.enable = true;
     services.cloud-init.network.enable = true;
     # services.amazon-ec2-agent.enable = true;
+    services.amazon-ssm-agent.enable = true;
     services.openssh.enable = true;
     services.openssh.settings.PermitRootLogin = "prohibit-password";
     blackmatter.components.kubernetes = {
@@ -85,6 +87,7 @@ inputs.colmena.lib.makeHive {
     services.cloud-init.enable = true;
     services.cloud-init.network.enable = true;
     # services.amazon-ec2-agent.enable = true;
+    services.amazon-ssm-agent.enable = true;
     services.openssh.enable = true;
     services.openssh.settings.PermitRootLogin = "prohibit-password";
     blackmatter.components.kubernetes = {
@@ -116,6 +119,7 @@ inputs.colmena.lib.makeHive {
     imports = [inputs.self.nixosModules.kubernetes];
     services.cloud-init.enable = true;
     services.cloud-init.network.enable = true;
+    services.amazon-ssm-agent.enable = true;
     # services.amazon-ec2-agent.enable = true;
     services.openssh.enable = true;
     services.openssh.settings.PermitRootLogin = "prohibit-password";
