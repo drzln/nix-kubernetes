@@ -74,13 +74,15 @@ def probe_ssh(host_ip, ssh_user, ssh_key_path)
     non_interactive: true,
     timeout: 10
   ) do |ssh_session|
+    puts "trying #{ssh_session}"
     return ssh_session.exec!('hostname').strip
   end
 rescue Net::SSH::AuthenticationFailed,
        Net::SSH::ConnectionTimeout,
        Errno::ETIMEDOUT,
        Errno::ECONNREFUSED
-  nil
+  sleep 1
+  probe_ssh(host_ip, ssh_user, ssh_key_path)
 end
 
 # ─── main workflow ───────────────────────────────────────────
