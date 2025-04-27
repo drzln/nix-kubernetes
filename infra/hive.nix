@@ -10,11 +10,14 @@ inputs.colmena.lib.makeHive {
     environment.systemPackages = with pkgs; [vim wget curl];
     system.stateVersion = "24.05";
     fileSystems."/" = {
-      device = "none";
-      fsType = "tmpfs";
-      options = ["mode=755"];
+      device = "/dev/xvda1"; # first EBS volume
+      fsType = "ext4";
     };
-    boot.loader.grub.enable = false;
+    boot.loader.grub = {
+      enable = true;
+      devices = ["/dev/xvda"];
+    };
+    # boot.loader.grub.enable = false;
     _module.args.testOverlay = self: super: {};
   };
 
