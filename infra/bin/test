@@ -101,7 +101,6 @@ rescue StandardError
   nil
 end
 
-# ─── main loop ───────────────────────────────────────────────
 asg_names.each do |name|
   log "Processing ASG #{name}"
   ensure_asg_exists(asg, name) or abort! "ASG #{name} not found in AWS"
