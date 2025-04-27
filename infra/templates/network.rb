@@ -31,6 +31,11 @@ template(:network) do
     tags base_tags.merge(Name: "#{product}_public_subnet")
   end
 
+  resource :aws_route_table, "#{product}_public_rt" do
+    vpc_id vpc_id_ref
+    tags base_tags.merge(Name: "#{product}_public_rt")
+  end
+
   resource :aws_security_group, "#{product}_sg" do
     vpc_id vpc_id_ref
     description 'Security group for kubernetes testing'
