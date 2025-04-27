@@ -100,6 +100,10 @@ begin
     log "SSH OK: #{host}"
   end
   log 'All ASGs verified via SSH'
+  system 'colmena build'
+  system 'rm -rf dynamic-nodes.nix'
+  system 'ruby fetch_ips.rb'
+  system 'colmena apply'
 
 # ─── always scale back to zero ───────────────────────────────
 ensure
