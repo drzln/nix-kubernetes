@@ -36,6 +36,20 @@ template(:network) do
     tags base_tags.merge(Name: "#{product}_public_rt")
   end
 
+  route_table_id_ref = "${aws_route_table.#{product}_public_rt.id}"
+  igw_id_ref         = "${aws_internet_gateway.#{product}_igw.id}"
+
+  resource :aws_route, "#{product}_igw_default_route" do
+    route_table_id         route_table_id_ref
+    destination_cidr_block '0.0.0.0/0'
+    gateway_id             igw_id_ref
+  end
+
+  resource :aws_route_table_association, "#{product}_public_rt_assoc" do
+    subnet_id web_subnet_ref
+    route_table_id route_table_id_ref
+  end
+
   resource :aws_security_group, "#{product}_sg" do
     vpc_id vpc_id_ref
     description 'Security group for kubernetes testing'
