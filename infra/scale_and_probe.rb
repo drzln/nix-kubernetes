@@ -12,8 +12,8 @@ require 'English' # ← gives us $CHILD_STATUS
 # ─── helpers ──────────────────────────────────────────────────────────
 def log(msg) = warn "[#{Time.now.iso8601}] #{msg}"
 
-def abort!(m)
-  log("ERROR: #{m}")
+def abort!(msg)
+  log("ERROR: #{msg}")
   exit 1
 end
 
