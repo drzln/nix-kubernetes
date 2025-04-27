@@ -3,12 +3,17 @@
   inputs.nixpkgs.url = "github:NixOS/nixpkgs";
   inputs.ruby-nix.url = "github:inscapist/ruby-nix";
   inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.colmena = {
+    url = "github:zhaofengli/colmena?=master";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
   outputs = {
     nixpkgs,
     ruby-nix,
     flake-utils,
+    colmena,
     ...
-  }:
+  } @ inputs:
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs {
         inherit system;
@@ -30,6 +35,7 @@
         default = dev;
         dev = pkgs.mkShell {
           buildInputs = with pkgs; [
+            colmena.packages.${system}.colmena
             aws-nuke
             opentofu
             packer
@@ -44,5 +50,8 @@
           '';
         };
       };
-    });
+    })
+    // {
+      colmenaHive = import ./hive.nix {inherit inputs;};
+    };
 }
