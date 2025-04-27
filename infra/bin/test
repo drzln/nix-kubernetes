@@ -67,10 +67,12 @@ def wait_for_instance(asg, ec2, group_name, timeout)
 end
 
 def probe_ssh(ip, user, key)
-  Net::SSH.start(ip, user, keys: [File.expand_path(key)],
-                           non_interactive: true, timeout: 10) { |ssh| ssh.exec!('hostname').strip }
-rescue StandardError
-  nil
+  Net::SSH.start(
+    ip,
+    user,
+    keys: [File.expand_path(key)],
+    non_interactive: true, timeout: 10
+  ) { |ssh| ssh.exec!('hostname').strip }
 end
 
 # ─── main workflow ───────────────────────────────────────────
