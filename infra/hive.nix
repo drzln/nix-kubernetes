@@ -9,7 +9,7 @@ inputs.colmena.lib.makeHive {
     # deployment.order = ["master-1" "master-2" "worker-1" "worker-2"];
     environment.systemPackages = with pkgs; [vim wget curl];
     system.stateVersion = "24.05";
-    nix.settings.lock-protocol-timeout = 300; # seconds, default is 30
+    # nix.settings.lock-protocol-timeout = 300; # seconds, default is 30
     # systemd.services.nixos-upgrade.enable = lib.mkForce false;
     # systemd.timers.nixos-upgrade.enable = lib.mkForce false;
     fileSystems."/" = {
