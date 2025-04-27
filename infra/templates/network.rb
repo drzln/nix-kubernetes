@@ -135,6 +135,7 @@ template(:network) do
   web_subnet_ref      = "${aws_subnet.#{product}_public_subnet.id}"
 
   resource :aws_autoscaling_group, "#{product}_master_1" do
+    name "#{product}_master_1"
     launch_template(
       {
         id: launch_template_ref,
@@ -152,6 +153,7 @@ template(:network) do
     }]
   end
   resource :aws_autoscaling_group, "#{product}_master_2" do
+    name "#{product}_master_2"
     launch_template(
       {
         id: launch_template_ref,
@@ -169,6 +171,7 @@ template(:network) do
     }]
   end
   resource :aws_autoscaling_group, "#{product}_worker_1" do
+    name "#{product}_worker_1"
     launch_template(
       {
         id: launch_template_ref,
@@ -186,6 +189,7 @@ template(:network) do
     }]
   end
   resource :aws_autoscaling_group, "#{product}_worker_2" do
+    name "#{product}_worker_2"
     launch_template(
       {
         id: launch_template_ref,
