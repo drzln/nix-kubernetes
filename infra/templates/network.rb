@@ -39,7 +39,7 @@ template(:network) do
   sg_ref = "${aws_security_group.#{product}_sg.id}"
 
   resource :aws_security_group_rule, "#{product}_sg" do
-    security_group_id lb_sg_ref
+    security_group_id sg_ref
     type :ingress
     from_port 22
     to_port 22
