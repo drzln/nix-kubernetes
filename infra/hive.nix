@@ -23,7 +23,7 @@ inputs.colmena.lib.makeHive {
     testOverlay,
     ...
   }: {
-    imports = [../../modules];
+    imports = [inputs.self.nixosModules.kubernetes];
     blackmatter.components.kubernetes = {
       enable = true;
       role = "master";
@@ -47,7 +47,7 @@ inputs.colmena.lib.makeHive {
     testOverlay,
     ...
   }: {
-    imports = [../../modules];
+    imports = [inputs.self.nixosModules.kubernetes];
     blackmatter.components.kubernetes = {
       enable = true;
       role = "master";
@@ -71,7 +71,7 @@ inputs.colmena.lib.makeHive {
     testOverlay,
     ...
   }: {
-    imports = [../../modules];
+    imports = [inputs.self.nixosModules.kubernetes];
     blackmatter.components.kubernetes = {
       enable = true;
       role = "worker";
@@ -99,7 +99,7 @@ inputs.colmena.lib.makeHive {
     testOverlay,
     ...
   }: {
-    imports = [../../modules];
+    imports = [inputs.self.nixosModules.kubernetes];
     blackmatter.components.kubernetes = {
       enable = true;
       role = "single";
