@@ -92,6 +92,7 @@ def wait_for_instance(asg_client, ec2_client, group, timeout)
     sleep 5
   end
 rescue StandardError
+  sleep 5
   wait_for_instance(asg_client, ec2_client, group, timeout)
 end
 
