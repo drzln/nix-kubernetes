@@ -84,7 +84,7 @@ inputs.colmena.lib.makeHive {
       kubeadmExtra = {nodeRegistration = {criSocket = "/run/containerd/containerd.sock";};};
       firewallOpen = false;
       join = {
-        address = "${dynamicHosts.master-1 or "192.168.1.10";}:6443";
+        address = "${dynamicHosts.master-1 or "192.168.1.10"}:6443";
         token = "abcdef.0123456789abcdef";
         caHash = "sha256:deadbeefcafebabe0123456789abcdef0123456789abcdef0123456789abcd";
       };
@@ -111,7 +111,7 @@ inputs.colmena.lib.makeHive {
       kubeadmExtra = {nodeRegistration = {criSocket = "/run/containerd/containerd.sock";};};
       firewallOpen = false;
       join = {
-        address = "${dynamicHosts.master-2 or "192.168.1.10";}:6443";
+        address = "${dynamicHosts.master-2 or "192.168.1.10"}:6443";
         token = "abcdef.0123456789abcdef";
         caHash = "sha256:deadbeefcafebabe0123456789abcdef0123456789abcdef0123456789abcd";
       };
