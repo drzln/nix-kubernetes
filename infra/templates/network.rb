@@ -99,10 +99,6 @@ template(:network) do
   #   source_security_group_id web_sg_ref
   # end
 
-  #######################################################################################
-  # compute testing
-  #######################################################################################
-
   resource :aws_key_pair, "#{product}_key" do
     key_name product
     public_key File.read("#{Dir.home}/.ssh/id_rsa.pub") # Path to your local public key
