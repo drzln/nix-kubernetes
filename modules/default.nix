@@ -1,9 +1,15 @@
 # modules/kubernetes/default.nix
+#
+# A **self-contained** Kubernetes profile for NixOS.
+# Drop this file into a module path and enable with:
+#
+#   blackmatter.components.kubernetes.enable = true;
+#
 {
   lib,
   pkgs, # ← host pkgs
   config,
-  inputs, # ← pass via specialArgs
+  inputs, # ← pass the flake’s `inputs` through specialArgs
   ...
 }: let
   inherit
@@ -14,25 +20,17 @@
     mkMerge
     types
     recursiveUpdate
-    mapAttrsToList
     concatStringsSep
+    mapAttrsToList
     isFunction
     ;
 
-  #############################################################################
-  ## Option shortcuts / helpers
-  #############################################################################
-
   cfg = config.blackmatter.components.kubernetes;
 
-  # ─────────────── overlay handling ─────────────────────────────────────────
-  # Accept either:
-  #   • null
-  #   • attr-set overlay ( {k = …;} )
-  #   • function overlay ( self: super: { … } )
-  #
-  # Always normalise to a *function* so we can stick it into the overlays list.
+  # ── overlay handling ──────────────────────────────────────────────────────
   overlayRaw = cfg.overlay or inputs.nix-kubernetes.overlays.default;
+
+  # normalise: always give Nixpkgs a *function* overlay
   overlayFn =
     if overlayRaw == null
     then (_: _: {})
@@ -45,7 +43,7 @@
     overlays = [overlayFn];
   };
 
-  # ─────────────── packages actually executed on the node ──────────────────
+  # ── packages we run on the machine ────────────────────────────────────────
   k8sPkgs =
     pkgs'.kubernetesPackages
     // {
@@ -55,18 +53,19 @@
       kubeadm = pkgs'.kubeadm;
     };
 
-  etcdPkg = cfg.etcdPackage       or pkgs'.etcd       or pkgs.etcd;
+  # three-level fallback so they are never null
+  etcdPkg = cfg.etcdPackage or pkgs'.etcd or pkgs.etcd;
   containerdPkg = cfg.containerdPackage or pkgs'.containerd or pkgs.containerd;
 
   isMaster = cfg.role == "master" || cfg.role == "single";
   isWorker = cfg.role == "worker" || cfg.role == "single";
 
-  # ─────────────── minimal containerd config ───────────────────────────────
+  # ── minimal containerd config ────────────────────────────────────────────
   containerdConf = ''
     version = 2
     [plugins."io.containerd.grpc.v1.cri"]
-      sandbox_image   = "registry.k8s.io/pause:3.9"
-      systemd_cgroup  = true
+      sandbox_image  = "registry.k8s.io/pause:3.9"
+      systemd_cgroup = true
   '';
 
   # kubeadm YAML rendered from Nix attrset
@@ -74,10 +73,8 @@
       apiVersion = "kubeadm.k8s.io/v1beta3";
       kind = "ClusterConfiguration";
       kubernetesVersion = "v1.30.0";
-      networking = {
-        serviceSubnet = "10.96.0.0/12";
-        podSubnet = "10.244.0.0/16";
-      };
+      networking.serviceSubnet = "10.96.0.0/12";
+      networking.podSubnet = "10.244.0.0/16";
       apiServer.extraArgs =
         cfg.extraApiArgs // {"service-node-port-range" = cfg.nodePortRange;};
     }
@@ -97,16 +94,19 @@ in
       };
 
       overlay = mkOption {
-        type = types.nullOr (types.oneOf [types.attrs (types.functionTo types.attrs)]);
+        type = types.nullOr types.anything; # <─ accepts set OR fn
         default = null;
-        description = "Custom Nixpkgs overlay (attr-set or function) providing Kubernetes / containerd / etcd builds.";
+        description = ''
+          A Nixpkgs overlay (either a function `self: super: { ... }`
+          or an attribute-set).  If null, the default overlay from
+          `inputs.nix-kubernetes` is used.
+        '';
       };
 
       etcdPackage = mkOption {
         type = types.nullOr types.package;
         default = null;
       };
-
       containerdPackage = mkOption {
         type = types.nullOr types.package;
         default = null;
@@ -116,17 +116,14 @@ in
         type = types.str;
         default = "30000-32767";
       };
-
       extraApiArgs = mkOption {
         type = types.attrsOf types.str;
         default = {};
       };
-
       extraKubeletOpts = mkOption {
         type = types.str;
         default = "";
       };
-
       kubeadmExtra = mkOption {
         type = types.attrs;
         default = {};
@@ -153,23 +150,21 @@ in
       };
     };
 
-    #############################################################################
-    ## Implementation
-    #############################################################################
+    ###############################################################################
+    # Implementation
+    ###############################################################################
     config = mkIf cfg.enable (mkMerge [
-      # ─────────────── Common for *all* roles ─────────────────────────────────
+      # ─────────── Common to *all* nodes ──────────────────────────────────────
       {
         networking.firewall.enable = cfg.firewallOpen;
 
-        # --- filesystem paths & tmpfiles -------------------------------------
         systemd.tmpfiles.rules = [
-          "d /etc/containerd              0755 root   root    - -"
-          "d /var/lib/containerd          0710 root   root    - -"
-          "d /etc/kubernetes/manifests    0755 root   root    - -"
+          "d /etc/containerd              0755 root root  - -"
+          "d /var/lib/containerd          0710 root root  - -"
+          "d /etc/kubernetes/manifests    0755 root root  - -"
           "d /var/lib/kubelet             0755 kubelet kubelet - -"
         ];
 
-        # --- containerd ------------------------------------------------------
         environment.etc."containerd/config.toml".text = containerdConf;
 
         users.users.kubelet = {
@@ -186,11 +181,10 @@ in
           serviceConfig = {
             ExecStart = "${containerdPkg}/bin/containerd --config /etc/containerd/config.toml";
             Restart = "always";
-            Delegate = true; # cgroup v2 support
+            Delegate = true; # required for cgroup v2
           };
         };
 
-        # --- kubelet ---------------------------------------------------------
         systemd.services.kubelet = {
           description = "Kubernetes kubelet";
           wantedBy = ["multi-user.target"];
@@ -210,9 +204,9 @@ in
         };
       }
 
-      # ─────────────── Control-plane (master / single) ───────────────────────
+      # ─────────── Control-plane nodes ───────────────────────────────────────
       (mkIf isMaster {
-        # --- embedded etcd ---------------------------------------------------
+        # ---- etcd -----------------------------------------------------------
         users.users.etcd = {
           isSystemUser = true;
           group = "etcd";
@@ -234,7 +228,7 @@ in
           };
         };
 
-        # --- kube-apiserver --------------------------------------------------
+        # ---- API-server ------------------------------------------------------
         systemd.services.kube-apiserver = {
           description = "Kubernetes API server";
           wantedBy = ["multi-user.target"];
@@ -252,7 +246,7 @@ in
           };
         };
 
-        # --- controller-manager ---------------------------------------------
+        # ---- Controller-manager ---------------------------------------------
         systemd.services.kube-controller-manager = {
           description = "Kubernetes controller-manager";
           wantedBy = ["multi-user.target"];
@@ -267,7 +261,7 @@ in
           };
         };
 
-        # --- scheduler -------------------------------------------------------
+        # ---- Scheduler -------------------------------------------------------
         systemd.services.kube-scheduler = {
           description = "Kubernetes scheduler";
           wantedBy = ["multi-user.target"];
@@ -282,7 +276,7 @@ in
           };
         };
 
-        # --- one-shot kubeadm init ------------------------------------------
+        # ---- kubeadm init (one-shot) ----------------------------------------
         systemd.services.kubeadm-init = {
           description = "kubeadm init (first boot)";
           wantedBy = ["multi-user.target"];
@@ -302,7 +296,7 @@ in
         environment.etc."kubeadm.yaml".text = kubeadmConfig;
       })
 
-      # ─────────────── Worker-only (pure node) ───────────────────────────────
+      # ─────────── Workers (non-masters) ─────────────────────────────────────
       (mkIf (isWorker && !isMaster) {
         systemd.services.kubeadm-join = {
           description = "kubeadm join (first boot)";
@@ -321,5 +315,5 @@ in
           };
         };
       })
-    ]);
+    ]); # mkMerge
   }
