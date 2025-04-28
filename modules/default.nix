@@ -94,57 +94,63 @@ in {
     {networking.firewall.enable = cfg.firewallOpen;}
 
     (mkIf isWorker {
-      # services.containerd = {
-      #   enable  = true;
-      #   package = containerdPkg;
-      #   settings.plugins."io.containerd.grpc.v1.cri".systemdCgroup = true;
-      # };
+      virtualisation.containerd = {
+        enable = true;
+        package = containerdPkg;
+        settings.plugins."io.containerd.grpc.v1.cri".systemdCgroup = true;
+      };
     })
 
     (mkIf isMaster {
-      # services.kubernetes = {
-      #   roles = [ "master" ];
-      #
-      #   kubelet.package           = k8sPkgs.kubelet;
-      #   apiserver.package         = k8sPkgs.kube-apiserver;
-      #   controllerManager.package = k8sPkgs.kube-controller-manager;
-      #   scheduler.package         = k8sPkgs.kube-scheduler;
-      #
-      #   etcd = { enable = true; package = etcdPkg; };
-      #
-      #   kubelet.extraOpts = ''
-      #     --container-runtime-endpoint=unix:///run/containerd/containerd.sock
-      #     ${cfg.extraKubeletOpts}
-      #   '';
-      #
-      #   kubeadm.extraConfig = lib.recursiveUpdate
-      #     { apiServer.extraArgs = cfg.extraApiArgs //
-      #         { "service-node-port-range" = cfg.nodePortRange; }; }
-      #     cfg.kubeadmExtra;
-      # };
+      services.kubernetes = {
+        roles = ["master"];
+
+        kubelet.package = k8sPkgs.kubelet;
+        apiserver.package = k8sPkgs.kube-apiserver;
+        controllerManager.package = k8sPkgs.kube-controller-manager;
+        scheduler.package = k8sPkgs.kube-scheduler;
+
+        etcd = {
+          enable = true;
+          package = etcdPkg;
+        };
+
+        kubelet.extraOpts = ''
+          --container-runtime-endpoint=unix:///run/containerd/containerd.sock
+          ${cfg.extraKubeletOpts}
+        '';
+
+        kubeadm.extraConfig =
+          lib.recursiveUpdate
+          {
+            apiServer.extraArgs =
+              cfg.extraApiArgs
+              // {"service-node-port-range" = cfg.nodePortRange;};
+          }
+          cfg.kubeadmExtra;
+      };
     })
 
     (mkIf (isWorker && !isMaster) {
-      # services.kubernetes = {
-      #   roles = [ "node" ];
-      #   kubelet.package = k8sPkgs.kubelet;
-      #   kubelet.extraOpts = ''
-      #     --container-runtime-endpoint=unix:///run/containerd/containerd.sock
-      #     ${cfg.extraKubeletOpts}
-      #   '';
-      #   kubeadm.join = {
-      #     enable     = true;
-      #     address    = cfg.join.address;
-      #     token      = cfg.join.token;
-      #     caCertHash = cfg.join.caHash;
-      #   };
-      # };
-      #
-      # services.containerd = {
-      #   enable  = true;
-      #   package = containerdPkg;
-      #   settings.plugins."io.containerd.grpc.v1.cri".systemdCgroup = true;
-      # };
+      services.kubernetes = {
+        roles = ["node"];
+        kubelet.package = k8sPkgs.kubelet;
+        kubelet.extraOpts = ''
+          --container-runtime-endpoint=unix:///run/containerd/containerd.sock
+          ${cfg.extraKubeletOpts}
+        '';
+        kubeadm.join = {
+          enable = true;
+          address = cfg.join.address;
+          token = cfg.join.token;
+          caCertHash = cfg.join.caHash;
+        };
+      };
+      virtualisation.containerd = {
+        enable = true;
+        package = containerdPkg;
+        settings.plugins."io.containerd.grpc.v1.cri".systemdCgroup = true;
+      };
     })
   ]);
 }
