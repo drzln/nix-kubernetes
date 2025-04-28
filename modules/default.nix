@@ -1,12 +1,9 @@
 # modules/kubernetes/default.nix
-#
-# Self-contained Kubernetes profile for NixOS
-# Enable with:   blackmatter.components.kubernetes.enable = true;
 {
   lib,
-  pkgs,
+  pkgs, # host pkgs
   config,
-  inputs, # <- pass via specialArgs = { inherit inputs; }
+  inputs, # passed through specialArgs / hive defaults
   ...
 }: let
   inherit
@@ -17,47 +14,44 @@
     mkMerge
     types
     recursiveUpdate
-    concatStringsSep
     mapAttrsToList
-    isFunction
-    optionalAttrs
+    concatStringsSep
     ;
 
   cfg = config.blackmatter.components.kubernetes;
 
-  # ── overlay handling ────────────────────────────────────────────────────
-  overlayRaw = cfg.overlay or inputs.nix-kubernetes.overlays.default;
-  overlayFn =
-    if overlayRaw == null
-    then (_: _: {})
-    else if isFunction overlayRaw
-    then overlayRaw
-    else (_: _: overlayRaw);
+  # ───────────────────────── custom overlay ────────────────────────────────
+  # Accept either an attr-set OR a function (self: super: { … })
+  overlay =
+    if cfg.overlay == null
+    then inputs.nix-kubernetes.overlays.default
+    else cfg.overlay;
 
   pkgs' = import inputs.nixpkgs {
     system = pkgs.system;
-    overlays = [overlayFn];
+    overlays = [overlay];
   };
 
-  # ── packages we actually run ────────────────────────────────────────────
-  k8sPkgs =
-    optionalAttrs (pkgs' ? kubernetesPackages) pkgs'.kubernetesPackages
-    // {
-      kubelet = pkgs'.kubelet;
-      kube-apiserver = pkgs'.kube-apiserver;
-      kube-controller-manager = pkgs'.kube-controller-manager;
-      kube-scheduler = pkgs'.kube-scheduler;
-      kubeadm = pkgs'.kubeadm;
-    };
+  # ─────────────── packages we actually run on the machine ────────────────
+  mkReq = name:
+    assert pkgs' ? ${name}; pkgs'.${name};
 
-  # never-null fallbacks
-  etcdPkg = cfg.etcdPackage or pkgs'.etcd or pkgs.etcd;
-  containerdPkg = cfg.containerdPackage or pkgs'.containerd or pkgs.containerd;
+  k8sPkgs = {
+    kubelet = mkReq "kubelet";
+    kubectl = mkReq "kubectl";
+    kube-apiserver = mkReq "kube-apiserver";
+    kube-controller-manager = mkReq "kube-controller-manager";
+    kube-scheduler = mkReq "kube-scheduler";
+    kubeadm = mkReq "kubeadm";
+  };
+
+  etcdPkg = cfg.etcdPackage       or mkReq "etcd";
+  containerdPkg = cfg.containerdPackage or mkReq "containerd";
 
   isMaster = cfg.role == "master" || cfg.role == "single";
   isWorker = cfg.role == "worker" || cfg.role == "single";
 
-  # minimal containerd config
+  # ─────────────── minimal containerd config ───────────────────────────────
   containerdConf = ''
     version = 2
     [plugins."io.containerd.grpc.v1.cri"]
@@ -65,35 +59,39 @@
       systemd_cgroup = true
   '';
 
-  # kubeadm YAML
+  # kubeadm YAML rendered from Nix attr-set
   kubeadmConfig = lib.generators.toYAML {} (recursiveUpdate {
       apiVersion = "kubeadm.k8s.io/v1beta3";
       kind = "ClusterConfiguration";
       kubernetesVersion = "v1.30.0";
-      networking.serviceSubnet = "10.96.0.0/12";
-      networking.podSubnet = "10.244.0.0/16";
+      networking = {
+        serviceSubnet = "10.96.0.0/12";
+        podSubnet = "10.244.0.0/16";
+      };
       apiServer.extraArgs =
-        cfg.extraApiArgs
-        // {"service-node-port-range" = cfg.nodePortRange;};
+        cfg.extraApiArgs // {"service-node-port-range" = cfg.nodePortRange;};
     }
     cfg.kubeadmExtra);
 in
-  ############################################################################
+  #############################################################################
   # Options
-  ############################################################################
+  #############################################################################
   {
     options.blackmatter.components.kubernetes = {
-      enable = mkEnableOption "BlackMatter Kubernetes";
+      enable = mkEnableOption "BlackMatter self-contained Kubernetes";
 
       role = mkOption {
         type = types.enum ["master" "worker" "single"];
         default = "single";
+        description = "Control-plane, worker or all-in-one node";
       };
 
       overlay = mkOption {
+        # allow attr-set OR overlay function
         type = types.nullOr types.anything;
         default = null;
       };
+
       etcdPackage = mkOption {
         type = types.nullOr types.package;
         default = null;
@@ -119,6 +117,7 @@ in
         type = types.attrs;
         default = {};
       };
+
       firewallOpen = mkOption {
         type = types.bool;
         default = false;
@@ -140,19 +139,20 @@ in
       };
     };
 
-    ############################################################################
+    #############################################################################
     # Implementation
-    ############################################################################
+    #############################################################################
     config = mkIf cfg.enable (mkMerge [
-      # ── common to every node ───────────────────────────────────────────────
+      #################### Common to every node ################################
       {
         networking.firewall.enable = cfg.firewallOpen;
 
+        # ------ files / dirs needed by our services ---------------------------
         systemd.tmpfiles.rules = [
-          "d /etc/containerd              0755 root root  - -"
-          "d /var/lib/containerd          0710 root root  - -"
-          "d /etc/kubernetes/manifests    0755 root root  - -"
-          "d /var/lib/kubelet             0755 kubelet kubelet - -"
+          "d /etc/containerd 0755 root root - -"
+          "d /var/lib/containerd 0710 root root - -"
+          "d /etc/kubernetes/manifests 0755 root root - -"
+          "d /var/lib/kubelet 0755 kubelet kubelet - -"
         ];
 
         environment.etc."containerd/config.toml".text = containerdConf;
@@ -163,18 +163,20 @@ in
         };
         users.groups.kubelet = {};
 
+        # -------------------- containerd --------------------------------------
         systemd.services.containerd = {
-          description = "Self-contained containerd";
+          description = "Self-contained containerd runtime";
           wantedBy = ["multi-user.target"];
           after = ["network.target"];
           environment = {PATH = "/run/wrappers/bin:${pkgs.coreutils}/bin";};
           serviceConfig = {
             ExecStart = "${containerdPkg}/bin/containerd --config /etc/containerd/config.toml";
             Restart = "always";
-            Delegate = true;
+            Delegate = true; # needed for cgroup v2
           };
         };
 
+        # -------------------- kubelet -----------------------------------------
         systemd.services.kubelet = {
           description = "Kubernetes kubelet";
           wantedBy = ["multi-user.target"];
@@ -194,8 +196,9 @@ in
         };
       }
 
-      # ── control-plane only ────────────────────────────────────────────────
+      #################### Control-plane only ##################################
       (mkIf isMaster {
+        # -------------------- etcd --------------------------------------------
         users.users.etcd = {
           isSystemUser = true;
           group = "etcd";
@@ -208,25 +211,26 @@ in
           wantedBy = ["multi-user.target"];
           serviceConfig = {
             ExecStart = ''
-              ${etcdPkg}/bin/etcd \
-                --data-dir=/var/lib/etcd \
-                --advertise-client-urls=http://127.0.0.1:2379 \
+              ${etcdPkg}/bin/etcd                                   \
+                --data-dir=/var/lib/etcd                             \
+                --advertise-client-urls=http://127.0.0.1:2379        \
                 --listen-client-urls=http://127.0.0.1:2379
             '';
             Restart = "always";
           };
         };
 
+        # -------------------- API server --------------------------------------
         systemd.services.kube-apiserver = {
           description = "Kubernetes API server";
           wantedBy = ["multi-user.target"];
           after = ["etcd.service"];
           serviceConfig = {
             ExecStart = ''
-              ${k8sPkgs.kube-apiserver}/bin/kube-apiserver \
-                --etcd-servers=http://127.0.0.1:2379 \
-                --advertise-address=127.0.0.1 \
-                --allow-privileged=true \
+              ${k8sPkgs.kube-apiserver}/bin/kube-apiserver            \
+                --etcd-servers=http://127.0.0.1:2379                  \
+                --advertise-address=127.0.0.1                         \
+                --allow-privileged=true                               \
                 ${concatStringsSep " " (mapAttrsToList (k: v: "--${k}=${v}") cfg.extraApiArgs)} \
                 --service-node-port-range=${cfg.nodePortRange}
             '';
@@ -234,6 +238,7 @@ in
           };
         };
 
+        # -------------------- controller-manager ------------------------------
         systemd.services.kube-controller-manager = {
           description = "Kubernetes controller-manager";
           wantedBy = ["multi-user.target"];
@@ -241,13 +246,14 @@ in
           serviceConfig = {
             ExecStart = ''
               ${k8sPkgs.kube-controller-manager}/bin/kube-controller-manager \
-                --kubeconfig=/etc/kubernetes/controller-manager.conf \
+                --kubeconfig=/etc/kubernetes/controller-manager.conf          \
                 --leader-elect=true
             '';
             Restart = "always";
           };
         };
 
+        # -------------------- scheduler ---------------------------------------
         systemd.services.kube-scheduler = {
           description = "Kubernetes scheduler";
           wantedBy = ["multi-user.target"];
@@ -262,6 +268,7 @@ in
           };
         };
 
+        # -------------------- kubeadm init (one-shot) -------------------------
         systemd.services.kubeadm-init = {
           description = "kubeadm init (first boot)";
           wantedBy = ["multi-user.target"];
@@ -271,7 +278,7 @@ in
             Type = "oneshot";
             ExecStart = ''
               ${k8sPkgs.kubeadm}/bin/kubeadm init \
-                --skip-token-print \
+                --skip-token-print                \
                 --config /etc/kubeadm.yaml
             '';
             RemainAfterExit = true;
@@ -281,7 +288,7 @@ in
         environment.etc."kubeadm.yaml".text = kubeadmConfig;
       })
 
-      # ── workers (non-masters) ─────────────────────────────────────────────
+      #################### Worker only (pure nodes) ###########################
       (mkIf (isWorker && !isMaster) {
         systemd.services.kubeadm-join = {
           description = "kubeadm join (first boot)";
@@ -292,8 +299,8 @@ in
             Type = "oneshot";
             ExecStart = ''
               ${k8sPkgs.kubeadm}/bin/kubeadm join \
-                ${cfg.join.address} \
-                --token ${cfg.join.token} \
+                ${cfg.join.address}               \
+                --token ${cfg.join.token}         \
                 --discovery-token-ca-cert-hash ${cfg.join.caHash}
             '';
             RemainAfterExit = true;
