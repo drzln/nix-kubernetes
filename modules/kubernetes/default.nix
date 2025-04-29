@@ -11,23 +11,21 @@
 in {
   imports =
     [
-      ./pkgs.nix
       ./options.nix
-      ./assertions.nix
-      ./files.nix
-      ./firewall.nix
+      # ./pkgs.nix
+      # ./assertions.nix
+      # ./files.nix
+      # ./firewall.nix
 
-      ./services/containerd.nix
-      ./services/kubelet.nix
-      ./services/kubeadm.nix
-      ./services/proxy.nix
+      # ./services/containerd.nix
+      # ./services/kubelet.nix
+      # ./services/kubeadm.nix
+      # ./services/proxy.nix
     ]
     ++ lib.optional isMaster [
-      ./services/etcd.nix
-      ./services/apiserver.nix
-      ./services/controller.nix
-      ./services/scheduler.nix
+      # ./services/etcd.nix
+      # ./services/apiserver.nix
+      # ./services/controller.nix
+      # ./services/scheduler.nix
     ];
-
-  # nothing else; every real setting lives in sub-files
 }
