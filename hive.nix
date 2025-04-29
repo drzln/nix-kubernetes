@@ -8,7 +8,7 @@ inputs.colmena.lib.makeHive {
   };
 
   master-1 = {pkgs, ...}: {
-    imports = [./modules];
+    imports = [./modules/kubernetes];
     kubernetes = {
       enable = true;
       role = "master";
@@ -20,7 +20,7 @@ inputs.colmena.lib.makeHive {
   };
 
   master-2 = {pkgs, ...}: {
-    imports = [./modules];
+    imports = [./modules/kubernetes];
     kubernetes = {
       enable = true;
       role = "master";
@@ -32,7 +32,7 @@ inputs.colmena.lib.makeHive {
   };
 
   worker = {pkgs, ...}: {
-    imports = [./modules];
+    imports = [./modules/kubernetes];
     kubernetes = {
       enable = true;
       role = "worker";
@@ -47,7 +47,7 @@ inputs.colmena.lib.makeHive {
   };
 
   single = {pkgs, ...}: {
-    imports = [./modules];
+    imports = [./modules/kubernetes];
     kubernetes = {
       enable = true;
       role = "single";
