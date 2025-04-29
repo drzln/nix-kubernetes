@@ -12,8 +12,8 @@ inputs.colmena.lib.makeHive {
     kubernetes = {
       enable = true;
       role = "master";
-      etcdPackage = pkgs.etcd;
-      containerdPackage = pkgs.containerd;
+      # etcdPackage = pkgs.etcd;
+      # containerdPackage = pkgs.containerd;
     };
     networking.hostName = "master-1";
     deployment.targetHost = "192.168.1.10";

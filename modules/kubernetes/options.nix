@@ -6,6 +6,7 @@ with lib; {
       type = types.enum ["master" "worker" "single"];
       default = "master";
     };
+
     overlay = mkOption {
       type = types.nullOr types.anything;
       default = null;
@@ -15,6 +16,7 @@ with lib; {
       type = types.nullOr types.package;
       default = null;
     };
+
     containerdPackage = mkOption {
       type = types.nullOr types.package;
       default = null;
@@ -24,14 +26,17 @@ with lib; {
       type = types.nullOr types.str;
       default = null;
     };
+
     extraApiArgs = mkOption {
       type = types.listOf types.str;
       default = [];
     };
+
     extraKubeletOpts = mkOption {
       type = types.listOf types.str;
       default = [];
     };
+
     kubeadmExtra = mkOption {
       type = types.str;
       default = "";
@@ -46,10 +51,12 @@ with lib; {
       type = types.str;
       default = "";
     };
+
     join.token = mkOption {
       type = types.str;
       default = "";
     };
+
     join.caHash = mkOption {
       type = types.str;
       default = "";
