@@ -8,15 +8,15 @@ inputs.colmena.lib.makeHive {
   };
 
   master-1 = {pkgs, ...}: {
-    imports = [./modules/kubernetes];
+    imports = [inputs.self.nixosModules.kubernetes];
     kubernetes = {
       enable = true;
       role = "master";
       # etcdPackage = pkgs.etcd;
       # containerdPackage = pkgs.containerd;
     };
-    networking.hostName = "master-1";
-    deployment.targetHost = "192.168.1.10";
+    # networking.hostName = "master-1";
+    # deployment.targetHost = "192.168.1.10";
   };
 
   # master-2 = {pkgs, ...}: {
