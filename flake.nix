@@ -73,7 +73,7 @@
       };
     })
     // {
-      nixosModules.kubernetes = ./modules/kubernetes;
+      nixosModules.kubernetes = ./modules/kubernetes/default.nix;
       colmenaHive = import ./hive.nix {inherit inputs;};
     };
 }
