@@ -1,6 +1,6 @@
 {
+  # pkgs,
   lib,
-  pkgs,
   config,
   ...
 } @ args: let
