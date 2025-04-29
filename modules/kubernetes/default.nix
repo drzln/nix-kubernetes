@@ -22,6 +22,7 @@ in {
       # ./services/kubeadm.nix
       # ./services/proxy.nix
     ]
+    ++ lib.optional isWorker []
     ++ lib.optional isMaster [
       # ./services/etcd.nix
       # ./services/apiserver.nix
