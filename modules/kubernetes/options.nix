@@ -8,10 +8,10 @@ with lib; {
       default = "master";
     };
 
-    # overlay = mkOption {
-    #   type = types.nullOr types.anything;
-    #   default = null;
-    # };
+    overlay = mkOption {
+      type = types.nullOr types.anything;
+      default = null;
+    };
 
     # etcdPackage = mkOption {
     #   type = types.nullOr types.package;
