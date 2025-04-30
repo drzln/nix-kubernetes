@@ -18,10 +18,10 @@ with lib; {
       default = null;
     };
 
-    # containerdPackage = mkOption {
-    #   type = types.nullOr types.package;
-    #   default = null;
-    # };
+    containerdPackage = mkOption {
+      type = types.nullOr types.package;
+      default = null;
+    };
 
     # nodePortRange = mkOption {
     #   type = types.nullOr types.str;
