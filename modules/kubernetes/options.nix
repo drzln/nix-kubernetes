@@ -28,39 +28,39 @@ with lib; {
       default = null;
     };
 
-    # extraApiArgs = mkOption {
-    #   type = types.listOf types.str;
-    #   default = [];
-    # };
+    extraApiArgs = mkOption {
+      type = types.listOf types.str;
+      default = [];
+    };
 
-    # extraKubeletOpts = mkOption {
-    #   type = types.listOf types.str;
-    #   default = [];
-    # };
+    extraKubeletOpts = mkOption {
+      type = types.listOf types.str;
+      default = [];
+    };
 
-    # kubeadmExtra = mkOption {
-    #   type = types.str;
-    #   default = "";
-    # };
+    kubeadmExtra = mkOption {
+      type = types.str;
+      default = "";
+    };
 
-    # firewallOpen = mkOption {
-    #   type = types.bool;
-    #   default = false;
-    # };
+    firewallOpen = mkOption {
+      type = types.bool;
+      default = false;
+    };
 
-    # join.address = mkOption {
-    #   type = types.str;
-    #   default = "";
-    # };
+    join.address = mkOption {
+      type = types.str;
+      default = "";
+    };
 
-    # join.token = mkOption {
-    #   type = types.str;
-    #   default = "";
-    # };
+    join.token = mkOption {
+      type = types.str;
+      default = "";
+    };
 
-    # join.caHash = mkOption {
-    #   type = types.str;
-    #   default = "";
-    # };
+    join.caHash = mkOption {
+      type = types.str;
+      default = "";
+    };
   };
 }
