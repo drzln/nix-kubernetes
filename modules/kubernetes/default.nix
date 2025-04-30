@@ -13,7 +13,7 @@ in {
     [
       ./options.nix
       ./pkgs.nix
-      # ./assertions.nix
+      ./assertions.nix
       # ./files.nix
       # ./firewall.nix
 
