@@ -23,10 +23,10 @@ with lib; {
       default = null;
     };
 
-    # nodePortRange = mkOption {
-    #   type = types.nullOr types.str;
-    #   default = null;
-    # };
+    nodePortRange = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+    };
 
     # extraApiArgs = mkOption {
     #   type = types.listOf types.str;
