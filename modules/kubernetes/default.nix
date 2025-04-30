@@ -12,7 +12,7 @@ in {
   imports =
     [
       ./options.nix
-      # ./pkgs.nix
+      ./pkgs.nix
       # ./assertions.nix
       # ./files.nix
       # ./firewall.nix
@@ -22,7 +22,8 @@ in {
       # ./services/kubeadm.nix
       # ./services/proxy.nix
     ]
-    ++ lib.optional isWorker []
+    ++ lib.optional isWorker [
+    ]
     ++ lib.optional isMaster [
       # ./services/etcd.nix
       # ./services/apiserver.nix
