@@ -13,10 +13,10 @@ with lib; {
       default = null;
     };
 
-    # etcdPackage = mkOption {
-    #   type = types.nullOr types.package;
-    #   default = null;
-    # };
+    etcdPackage = mkOption {
+      type = types.nullOr types.package;
+      default = null;
+    };
 
     # containerdPackage = mkOption {
     #   type = types.nullOr types.package;
