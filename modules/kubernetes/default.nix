@@ -11,7 +11,7 @@
 in {
   imports =
     [
-      # ./options.nix
+      ./options.nix
       # ./pkgs.nix
       # ./assertions.nix
       # ./files.nix
