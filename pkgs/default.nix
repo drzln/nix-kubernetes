@@ -39,4 +39,5 @@
   cmctl = callPackage ./cmctl {};
   spire-server = callPackage ./spire-server {};
   spire-agent = callPackage ./spire-agent {};
+  oidc-discovery-provider = callPackage ./oidc-discovery-provider {};
 }
