@@ -28,7 +28,7 @@ in
     vendorHash = null; # build once → copy printed hash here
 
     # The CLI’s main package lives in ./cmd/cilium
-    subPackages = ["./cmd/cilium"];
+    subPackages = ["."];
 
     # Static, stripped binary
     env.CGO_ENABLED = "0";
