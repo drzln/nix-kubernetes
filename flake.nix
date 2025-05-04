@@ -35,13 +35,13 @@
         with import ./pkgs/containerd pkgs;
         with pkgs; {
           inherit
+            containerd
             # kubelet
             # kubectl
             # kube-apiserver
             # kube-controller-manager
             # kube-scheduler
             # etcdserver
-            containerd
             # cilium-cli
             # etcdctl
             # etcdutl
