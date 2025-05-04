@@ -14,7 +14,7 @@ in {
       ./options.nix
       ./pkgs.nix
       ./assertions.nix
-      # ./files.nix
+      ./files.nix
       # ./firewall.nix
 
       # ./services/containerd.nix
