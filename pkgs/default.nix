@@ -33,4 +33,5 @@
   node-problem-detector = callPackage ./node-problem-detector {};
   csi-driver-host-path = callPackage ./csi-driver-host-path {};
   aws-ebs-csi-driver = callPackage ./aws-ebs-csi-driver {};
+  external-dns = callPackage ./external-dns {};
 }
