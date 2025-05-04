@@ -1,3 +1,4 @@
+# pkgs/cilium-agent/default.nix
 {
   lib,
   buildGoModule,
@@ -31,7 +32,7 @@ in
     # Build only the agent’s main package
     #   main.go lives in daemon/cmd/
     ############################################################################
-    subPackages = ["daemon/cmd"];
+    subPackages = ["daemon"];
 
     # produce a fully-static binary
     env.CGO_ENABLED = "0";
