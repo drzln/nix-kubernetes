@@ -12,7 +12,7 @@ buildGoModule rec {
     rev = "v${version}";
     sha256 = "sha256-UgltnGkzAtUfuXzNfnNWOGIKC7IUi6Yy0YZuOgyNSaA=";
   };
-  vendorHash = null;
+  vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   subPackages = ["."]; # main.go is at the repo root
   ldflags = [
     "-s"
