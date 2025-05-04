@@ -1,5 +1,5 @@
 {
-  # lib,
+  lib,
   # config,
   ...
 } @ args: let
