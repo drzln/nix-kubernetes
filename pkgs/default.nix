@@ -16,10 +16,6 @@
     etcdctl
     etcdutl
     ;
-
-  # etcd = callPackage ./etcd {};
-  # etcdctl = callPackage ./etcd/ctl.nix {};
-  # etcdutl = callPackage ./etcd/utl.nix {};
   # cilium-cli = callPackage ./cilium-cli {};
   # runc = callPackage ./runc {};
 }
