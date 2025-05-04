@@ -1,11 +1,10 @@
-# pkgs/cilium-agent/default.nix
+# pkgs/cilium-bugtool/default.nix
 {
   lib,
   buildGoModule,
   fetchFromGitHub,
   ...
 }: let
-  # Keep in lock-step with the rest of your Cilium stack
   version = "1.17.3";
 in
   buildGoModule {
