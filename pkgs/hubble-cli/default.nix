@@ -1,3 +1,4 @@
+# pkgs/cilium-agent/default.nix
 {
   lib,
   buildGoModule,
