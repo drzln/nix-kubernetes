@@ -4,7 +4,7 @@
   callPackage,
 }: {
   containerd = callPackage ./containerd {};
-  # kube-apiserver = callPackage ./kube-apiserver {};
+  kube-apiserver = callPackage ./kube-apiserver {};
   # kube-scheduler = callPackage ./kube-scheduler {};
   # kube-controller = callPackage ./kube-controller {};
   # kubelet = callPackage ./kubelet {};
