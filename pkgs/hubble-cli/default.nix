@@ -20,7 +20,7 @@ in
       rev = "v${version}";
       # First time:  nix-prefetch-url --type sha256 \
       #              https://github.com/cilium/hubble/archive/refs/tags/v0.13.2.tar.gz
-      sha256 = "1q2akgwi1r5xpc2gs7k2k96mfkdq2q9n4f4s3p37gbsm3dd5aspn";
+      sha256 = "sha256-0SCuQzRwluowF48lzyLxY+0rvTOyDbpkMI7Iwb6GHJo=";
     };
 
     ############################################################################
