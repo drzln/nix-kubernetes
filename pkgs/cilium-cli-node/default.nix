@@ -20,7 +20,7 @@ in
       rev = "v${version}";
       # Prefetch once: nix-prefetch-url --type sha256 \
       #   https://github.com/cilium/cilium/archive/refs/tags/v1.15.4.tar.gz
-      sha256 = "sha256-REPLACE_AFTER_PREFETCH";
+      sha256 = "1q2akgwi1r5xpc2gs7k2k96mfkdq2q9n4f4s3p37gbsm3dd5aspn";
     };
 
     ############################################################################
