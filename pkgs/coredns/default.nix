@@ -6,31 +6,19 @@
 }:
 buildGoModule rec {
   pname = "coredns";
-  version = "1.11.1"; # or the latest stable
+  version = "1.12.1";
 
   src = fetchFromGitHub {
     owner = "coredns";
     repo = "coredns";
     rev = "v${version}";
-    sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # Replace after first run
+    sha256 = "sha256-XZoRN907PXNKV2iMn51H/lt8yPxhPupNfJ49Pymdm9Y=";
   };
-
-  vendorHash = null; # Let Nix print it the first time
-
-  subPackages = ["."]; # root of repo builds the coredns binary
-
+  vendorHash = null;
+  subPackages = ["."];
   ldflags = [
     "-s"
     "-w"
   ];
-
   doCheck = false;
-
-  meta = with lib; {
-    description = "CoreDNS is a DNS server that chains plugins and serves as the cluster DNS in Kubernetes.";
-    homepage = "https://coredns.io";
-    license = licenses.asl20;
-    maintainers = with maintainers; []; # Add yourself
-    platforms = platforms.linux;
-  };
 }
