@@ -14,7 +14,7 @@ buildGoModule rec {
     sha256 = "sha256-iT+Plrk0FsDnUISx2ZNSqxx777Yw+xGq8YWWgQpmzGw=";
   };
 
-  vendorHash = null;
+  vendorHash = "sha256-iT+Plrk0FsDnUISx2ZNSqxx777Yw+xGq8YWWgQpmzGw=";
 
   subPackages = ["cmd/ebs-plugin"]; # this is the main binary
 
