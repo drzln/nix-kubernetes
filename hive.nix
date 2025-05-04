@@ -25,6 +25,7 @@ inputs.colmena.lib.makeHive {
   };
 
   master-1 = {pkgs, ...}: {
+    imports = [./modules/kubernetes];
     # imports = [inputs.self.nixosModules.kubernetes];
     networking.hostName = "master-1";
     deployment.targetHost = "192.168.1.10";
