@@ -10,7 +10,7 @@ buildGoModule {
     owner  = "cilium";
     repo   = "cilium";
     rev    = "v${version}";
-    sha256 = "1q2akgwi1r5xpc2gs7k2k96mfkdq2q9n4f4s3p37gbsm3dd5aspn";           # tar-ball hash
+    sha256 = "sha256-HcKRenRILpJCzJZbOYzrQrLlEeif9J9jJDKFzA6NtXc=";           # tar-ball hash
   };
 
   vendorHash  = null;                                   # first build prints it
