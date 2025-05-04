@@ -2,7 +2,11 @@
 inputs.colmena.lib.makeHive {
   meta.nixpkgs = import inputs.nixpkgs {system = "x86_64-linux";};
 
-  defaults = {pkgs, ...}: {
+  defaults = {
+    pkgs,
+    lib,
+    ...
+  }: {
     _module.args.inputs = inputs;
     system.stateVersion = "24.05";
 
