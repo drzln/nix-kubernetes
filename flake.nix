@@ -41,7 +41,7 @@
     # Overlay puts packages under pkgs.blackmatter.k8s
     blackmatterOverlay = import ./overlays/blackmatter-k8s.nix;
   in
-    flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux"]
+    flake-utils.lib.eachSystem ["x86_64-linux"]
     ({
       system,
       pkgs,
