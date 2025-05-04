@@ -5,7 +5,7 @@
   ...
 }: let
   # Keep this aligned with the Cilium datapath you plan to deploy.
-  version = "0.17.3";
+  version = "0.18.3";
 in
   buildGoModule {
     pname = "cilium-cli";
@@ -19,7 +19,7 @@ in
       repo = "cilium-cli";
       rev = "v${version}";
       # First run: set to lib.fakeHash or leave null, prefetch to fill in
-      sha256 = "sha256-a+nNZEXjSoNB/Ftn/CtoBcR/uaD71C1jzDEaEG3Wpb4=";
+      sha256 = "sha256-9+nNZEXjSoNB/Ftn/CtoBcR/uaD71C1jzDEaEG3Wpb4=";
     };
 
     ############################################################################
