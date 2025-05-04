@@ -27,7 +27,7 @@ in
     #  Put a fake hash the first time:
     #  vendorSha256 = lib.fakeHash;
     #  then run `nix build .#kube-apiserver` to get the real hash.
-    vendorSha256 = "sha256-BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB";
+    vendorHash = null;
 
     # Build only the apiserver binary out of the Kubernetes monorepo
     subPackages = ["cmd/kube-apiserver"];
