@@ -5,7 +5,7 @@
   ...
 }: let
   # Keep this in lock-step with the agent version you deploy
-  version = "1.15.4";
+  version = "1.17.3";
 in
   buildGoModule {
     pname = "cilium-operator";
@@ -30,7 +30,7 @@ in
     ############################################################################
     # Build ONLY the operator’s main package
     ############################################################################
-    subPackages = ["operator/cmd"]; # <repo>/operator/cmd/main.go
+    subPackages = ["operator"]; # <repo>/operator/cmd/main.go
 
     # Static build (no CGO / libc dependency)
     env.CGO_ENABLED = "0";
