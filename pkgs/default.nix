@@ -42,4 +42,5 @@
   oidc-discovery-provider = callPackage ./oidc-discovery-provider {};
   woodpecker-server = callPackage ./woodpecker-server {};
   woodpecker-agent = callPackage ./woodpecker-agent {};
+  woodpecker-cli = callPackage ./woodpecker-cli {};
 }
