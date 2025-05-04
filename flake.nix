@@ -41,7 +41,7 @@
     ...
   }: let
     # ── Overlay: put everything under pkgs.blackmatter.k8s ────────────────
-    blackmatterOverlay = import ./overlay.nix;
+    blackmatterOverlay = import ./overlays/blackmatter-k8s.nix;
   in
     flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux"] (system: let
       pkgs = import nixpkgs {
