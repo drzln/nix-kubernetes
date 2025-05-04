@@ -18,6 +18,7 @@
     ;
   runc = callPackage ./runc {};
   cilium-cli = callPackage ./cilium-cli {};
+  cilium-cli-node = callPackage ./cilium-cli-node {};
   cilium-agent = callPackage ./cilium-agent {};
   cilium-operator = callPackage ./cilium-operator {};
   cilium-cni = callPackage ./cilium-cni {};
