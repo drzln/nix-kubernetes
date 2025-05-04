@@ -1,3 +1,4 @@
+# pkgs/hubble-relay/default.nix
 {
   lib,
   buildGoModule,
