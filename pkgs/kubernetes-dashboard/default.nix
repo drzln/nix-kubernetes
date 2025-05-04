@@ -14,7 +14,7 @@ buildGoModule rec {
     sha256 = "sha256-ESC9xdMj6KxV9QcXc4XYAGmKBfWxs4zfGVEAsidIUSg=";
   };
 
-  vendorHash = null;
+  vendorHash = "sha256-ESC9xdMj6KxV9QcXc4XYAGmKBfWxs4zfGVEAsidIUSg=";
 
   subPackages = ["cmd/dashboard"]; # ← Go backend binary
 
