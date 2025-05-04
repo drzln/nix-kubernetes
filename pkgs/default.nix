@@ -41,4 +41,5 @@
   spire-agent = callPackage ./spire-agent {};
   oidc-discovery-provider = callPackage ./oidc-discovery-provider {};
   woodpecker-server = callPackage ./woodpecker-server {};
+  woodpecker-agent = callPackage ./woodpecker-agent {};
 }
