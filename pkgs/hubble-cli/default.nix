@@ -1,4 +1,4 @@
-# pkgs/cilium-agent/default.nix
+# pkgs/hubble-cli/default.nix
 {
   lib,
   buildGoModule,
