@@ -37,4 +37,5 @@
   aws-ebs-csi-driver = callPackage ./aws-ebs-csi-driver {};
   external-dns = callPackage ./external-dns {};
   cmctl = callPackage ./cmctl {};
+  kubernetes-dashboard = callPackage ./kubernetes-dashboard {};
 }
