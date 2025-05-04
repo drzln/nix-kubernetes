@@ -13,7 +13,7 @@ buildGoModule rec {
     sha256 = "sha256-gg3FhPDXqnn3y/tcvlHTd0t8KxtPGTrN/2buBSVffBg=";
   };
   vendorHash = null;
-  subPackages = ["."];
+  subPackages = ["./cmd/tkn"];
   env.CGO_ENABLED = "0";
   ldflags = [
     "-s"
