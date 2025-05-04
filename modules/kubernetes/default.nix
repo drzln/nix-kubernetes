@@ -15,7 +15,7 @@ in {
       ./pkgs.nix
       ./assertions.nix
       ./files.nix
-      # ./firewall.nix
+      ./firewall.nix
 
       # ./services/containerd.nix
       # ./services/kubelet.nix
