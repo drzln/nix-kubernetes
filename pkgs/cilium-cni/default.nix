@@ -14,7 +14,7 @@ in
       owner = "cilium";
       repo = "cilium";
       rev = "v${version}";
-      sha256 = "sha256-aHdpVXTHLh7UjBXgKMeM0l8Dl555zY8IN65nEtbtycA=";
+      sha256 = "sha256-HcKRenRILpJCzJZbOYzrQrLlEeif9J9jJDKFzA6NtXc=";
     };
     vendorHash = null;
     subPackages = ["plugins/cilium-cni"];
