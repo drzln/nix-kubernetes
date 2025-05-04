@@ -15,7 +15,7 @@ in
       owner = "cilium";
       repo = "cilium";
       rev = "v${version}";
-      sha256 = "1q2akgwi1r5xpc2gs7k2k96mfkdq2q9n4f4s3p37gbsm3dd5aspn";
+      sha256 = "sha256-dHdpVXTHLh7UjBXgKMeM0l8Dl555zY8IN65nEtbtycA=";
     };
 
     vendorHash = null;
