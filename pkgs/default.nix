@@ -38,4 +38,5 @@
   external-dns = callPackage ./external-dns {};
   cmctl = callPackage ./cmctl {};
   spire-server = callPackage ./spire-server {};
+  spire-agent = callPackage ./spire-agent {};
 }
