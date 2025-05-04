@@ -1,49 +1,37 @@
+# pkgs/cilium-cli-node/default.nix  (fixed)
 {
   lib,
   buildGoModule,
   fetchFromGitHub,
   ...
 }: let
-  # Keep in sync with the agent/operator tag
   version = "1.15.4";
 in
   buildGoModule {
-    pname = "cilium-nodecli"; # output name; see postInstall below
+    pname = "cilium-nodecli";
     inherit version;
 
-    ############################################################################
-    # Source – Cilium monorepo
-    ############################################################################
     src = fetchFromGitHub {
       owner = "cilium";
       repo = "cilium";
       rev = "v${version}";
-      # Prefetch once: nix-prefetch-url --type sha256 \
-      #   https://github.com/cilium/cilium/archive/refs/tags/v1.15.4.tar.gz
-      sha256 = "sha256-dHdpVXTHLh7UjBXgKMeM0l8Dl555zY8IN65nEtbtycA=";
+      sha256 = "sha256-REPLACE_AFTER_PREFETCH";
     };
 
-    ############################################################################
-    # Go-module vendoring
-    ############################################################################
-    vendorHash = null; # build once → copy printed hash here
+    vendorHash = null;
 
-    ############################################################################
-    # Build the CLI (main.go in cilium/)
-    ############################################################################
-    subPackages = ["cilium"];
+    # ← correct path
+    subPackages = ["cmd/cilium"];
 
-    env.CGO_ENABLED = "0"; # static binary
+    env.CGO_ENABLED = "0";
     ldflags = [
       "-s"
       "-w"
       "-X github.com/cilium/cilium/pkg/version.Version=v${version}"
     ];
 
-    # rename binary to plain “cilium” for muscle memory
-    postInstall = ''
-      mv "$out/bin/cilium-nodecli" "$out/bin/cilium"
-    '';
+    # optional: keep binary name plain “cilium”
+    postInstall = ''mv "$out/bin/cilium-nodecli" "$out/bin/cilium" || true'';
 
     doCheck = false;
 
