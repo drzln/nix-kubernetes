@@ -18,9 +18,9 @@ in {
       ./firewall.nix
 
       ./services/containerd.nix
-      # ./services/kubelet.nix
-      # ./services/kubeadm.nix
-      # ./services/proxy.nix
+      ./services/kubelet.nix
+      ./services/kubeadm.nix
+      ./services/proxy.nix
     ]
     ++ lib.optional isWorker [
     ]
