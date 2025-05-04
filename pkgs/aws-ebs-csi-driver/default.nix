@@ -16,7 +16,7 @@ buildGoModule rec {
 
   vendorHash = "sha256-FosfFQ471zAMhtnSOXPLtzG6OxnyFigbgpe9DkGjjsY=";
 
-  subPackages = ["cmd/ebs-plugin"]; # this is the main binary
+  subPackages = ["cmd"];
 
   env.CGO_ENABLED = "0";
 
