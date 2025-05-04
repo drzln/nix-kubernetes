@@ -25,4 +25,5 @@
   cilium-bugtool = callPackage ./cilium-bugtool {};
   clustermesh-apiserver = callPackage ./clustermesh-apiserver {};
   hubble-relay = callPackage ./hubble-relay {};
+  hubble-cli = callPackage ./hubble-cli {};
 }
