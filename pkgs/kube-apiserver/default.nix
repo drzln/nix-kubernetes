@@ -19,7 +19,7 @@ in
       repo = "kubernetes";
       rev = "v${version}";
       # Replace this with the real SRI hash once you prefetched it
-      sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+      sha256 = "sha256-nTVjgNMnB6775ubzK7ezOxR5Z0z5PBxx88CxtbxGxrY=";
     };
 
     # ░░ Go module dependencies ░░
