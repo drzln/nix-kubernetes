@@ -34,4 +34,5 @@
   csi-driver-host-path = callPackage ./csi-driver-host-path {};
   aws-ebs-csi-driver = callPackage ./aws-ebs-csi-driver {};
   external-dns = callPackage ./external-dns {};
+  cmctl = callPackage ./cmctl {};
 }
