@@ -14,7 +14,7 @@ buildGoModule rec {
     sha256 = "sha256-D6NNG//1rM7EIzawKdMA/8nloqMNAkF75YyFpHvxUkI=";
   };
 
-  vendorHash = null;
+  vendorHash = "sha256-D6NNG//1rM7EIzawKdMA/8nloqMNAkF75YyFpHvxUkI=";
 
   subPackages = ["cmd/spire-agent"];
 
