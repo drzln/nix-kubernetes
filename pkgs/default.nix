@@ -32,6 +32,7 @@
   kube-state-metrics = callPackage ./kube-state-metrics {};
   node-problem-detector = callPackage ./node-problem-detector {};
   csi-driver-host-path = callPackage ./csi-driver-host-path {};
+  csi-snapshot-controller = callPackage ./csi-snapshot-controller {};
   aws-ebs-csi-driver = callPackage ./aws-ebs-csi-driver {};
   external-dns = callPackage ./external-dns {};
   cmctl = callPackage ./cmctl {};
