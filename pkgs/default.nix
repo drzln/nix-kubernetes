@@ -29,4 +29,5 @@
   hubble-cli = callPackage ./hubble-cli {};
   coredns = callPackage ./coredns {};
   metrics-server = callPackage ./metrics-server {};
+  kube-state-metrics = callPackage ./kube-state-metrics {};
 }
