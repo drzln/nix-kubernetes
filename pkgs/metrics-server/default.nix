@@ -13,7 +13,7 @@ buildGoModule rec {
     sha256 = "sha256-UgltnGkzAtUfuXzNfnNWOGIKC7IUi6Yy0YZuOgyNSaA=";
   };
   vendorHash = "sha256-BZa18s4vvp8MDSavCE5l2WuAwPLQS/zzAAzxSSGHcfM=";
-  subPackages = ["."];
+  subPackages = ["./cmd/metrics-server"];
   ldflags = [
     "-s"
     "-w"
