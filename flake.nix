@@ -1,5 +1,5 @@
 ###############################################################################
-#  flake.nix  – pkgs.blackmatter.k8s namespace (treefmt path fixed)
+#  flake.nix  – pkgs.blackmatter.k8s namespace  (treefmt check fixed)
 ###############################################################################
 {
   description = "Self-contained Kubernetes stack built entirely with Nix";
@@ -38,7 +38,6 @@
     colmena,
     ...
   }: let
-    # Overlay that mounts all custom packages under pkgs.blackmatter.k8s
     blackmatterOverlay = import ./overlays/blackmatter-k8s.nix;
   in
     flake-utils.lib.eachSystem ["x86_64-linux"] (system: let
@@ -47,10 +46,10 @@
         overlays = [blackmatterOverlay];
       };
 
-      # external tool binaries for the checks
       lintBin = "${nixpkgs-lint.packages.${system}.nixpkgs-lint}/bin/nixpkgs-lint";
       statixBin = "${statix.packages.${system}.default}/bin/statix";
       deadnixBin = "${deadnix.packages.${system}.default}/bin/deadnix";
+      treefmtBin = "${treefmt-nix.packages.${system}.default}/bin/treefmt";
     in {
       ####################################################################
       # 1. Packages
@@ -75,14 +74,13 @@
       };
 
       ####################################################################
-      # 3. Checks  (treefmt block fixed)
+      # 3. Checks  (treefmt rewritten)
       ####################################################################
       checks = {
-        # ---- formatter / lint ------------------------------------------
-        treefmt = treefmt-nix.lib.run {
-          projectRoot = ./.; # treat repo root as project
-          checkers.nixpkgs-fmt.enable = true; # run nixpkgs-fmt
-        };
+        treefmt = pkgs.runCommand "treefmt-check" {} ''
+          ${treefmtBin} --fail .
+          touch $out
+        '';
 
         nixpkgs-lint = pkgs.runCommand "nixpkgs-lint" {} ''
           ${lintBin} ${self}
@@ -100,9 +98,9 @@
         '';
       };
     })
-    ## ------------------------------------------------------------------
+    ## ────────────────────────────────────────────────────────────────────
     ##  Top-level outputs
-    ## ------------------------------------------------------------------
+    ## ────────────────────────────────────────────────────────────────────
     // {
       overlays.default = blackmatterOverlay;
       nixosModules.kubernetes = ./modules/kubernetes/default.nix;
