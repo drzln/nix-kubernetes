@@ -4,50 +4,37 @@
   fetchFromGitHub,
   ...
 }: let
-  # Keep etcd roughly in sync with your control-plane
   version = "3.5.14";
 in
-  buildGoModule rec {
-    pname = "etcd";
+  buildGoModule {
+    pname = "etcdserver";
     inherit version;
 
-    ########################################################################
-    # Source
-    ########################################################################
     src = fetchFromGitHub {
       owner = "etcd-io";
       repo = "etcd";
       rev = "v${version}";
-      # Replace after `nix-prefetch-url ...`
       sha256 = "sha256-nTVjgNMnB6775ubzK7ezOxR5Z0z5PBxx88CxtbxGxrY=";
     };
 
-    ########################################################################
-    # Go module vendoring (set after first build)
-    ########################################################################
+    modRoot = "./server";
     vendorHash = null;
 
-    ########################################################################
-    # Build only the server binary
-    ########################################################################
-    subPackages = ["server"];
-
-    # Static, stripped
     env.CGO_ENABLED = "0";
     ldflags = [
       "-s"
       "-w"
       "-X go.etcd.io/etcd/server/v3/version.Version=v${version}"
     ];
-
+    # rename output binary to plain “etcd” like upstream releases
+    postInstall = ''mv $out/bin/server $out/bin/etcd'';
     doCheck = false;
 
     meta = with lib; {
-      description = "Distributed reliable key-value store (server binary)";
+      description = "etcd server binary";
       homepage = "https://github.com/etcd-io/etcd";
       license = licenses.asl20;
       platforms = platforms.linux;
-      maintainers = [maintainers.yourGithubHandle];
     };
   }
 # pkgs: rec {
