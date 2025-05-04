@@ -22,4 +22,5 @@
   cilium-operator = callPackage ./cilium-operator {};
   cilium-cni = callPackage ./cilium-cni {};
   cilium-health = callPackage ./cilium-health {};
+  clustermesh-apiserver = callPackage ./clustermesh-apiserver {};
 }
