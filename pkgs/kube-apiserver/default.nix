@@ -33,7 +33,7 @@ in
     subPackages = ["cmd/kube-apiserver"];
 
     # Disable CGO for a fully static binary (optional)
-    CGO_ENABLED = 0;
+    env.CGO_ENABLED = "0";
 
     # Make the binary as small as possible
     ldflags = [
