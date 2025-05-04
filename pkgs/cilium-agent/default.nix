@@ -20,7 +20,7 @@ in
       repo = "cilium";
       rev = "v${version}";
       # run `nix-prefetch-url --type sha256 <url>` once and paste the hash:
-      sha256 = "sha256-aHdpVXTHLh7UjBXgKMeM0l8Dl555zY8IN65nEtbtycA=";
+      sha256 = "sha256-HcKRenRILpJCzJZbOYzrQrLlEeif9J9jJDKFzA6NtXc=";
     };
 
     ############################################################################
