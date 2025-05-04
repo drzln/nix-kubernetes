@@ -19,7 +19,7 @@ in
       repo = "cilium-cli";
       rev = "v${version}";
       # First run: set to lib.fakeHash or leave null, prefetch to fill in
-      sha256 = "sha256-nTVjgNMnB6775ubzK7ezOxR5Z0z5PBxx88CxtbxGxrY=";
+      sha256 = "sha256-9+nNZEXjSoNB/Ftn/CtoBcR/uaD71C1jzDEaEG3Wpb4=";
     };
 
     ############################################################################
