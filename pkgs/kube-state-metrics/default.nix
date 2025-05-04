@@ -14,7 +14,7 @@ buildGoModule rec {
     sha256 = "sha256-RwJpRBGtRKKsNAwiZskqfyq4r0iiS4Evdmin1EjDgtg=";
   };
 
-  vendorHash = null;
+  vendorHash = "sha256-RwJpRBGtRKKsNAwiZskqfyq4r0iiS4Evdmin1EjDgtg=";
 
   subPackages = ["."]; # entry point is repo root
 
