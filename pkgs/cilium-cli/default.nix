@@ -5,7 +5,7 @@
   ...
 }: let
   # Keep this aligned with the Cilium datapath you plan to deploy.
-  version = "0.18.3";
+  version = "0.17.3";
 in
   buildGoModule {
     pname = "cilium-cli";
