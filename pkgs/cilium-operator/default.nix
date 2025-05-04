@@ -19,7 +19,7 @@ in
       repo = "cilium";
       rev = "v${version}";
       # Replace after: nix-prefetch-url --type sha256 https://github.com/cilium/cilium/archive/refs/tags/v1.15.4.tar.gz
-      sha256 = "1q2akgwi1r5xpc2gs7k2k96mfkdq2q9n4f4s3p37gbsm3dd5aspn";
+      sha256 = "sha256-dHdpVXTHLh7UjBXgKMeM0l8Dl555zY8IN65nEtbtycA=";
     };
 
     ############################################################################
