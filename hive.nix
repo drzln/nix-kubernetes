@@ -5,6 +5,19 @@ inputs.colmena.lib.makeHive {
   defaults = {pkgs, ...}: {
     _module.args.inputs = inputs;
     system.stateVersion = "24.05";
+
+    ## ───── minimal boot + root fs so eval passes ─────
+    fileSystems."/" = lib.mkDefault {
+      device = "/dev/disk/by-label/nixos"; # <-- change to your actual root
+      fsType = "ext4";
+    };
+
+    boot.loader.grub = {
+      enable = true;
+      devices = lib.mkDefault ["/dev/sda"]; # or "/dev/vda", etc.
+    };
+
+    networking.useDHCP = lib.mkDefault true; # avoids more assertions
   };
 
   master-1 = {pkgs, ...}: {
