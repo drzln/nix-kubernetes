@@ -17,7 +17,7 @@ in {
       ./files.nix
       ./firewall.nix
 
-      # ./services/containerd.nix
+      ./services/containerd.nix
       # ./services/kubelet.nix
       # ./services/kubeadm.nix
       # ./services/proxy.nix
