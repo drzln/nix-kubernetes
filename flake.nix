@@ -1,5 +1,5 @@
 ###############################################################################
-#  flake.nix  – blackmatter.k8s namespace (fixed devShell & checks)
+#  flake.nix  – pkgs.blackmatter.k8s namespace (fixed eachSystem param)
 ###############################################################################
 {
   description = "Self-contained Kubernetes stack built entirely with Nix";
@@ -38,16 +38,9 @@
     colmena,
     ...
   }: let
-    # Overlay puts packages under pkgs.blackmatter.k8s
     blackmatterOverlay = import ./overlays/blackmatter-k8s.nix;
   in
-    flake-utils.lib.eachSystem ["x86_64-linux"]
-    ({
-      system,
-      pkgs,
-      inputs',
-      ...
-    }: let
+    flake-utils.lib.eachSystem ["x86_64-linux"] (system: let
       pkgs = import nixpkgs {
         inherit system;
         overlays = [blackmatterOverlay];
@@ -55,8 +48,8 @@
 
       # external tools for checks
       lintBin = "${nixpkgs-lint.packages.${system}.nixpkgs-lint}/bin/nixpkgs-lint";
-      statixBin = "${inputs'.statix.packages.${system}.default}/bin/statix";
-      deadnixBin = "${inputs'.deadnix.packages.${system}.default}/bin/deadnix";
+      statixBin = "${statix.packages.${system}.default}/bin/statix";
+      deadnixBin = "${deadnix.packages.${system}.default}/bin/deadnix";
     in {
       ######################################################################
       # 1. Packages
@@ -65,7 +58,7 @@
       defaultPackage = pkgs.blackmatter.k8s.cilium-cli or pkgs.blackmatter.k8s.kubectl;
 
       ######################################################################
-      # 2. Dev shell  (fixed buildInputs)
+      # 2. Dev shell
       ######################################################################
       devShells.default = pkgs.mkShell {
         buildInputs = with pkgs; [
@@ -73,9 +66,9 @@
           git
           openssh
           nixpkgs-fmt
-          inputs'.statix.packages.${system}.default
-          inputs'.deadnix.packages.${system}.default
-          inputs'.nil.packages.${system}.default
+          statix.packages.${system}.default
+          deadnix.packages.${system}.default
+          nil.packages.${system}.default
           colmena.packages.${system}.colmena
         ];
       };
