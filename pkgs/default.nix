@@ -30,4 +30,5 @@
   coredns = callPackage ./coredns {};
   metrics-server = callPackage ./metrics-server {};
   kube-state-metrics = callPackage ./kube-state-metrics {};
+  node-problem-detector = callPackage ./node-problem-detector {};
 }
