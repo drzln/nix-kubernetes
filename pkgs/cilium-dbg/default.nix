@@ -18,7 +18,7 @@ in
       sha256 = "sha256-HcKRenRILpJCzJZbOYzrQrLlEeif9J9jJDKFzA6NtXc="; # tar-ball hash
     };
 
-    vendorHash = null;
+    vendorHash = "0000000000000000000000000000000000000000000000000000000000000000";
     subPackages = ["cilium-dbg/cmd"]; # ← correct path
 
     env.CGO_ENABLED = "0";
