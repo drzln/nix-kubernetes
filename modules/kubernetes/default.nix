@@ -2,7 +2,8 @@
   lib,
   config,
   ...
-}: let
+}:
+with lib; let
   cfg = config.blackmatter.components.kubernetes;
 in {
   options.blackmatter.components.kubernetes = {
