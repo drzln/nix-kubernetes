@@ -12,9 +12,9 @@
   inherit
     (callPackage ./etcd {})
     etcd
-    # etcdserver
-    # etcdctl
-    # etcdutl
+    etcdserver
+    etcdctl
+    etcdutl
     ;
 
   # etcd = callPackage ./etcd {};
