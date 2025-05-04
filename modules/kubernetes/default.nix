@@ -1,6 +1,6 @@
 {
   # lib,
-  # config,
+  config,
   ...
 } @ args: let
   # inherit (lib) mkIf mkMerge;
