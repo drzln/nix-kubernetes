@@ -29,26 +29,27 @@
         inherit system;
         overlays = overlayList;
       };
-      packages' = with import ./pkgs/etcd pkgs;
-      with import ./pkgs/cilium pkgs;
-      with import ./pkgs/containerd pkgs;
-      with pkgs; {
-        inherit
-          kubelet
-          kubectl
-          kube-apiserver
-          kube-controller-manager
-          kube-scheduler
-          etcdserver
-          containerd
-          cilium-cli
-          etcdctl
-          etcdutl
-          etcd
-          runc
-          ;
-        default = pkgs.cilium-cli;
-      };
+      packages' =
+        # with import ./pkgs/etcd pkgs;
+        # with import ./pkgs/cilium pkgs;
+        with import ./pkgs/containerd pkgs;
+        with pkgs; {
+          inherit
+            # kubelet
+            # kubectl
+            # kube-apiserver
+            # kube-controller-manager
+            # kube-scheduler
+            # etcdserver
+            containerd
+            # cilium-cli
+            # etcdctl
+            # etcdutl
+            # etcd
+            # runc
+            ;
+          # default = pkgs.cilium-cli;
+        };
       lintBin = "${nixpkgs-lint.packages.${system}.nixpkgs-lint}/bin/nixpkgs-lint";
       statixBin = "${statix.packages.${system}.default}/bin/statix";
     in {
