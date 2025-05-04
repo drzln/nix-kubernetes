@@ -1,8 +1,8 @@
 ###############################################################################
-#  nix-kubernetes/flake.nix   (namespace = pkgs.blackmatter.k8s.*)
+#  flake.nix  – blackmatter.k8s namespace (fixed devShell & checks)
 ###############################################################################
 {
-  description = "Bare-Metal Kubernetes";
+  description = "Self-contained Kubernetes stack built entirely with Nix";
 
   #######################################
   ## ░░ Inputs
@@ -11,14 +11,12 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
 
-    # Tooling / formatting / linting
     treefmt-nix.url = "github:numtide/treefmt-nix";
     nixpkgs-lint.url = "github:nix-community/nixpkgs-lint";
     statix.url = "github:nerdypepper/statix";
     deadnix.url = "github:astro/deadnix";
     nil.url = "github:oxalica/nil";
 
-    # Deployment
     colmena = {
       url = "github:zhaofengli/colmena";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -40,28 +38,34 @@
     colmena,
     ...
   }: let
-    # ── Overlay: put everything under pkgs.blackmatter.k8s ────────────────
+    # Overlay puts packages under pkgs.blackmatter.k8s
     blackmatterOverlay = import ./overlays/blackmatter-k8s.nix;
   in
-    flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux"] (system: let
+    flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux"]
+    ({
+      system,
+      pkgs,
+      inputs',
+      ...
+    }: let
       pkgs = import nixpkgs {
         inherit system;
         overlays = [blackmatterOverlay];
       };
 
-      # Paths to external tooling (for checks)
+      # external tools for checks
       lintBin = "${nixpkgs-lint.packages.${system}.nixpkgs-lint}/bin/nixpkgs-lint";
-      statixBin = "${statix.packages.${system}.default}/bin/statix";
-      deadnixBin = "${deadnix.packages.${system}.default}/bin/deadnix";
+      statixBin = "${inputs'.statix.packages.${system}.default}/bin/statix";
+      deadnixBin = "${inputs'.deadnix.packages.${system}.default}/bin/deadnix";
     in {
       ######################################################################
-      # 1. Packages  – surfaced directly under pkgs.blackmatter.k8s
+      # 1. Packages
       ######################################################################
       packages = pkgs.blackmatter.k8s;
       defaultPackage = pkgs.blackmatter.k8s.cilium-cli or pkgs.blackmatter.k8s.kubectl;
 
       ######################################################################
-      # 2. Dev shell
+      # 2. Dev shell  (fixed buildInputs)
       ######################################################################
       devShells.default = pkgs.mkShell {
         buildInputs = with pkgs; [
@@ -69,14 +73,15 @@
           git
           openssh
           nixpkgs-fmt
-          statix.deadnix
-          nil
+          inputs'.statix.packages.${system}.default
+          inputs'.deadnix.packages.${system}.default
+          inputs'.nil.packages.${system}.default
           colmena.packages.${system}.colmena
         ];
       };
 
       ######################################################################
-      # 3. Checks wired into `nix flake check`
+      # 3. Checks
       ######################################################################
       checks = {
         treefmt = treefmt-nix.lib.${system}.run {
@@ -101,7 +106,7 @@
       };
     })
     ## ────────────────────────────────────────────────────────────────────
-    ##  Top-level, system-independent outputs
+    ##  Top-level outputs
     ## ────────────────────────────────────────────────────────────────────
     // {
       overlays.default = blackmatterOverlay;
