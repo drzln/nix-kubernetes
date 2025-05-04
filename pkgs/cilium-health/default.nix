@@ -1,3 +1,4 @@
+# pkgs/cilium-health/default.nix
 {
   lib,
   buildGoModule,
@@ -15,7 +16,7 @@ in
       rev = "v${version}";
       sha256 = "sha256-dHdpVXTHLh7UjBXgKMeM0l8Dl555zY8IN65nEtbtycA=";
     };
-    vendorHash = null; # build → copy printed hash here
+    vendorHash = null;
     subPackages = ["cilium-health"];
     env.CGO_ENABLED = "0";
     ldflags = [
