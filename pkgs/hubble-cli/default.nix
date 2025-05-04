@@ -4,7 +4,6 @@
   fetchFromGitHub,
   ...
 }: let
-  # Latest stable CLI release as of May 2025
   version = "0.17.3";
 in
   buildGoModule {
