@@ -8,7 +8,7 @@
   kube-scheduler = callPackage ./kube-scheduler {};
   kube-controller = callPackage ./kube-controller {};
   kubelet = callPackage ./kubelet {};
-  # kubectl = callPackage ./kubectl {};
+  kubectl = callPackage ./kubectl {};
   #
   # etcd = callPackage ./etcd {};
   # etcdctl = callPackage ./etcd/ctl.nix {};
