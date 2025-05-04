@@ -18,7 +18,7 @@ in
       owner = "kubernetes";
       repo = "kubernetes";
       rev = "v${version}";
-      sha256 = "sha256-REPLACE_ME_AFTER_PREFETCH";
+      sha256 = "sha256-nTVjgNMnB6775ubzK7ezOxR5Z0z5PBxx88CxtbxGxrY=";
     };
 
     # ░░ Go module vendor hash ░░
