@@ -5,20 +5,19 @@
 }:
 buildGoModule rec {
   pname = "cmctl";
-  version = "v1.17.2";
+  version = "v2.2.0";
   src = fetchFromGitHub {
     owner = "cert-manager";
-    repo = "cert-manager";
+    repo = "cmctl";
     rev = version;
-    sha256 = "sha256-iUXN+8ueCxGsFnwhC2WjrQQSXV7TGUR80xaKqjxcC6o=";
+    sha256 = "sha256-REPLACE_WITH_ACTUAL_HASH";
   };
-  vendorHash = "sha256-KVBm7npfqyaRfDErcus4x0h5TmufPzYyd+mPTxBLQu0=";
-  subPackages = ["cmd"];
-  env.CGO_ENABLED = "0";
+  vendorHash = null;
+  subPackages = ["."];
   ldflags = [
     "-s"
     "-w"
-    "-X github.com/cert-manager/cert-manager/pkg/util.AppVersion=${version}"
+    "-X github.com/cert-manager/cmctl/pkg/build.name=cmctl"
   ];
   doCheck = false;
 }
