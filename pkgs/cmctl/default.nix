@@ -10,9 +10,9 @@ buildGoModule rec {
     owner = "cert-manager";
     repo = "cmctl";
     rev = version;
-    sha256 = "sha256-REPLACE_WITH_ACTUAL_HASH";
+    sha256 = "sha256-Kr7vwVW6v08QRbJDs2u0vK241ljNfhLVYIQCBl31QSs=";
   };
-  vendorHash = null;
+  vendorHash = "sha256-Kr7vwVW6v08QRbJDs2u0vK241ljNfhLVYIQCBl31QSs=";
   subPackages = ["."];
   ldflags = [
     "-s"
