@@ -10,7 +10,7 @@ buildGoModule rec {
     owner = "kubernetes-sigs";
     repo = "metrics-server";
     rev = "v${version}";
-    sha256 = "sha256-X1l5czZ4iFlEyKVQjT4Ai0fI3JQusLQqENBoZJTxYpo=";
+    sha256 = "sha256-UgltnGkzAtUfuXzNfnNWOGIKC7IUi6Yy0YZuOgyNSaA=";
   };
   vendorHash = null;
   subPackages = ["."]; # main.go is at the repo root
