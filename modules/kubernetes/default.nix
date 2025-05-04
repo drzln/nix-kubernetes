@@ -3,14 +3,14 @@
   config,
   ...
 } @ args: let
-  inherit (lib) mkIf mkMerge;
-  cfg = config.blackmatter.components.kubernetes;
-  isMaster = cfg.role == "master" || cfg.role == "single";
-  isWorker = cfg.role == "worker";
+  # inherit (lib) mkIf mkMerge;
+  # cfg = config.blackmatter.components.kubernetes;
+  # isMaster = cfg.role == "master" || cfg.role == "single";
+  # isWorker = cfg.role == "worker";
 in {
   imports =
     [
-      ./options.nix
+      # ./options.nix
       # ./pkgs.nix
       # ./assertions.nix
       # ./files.nix
