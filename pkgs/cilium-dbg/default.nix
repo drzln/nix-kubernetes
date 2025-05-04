@@ -10,31 +10,19 @@ in
   buildGoModule {
     pname = "cilium-dbg";
     inherit version;
-
     src = fetchFromGitHub {
       owner = "cilium";
       repo = "cilium";
       rev = "v${version}";
       sha256 = "sha256-HcKRenRILpJCzJZbOYzrQrLlEeif9J9jJDKFzA6NtXc=";
     };
-
     vendorHash = null;
     subPackages = ["cilium-dbg"];
-
     env.CGO_ENABLED = "0";
     ldflags = [
       "-s"
       "-w"
       "-X github.com/cilium/cilium/pkg/version.Version=v${version}"
     ];
-
     doCheck = false;
-
-    meta = with lib; {
-      description = "On-node Cilium debug CLI (replaces the old `cilium` command)";
-      homepage = "https://github.com/cilium/cilium";
-      license = licenses.asl20;
-      maintainers = [maintainers.yourGithubHandle];
-      platforms = platforms.linux;
-    };
   }
