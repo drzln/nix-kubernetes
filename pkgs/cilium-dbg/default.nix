@@ -5,7 +5,7 @@
   fetchFromGitHub,
   ...
 }: let
-  version = "1.17.3"; # same tag as the agent
+  version = "1.17.3";
 in
   buildGoModule {
     pname = "cilium-dbg";
@@ -15,7 +15,7 @@ in
       owner = "cilium";
       repo = "cilium";
       rev = "v${version}";
-      sha256 = "sha256-HcKRenRILpJCzJZbOYzrQrLlEeif9J9jJDKFzA6NtXc="; # tar-ball hash
+      sha256 = "sha256-HcKRenRILpJCzJZbOYzrQrLlEeif9J9jJDKFzA6NtXc=";
     };
 
     vendorHash = null;
