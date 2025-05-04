@@ -28,4 +28,5 @@
   hubble-relay = callPackage ./hubble-relay {};
   hubble-cli = callPackage ./hubble-cli {};
   coredns = callPackage ./coredns {};
+  metrics-server = callPackage ./metrics-server {};
 }
