@@ -21,7 +21,7 @@ in
     vendorHash = null;
 
     # ← correct path
-    subPackages = ["cmd/cilium"];
+    subPackages = ["cilium"];
 
     env.CGO_ENABLED = "0";
     ldflags = [
