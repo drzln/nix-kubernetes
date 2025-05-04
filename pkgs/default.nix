@@ -16,6 +16,6 @@
     etcdctl
     etcdutl
     ;
+  runc = callPackage ./runc {};
   # cilium-cli = callPackage ./cilium-cli {};
-  # runc = callPackage ./runc {};
 }
