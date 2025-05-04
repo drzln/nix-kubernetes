@@ -10,7 +10,7 @@ buildGoModule rec {
     owner = "cert-manager";
     repo = "cert-manager";
     rev = version;
-    sha256 = "1q2akgwi1r5xpc2gs7k2k96mfkdq2q9n4f4s3p37gbsm3dd5aspn";
+    sha256 = "sha256-iUXN+8ueCxGsFnwhC2WjrQQSXV7TGUR80xaKqjxcC6o=";
   };
   vendorHash = null;
   subPackages = ["cmd/cmctl"];
