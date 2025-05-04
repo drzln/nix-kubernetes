@@ -9,7 +9,7 @@
   kube-controller = callPackage ./kube-controller {};
   kubelet = callPackage ./kubelet {};
   kubectl = callPackage ./kubectl {};
-  # etcd = callPackage ./etcd {};
+  etcd = callPackage ./etcd {};
   # etcdctl = callPackage ./etcd/ctl.nix {};
   # etcdutl = callPackage ./etcd/utl.nix {};
   # cilium-cli = callPackage ./cilium-cli {};
