@@ -25,9 +25,9 @@ in {
     ++ lib.optional isWorker [
     ]
     ++ lib.optional isMaster [
-      # ./services/etcd.nix
-      # ./services/apiserver.nix
-      # ./services/controller.nix
-      # ./services/scheduler.nix
+      ./services/etcd.nix
+      ./services/apiserver.nix
+      ./services/controller.nix
+      ./services/scheduler.nix
     ];
 }
