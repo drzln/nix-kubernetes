@@ -22,7 +22,7 @@ in
     };
 
     # buildGoModule does the mod download; pin its hash
-    vendorHash = "sha256-7Q0U8RorMBYGH/J3ex72tzIezHY0hKkEMEP7zzfO0y8=";
+    vendorHash = "sha256-qLrPLGxsUmgEscrhyl+1rJ0k7c9ibKnpMpsJPD4xDZU=";
 
     subPackages = [
       "./cmd/containerd"
