@@ -20,4 +20,5 @@
   cilium-cli = callPackage ./cilium-cli {};
   cilium-agent = callPackage ./cilium-agent {};
   cilium-operator = callPackage ./cilium-operator {};
+  cilium-cni = callPackage ./cilium-cni {};
 }
