@@ -19,7 +19,7 @@ in
     };
 
     vendorHash = null;
-    subPackages = ["cilium-dbg/cmd"]; # ← correct path
+    subPackages = ["cilium-dbg"];
 
     env.CGO_ENABLED = "0";
     ldflags = [
