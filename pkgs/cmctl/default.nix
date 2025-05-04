@@ -5,7 +5,7 @@
 }:
 buildGoModule rec {
   pname = "cmctl";
-  version = "v1.14.4";
+  version = "v1.17.2";
   src = fetchFromGitHub {
     owner = "cert-manager";
     repo = "cert-manager";
