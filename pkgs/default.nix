@@ -23,4 +23,5 @@
   cilium-cni = callPackage ./cilium-cni {};
   cilium-health = callPackage ./cilium-health {};
   clustermesh-apiserver = callPackage ./clustermesh-apiserver {};
+  hubble-relay = callPackage ./hubble-relay {};
 }
