@@ -10,7 +10,7 @@ buildGoModule rec {
     owner = "kubernetes-csi";
     repo = "external-snapshotter";
     rev = version;
-    sha256 = "1q2akgwi1r5xpc2gs7k2k96mfkdq2q9n4f4s3p37gbsm3dd5aspn";
+    sha256 = "sha256-pk9600PSp3smMqOqm8cnB8ITFheiLEWonB5dfht/5Tw=";
   };
   vendorHash = null;
   subPackages = ["cmd/snapshot-validation-webhook"];
