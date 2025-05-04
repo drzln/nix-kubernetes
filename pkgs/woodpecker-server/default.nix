@@ -15,6 +15,10 @@ buildGoModule rec {
   vendorHash = "sha256-hwWKfMjLuz3oKCU6dCNhIlPYMy1AU1uOvRCLwJths+o=";
   subPackages = ["cmd/server"];
   env.CGO_ENABLED = "0";
+  preBuild = ''
+    mkdir -p web/dist
+    touch web/dist/.keep
+  '';
   ldflags = [
     "-s"
     "-w"
