@@ -55,7 +55,7 @@
       # 1. Packages
       ####################################################################
       packages = pkgs.blackmatter.k8s;
-      defaultPackage = pkgs.blackmatter.k8s.cilium-cli or pkgs.blackmatter.k8s.kubectl;
+      # defaultPackage = pkgs.blackmatter.k8s.cilium-cli or pkgs.blackmatter.k8s.kubectl;
 
       ####################################################################
       # 2. Dev shell
