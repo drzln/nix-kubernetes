@@ -1,3 +1,4 @@
+# pkgs/cilium-operator/default.nix
 {
   lib,
   buildGoModule,
@@ -24,11 +25,4 @@ in
       "-X github.com/cilium/cilium/pkg/version.Version=v${version}"
     ];
     doCheck = false;
-    meta = with lib; {
-      description = "Cilium Kubernetes operator (cluster-wide controller)";
-      homepage = "https://github.com/cilium/cilium";
-      license = licenses.asl20;
-      maintainers = [maintainers.yourGithubHandle];
-      platforms = platforms.linux;
-    };
   }
