@@ -18,7 +18,7 @@ in
       owner = "containerd";
       repo = "containerd";
       rev = rev;
-      sha256 = "sha256-lk0IJ5uXeiqgR/hEPZojKn6z0niCsaBYijjkE4mTJqk=";
+      sha256 = "sha256-qLrPLGxsUmgEscrhyl+1rJ0k7c9ibKnpMpsJPD4xDZU=";
     };
 
     # buildGoModule does the mod download; pin its hash
