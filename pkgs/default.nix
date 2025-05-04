@@ -7,7 +7,7 @@
   kube-apiserver = callPackage ./kube-apiserver {};
   kube-scheduler = callPackage ./kube-scheduler {};
   kube-controller = callPackage ./kube-controller {};
-  # kubelet = callPackage ./kubelet {};
+  kubelet = callPackage ./kubelet {};
   # kubectl = callPackage ./kubectl {};
   #
   # etcd = callPackage ./etcd {};
