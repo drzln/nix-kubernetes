@@ -4,7 +4,6 @@
   ...
 }: let
   cfg = config.blackmatter.components.kubernetes;
-  # inherit (lib) mkIf mkMerge;
   # isMaster = cfg.role == "master" || cfg.role == "single";
   # isWorker = cfg.role == "worker";
 in {
