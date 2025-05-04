@@ -5,7 +5,7 @@
   fetchFromGitHub,
   ...
 }: let
-  version = "1.15.4";
+  version = "1.17.3";
 in
   buildGoModule {
     pname = "cilium-nodecli";
