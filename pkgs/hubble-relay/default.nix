@@ -18,7 +18,7 @@ buildGoModule {
     repo   = "cilium";
     rev    = "v${version}";
     # run once:  nix-prefetch-url --type sha256 https://github.com/cilium/cilium/archive/refs/tags/v1.15.4.tar.gz
-    sha256 = "sha256-REPLACE_AFTER_PREFETCH";
+    sha256 = "sha256-dHdpVXTHLh7UjBXgKMeM0l8Dl555zY8IN65nEtbtycA=";
   };
 
   ############################################################################
