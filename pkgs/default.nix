@@ -47,4 +47,5 @@
   tkn = callPackage ./tkn {};
   k9s = callPackage ./k9s {};
   popeye = callPackage ./popeye {};
+  stern = callPackage ./stern {};
 }
