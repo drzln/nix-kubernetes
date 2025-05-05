@@ -1,5 +1,5 @@
+# pkgs/woodpecker-agent/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
