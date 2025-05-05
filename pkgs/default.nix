@@ -52,4 +52,5 @@
   external-secrets-operator = callPackage ./external-secrets-operator {};
   otelcol = callPackage ./otelcol {};
   loki = callPackage ./loki {};
+  tempo = callPackage ./tempo {};
 }
