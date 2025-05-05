@@ -1,6 +1,5 @@
 # pkgs/hubble-cli/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
   ...
