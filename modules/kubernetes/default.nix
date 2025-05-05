@@ -15,45 +15,47 @@ in {
       description = "What part of the cluster this node should run.";
     };
 
-    nodePortRange = mkOption {
-      type = types.nullOr types.str;
-      default = null;
-      example = "30000-32767";
-    };
+    # nodePortRange = mkOption {
+    #   type = types.nullOr types.str;
+    #   default = null;
+    #   example = "30000-32767";
+    # };
 
-    extraApiArgs = mkOption {
-      type = types.listOf types.str;
-      default = [];
-    };
+    # extraApiArgs = mkOption {
+    #   type = types.listOf types.str;
+    #   default = [];
+    # };
 
-    extraKubeletOpts = mkOption {
-      type = types.listOf types.str;
-      default = [];
-    };
+    # extraKubeletOpts = mkOption {
+    #   type = types.listOf types.str;
+    #   default = [];
+    # };
 
-    kubeadmExtra = mkOption {
-      type = types.str;
-      default = "";
-    };
+    # kubeadmExtra = mkOption {
+    #   type = types.str;
+    #   default = "";
+    # };
+    
+    # firewallOpen = mkOption {
+    #   type = types.bool;
+    #   default = false;
+    #   description = "Open all required Kubernetes ports on the host firewall.";
+    # };
 
-    firewallOpen = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Open all required Kubernetes ports on the host firewall.";
-    };
+    # join.address = mkOption {
+    #   type = types.str;
+    #   default = "";
+    # };
 
-    join.address = mkOption {
-      type = types.str;
-      default = "";
-    };
-    join.token = mkOption {
-      type = types.str;
-      default = "";
-    };
-    join.caHash = mkOption {
-      type = types.str;
-      default = "";
-    };
+    # join.token = mkOption {
+    #   type = types.str;
+    #   default = "";
+    # };
+
+    # join.caHash = mkOption {
+    #   type = types.str;
+    #   default = "";
+    # };
   };
   config =
     mkIf cfg.enable {
