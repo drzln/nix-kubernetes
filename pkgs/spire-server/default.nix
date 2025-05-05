@@ -1,5 +1,5 @@
+# pkgs/spire-server/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
