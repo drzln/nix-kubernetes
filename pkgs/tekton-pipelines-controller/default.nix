@@ -1,5 +1,5 @@
+# pkgs/tekton-pipeline-controller/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
