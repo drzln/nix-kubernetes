@@ -7,23 +7,17 @@ require 'time'
 require 'aws-sdk-autoscaling'
 require 'aws-sdk-ec2'
 require 'net/ssh'
-require 'English' # ← gives us $CHILD_STATUS
-
-# ─── helpers ──────────────────────────────────────────────────────────
+require 'English'
 def log(msg) = warn "[#{Time.now.iso8601}] #{msg}"
-
 def abort!(msg)
   log("ERROR: #{msg}")
   exit 1
 end
-
 DEFAULT_KEY = File.expand_path(
   "#{ENV.fetch('HOME', nil)}/.ssh/id_rsa"
 ).freeze
 DEFAULT_WAIT  = 300
 PLAN_COMMAND  = 'pangea show templates/network.rb'
-
-# ─── CLI ──────────────────────────────────────────────────────────────
 opts = {
   key: DEFAULT_KEY,
   wait: DEFAULT_WAIT,
@@ -35,24 +29,16 @@ OptionParser.new do |o|
   o.on('-w', '--wait SECS', Integer) { |v| opts[:wait] = v }
   o.on('-r', '--region NAME') { |v| opts[:region] = v }
 end.parse!
-
 abort! "SSH key #{opts[:key]} not readable" unless File.readable?(opts[:key])
-
-# ─── render plan JSON ─────────────────────────────────────────────────
 plan_json = `#{PLAN_COMMAND}`
 abort! "Command “#{PLAN_COMMAND}” failed" unless $CHILD_STATUS&.success?
-
 plan       = JSON.parse(plan_json, symbolize_names: true)
 asg_defs   = plan.dig(:resource, :aws_autoscaling_group) || {}
 asg_names  = asg_defs.keys
 abort! 'No aws_autoscaling_group resources found' if asg_names.empty?
 log "ASGs: #{asg_names.join(', ')}"
-
-# ─── AWS clients ─────────────────────────────────────────────────────
 asg  = Aws::AutoScaling::Client.new(region: opts[:region])
 ec2  = Aws::EC2::Client.new(region: opts[:region])
-
-# ─── functions ───────────────────────────────────────────────────────
 def scale_asg(client, name, size)
   client.update_auto_scaling_group(
     auto_scaling_group_name: name,
@@ -61,7 +47,6 @@ def scale_asg(client, name, size)
     desired_capacity: size
   )
 end
-
 def wait_for_instance(asg_c, ec2_c, name, timeout)
   deadline = Time.now + timeout
   loop do
@@ -77,11 +62,9 @@ def wait_for_instance(asg_c, ec2_c, name, timeout)
       return [inst_id, ip] if ip
     end
     raise Timeout::Error if Time.now >= deadline
-
     sleep 5
   end
 end
-
 def probe_ssh(ip:, key_path:, wait:)
   deadline = Time.now + wait
   backoff  = 5
@@ -114,17 +97,13 @@ def probe_ssh(ip:, key_path:, wait:)
     backoff = [(backoff * 1.5).ceil, 30].min
   end
 end
-
-# ─── main workflow ───────────────────────────────────────────────────
 system 'pangea apply templates/network.rb'
 asg_names.each do |name|
   log "Scaling #{name} → 1"
   scale_asg(asg, name, 1)
-
   log 'Waiting for instance…'
   inst_id, ip = wait_for_instance(asg, ec2, name, opts[:wait])
   log "Instance #{inst_id} @ #{ip}"
-
   probe_ssh(ip: ip, key_path: opts[:key], wait: opts[:wait])
 end
 log 'All ASGs reachable via SSH ✔'
