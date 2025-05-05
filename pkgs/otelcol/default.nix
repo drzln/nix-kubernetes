@@ -1,5 +1,5 @@
+# pkgs/otelcol/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
