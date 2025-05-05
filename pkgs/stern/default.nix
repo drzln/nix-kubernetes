@@ -11,7 +11,7 @@ buildGoModule rec {
     owner = "stern";
     repo = "stern";
     rev = version;
-    sha256 = "1q2akgwi1r5xpc2gs7k2k96mfkdq2q9n4f4s3p37gbsm3dd5aspn";
+    sha256 = "sha256-8Tvhul7GwVbRJqJenbYID8OY5zGzFhIormUwEtLE0Lw=";
   };
 
   vendorHash = null;
