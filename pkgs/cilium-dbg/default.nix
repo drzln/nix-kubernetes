@@ -1,6 +1,5 @@
 # pkgs/cilium-dbg/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
   ...
