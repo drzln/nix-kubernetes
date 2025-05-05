@@ -5,7 +5,7 @@
 }:
 buildGoModule rec {
   pname = "tempo";
-  version = "2.4.1";
+  version = "2.7.2";
 
   src = fetchFromGitHub {
     owner = "grafana";
