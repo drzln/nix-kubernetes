@@ -1,5 +1,6 @@
 # lib/config.rb
 # frozen_string_literal: true
+# infra/bin/config.rb
 
 AWS_PROFILE ||= 'pleme' # ✅ Define once, prevent redefinition
 AWS_REGION ||= 'us-east-1'
