@@ -1,5 +1,5 @@
+# pkgs/spire-agent/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
