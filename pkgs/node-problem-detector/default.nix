@@ -1,5 +1,5 @@
+# pkgs/node-problem-detector/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
