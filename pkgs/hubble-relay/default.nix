@@ -1,6 +1,5 @@
 # pkgs/hubble-relay/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
   ...
@@ -18,7 +17,7 @@ in
     };
     vendorHash = null;
     subPackages = ["hubble-relay"];
-    env.CGO_ENABLED = "0"; # fully static
+    env.CGO_ENABLED = "0";
     ldflags = [
       "-s"
       "-w"
