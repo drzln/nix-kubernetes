@@ -1,31 +1,18 @@
-###############################################################################
-#  flake.nix  – pkgs.blackmatter.k8s namespace  (treefmt check fixed)
-###############################################################################
 {
   description = "Self-contained Kubernetes stack built entirely with Nix";
-
-  #######################################
-  ## ░░ Inputs
-  #######################################
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-
     treefmt-nix.url = "github:numtide/treefmt-nix";
     nixpkgs-lint.url = "github:nix-community/nixpkgs-lint";
     statix.url = "github:nerdypepper/statix";
     deadnix.url = "github:astro/deadnix";
     nil.url = "github:oxalica/nil";
-
     colmena = {
       url = "github:zhaofengli/colmena";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-
-  #######################################
-  ## ░░ Outputs
-  #######################################
   outputs = inputs @ {
     self,
     nixpkgs,
@@ -51,15 +38,7 @@
       deadnixBin = "${deadnix.packages.${system}.default}/bin/deadnix";
       treefmtBin = "${treefmt-nix.packages.${system}.default}/bin/treefmt";
     in {
-      ####################################################################
-      # 1. Packages
-      ####################################################################
       packages = pkgs.blackmatter.k8s;
-      # defaultPackage = pkgs.blackmatter.k8s.cilium-cli or pkgs.blackmatter.k8s.kubectl;
-
-      ####################################################################
-      # 2. Dev shell
-      ####################################################################
       devShells.default = pkgs.mkShell {
         buildInputs = with pkgs; [
           go
@@ -72,10 +51,6 @@
           colmena.packages.${system}.colmena
         ];
       };
-
-      ####################################################################
-      # 3. Checks  (treefmt rewritten)
-      ####################################################################
       checks = {
         treefmt = pkgs.runCommand "treefmt-check" {} ''
           ${treefmtBin} --fail .
@@ -98,9 +73,6 @@
         '';
       };
     })
-    ## ────────────────────────────────────────────────────────────────────
-    ##  Top-level outputs
-    ## ────────────────────────────────────────────────────────────────────
     // {
       overlays.default = blackmatterOverlay;
       nixosModules.kubernetes = ./modules/kubernetes/default.nix;
