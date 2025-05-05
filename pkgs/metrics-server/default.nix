@@ -1,5 +1,5 @@
+# pkgs/metrics-server/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
