@@ -1,5 +1,5 @@
+# pkgs/oidc-discovery-provider/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
