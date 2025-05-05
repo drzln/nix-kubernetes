@@ -1,5 +1,5 @@
+# pkgs/csi-driver-host-path/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
@@ -13,7 +13,7 @@ buildGoModule rec {
     sha256 = "sha256-6hyJkPcAQzazobMxGJ/p5OQefvijMVnIyQEmfZWvtMI=";
   };
   vendorHash = null;
-  subPackages = ["cmd/hostpathplugin"]; # Entry point is here
+  subPackages = ["cmd/hostpathplugin"];
   env.CGO_ENABLED = "0";
   ldflags = [
     "-s"
