@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
+# infra/packer/templates/kubernetes.rb
 
 require 'json'
 require 'time'
