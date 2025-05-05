@@ -1,6 +1,6 @@
 # flake.nix
 {
-  description = "Self-contained Kubernetes stack built entirely with Nix";
+  description = "kubernetes built with nix";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
