@@ -1,6 +1,5 @@
 # pkgs/cilium-agent/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
   ...
