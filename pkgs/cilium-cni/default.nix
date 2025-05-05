@@ -1,6 +1,5 @@
 # pkgs/cilium-cni/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
   ...
