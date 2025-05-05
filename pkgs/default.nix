@@ -48,4 +48,5 @@
   k9s = callPackage ./k9s {};
   popeye = callPackage ./popeye {};
   stern = callPackage ./stern {};
+  kubeseal = callPackage ./kubeseal {};
 }
