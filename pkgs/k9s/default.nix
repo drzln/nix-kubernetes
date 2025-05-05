@@ -1,12 +1,10 @@
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
 buildGoModule rec {
   pname = "k9s";
   version = "v0.32.4";
-
   src = fetchFromGitHub {
     owner = "derailed";
     repo = "k9s";
