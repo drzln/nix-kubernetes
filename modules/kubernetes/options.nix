@@ -1,7 +1,8 @@
+# modules/kubernetes/options.nix
 {lib, ...}:
 with lib; {
   options.kubernetes = {
-    enable = mkEnableOption "Kubernetes";
+    enable = mkEnableOption "kubernetes";
 
     role = mkOption {
       type = types.enum ["master" "worker" "single"];
