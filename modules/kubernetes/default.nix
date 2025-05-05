@@ -1,10 +1,10 @@
 {
   lib,
-  config,
+  # config,
   ...
 }:
 with lib; let
-  cfg = config.blackmatter.components.kubernetes;
+  # cfg = config.blackmatter.components.kubernetes;
 in {
   imports = [
     ./services/containerd.nix
@@ -61,9 +61,9 @@ in {
     #   default = "";
     # };
   };
-  config =
-    mkIf cfg.enable {
-    };
+  # config =
+  #   mkIf cfg.enable {
+  #   };
   # imports =
   #   [
   #     # ./options.nix
