@@ -1,1 +1,1 @@
-# nix-kubernetes infrastructure
+# nix-kubernetes test infrastructure
