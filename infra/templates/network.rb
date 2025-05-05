@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# infra/templates/network.rb
 
 template(:network) do
   product       = :kubernetes
@@ -7,7 +8,6 @@ template(:network) do
   ami           = 'ami-08ee7b48673f8a214'
   instance_type = 'c5.xlarge'
 
-  # ─────────────────────────── VPC  &  Subnet ────────────────────────────
   resource :aws_vpc, product do
     cidr_block           "#{base_cidr}.0.0/16"
     enable_dns_support   true
@@ -31,7 +31,6 @@ template(:network) do
   end
   public_subnet_ref = "${aws_subnet.#{product}_public_subnet.id}"
 
-  # ─────────────── Route table with **IGW-egress** for the subnet ─────────
   resource :aws_route_table, "#{product}_public_rt" do
     vpc_id vpc_id_ref
     tags   base_tags.merge(Name: "#{product}_public_rt")
@@ -49,7 +48,6 @@ template(:network) do
     route_table_id route_table_ref
   end
 
-  # ─────────────────────── Security Group (SSH + ALL egress) ─────────────
   resource :aws_security_group, "#{product}_sg" do
     vpc_id      vpc_id_ref
     description 'Security group for Kubernetes test cluster'
@@ -57,7 +55,6 @@ template(:network) do
   end
   sg_ref = "${aws_security_group.#{product}_sg.id}"
 
-  # Ingress: SSH from anywhere
   resource :aws_security_group_rule, "#{product}_sg_ssh_ingress" do
     security_group_id sg_ref
     type              :ingress
@@ -67,7 +64,6 @@ template(:network) do
     cidr_blocks       ['0.0.0.0/0']
   end
 
-  # **NEW** Egress: allow every protocol / port to the Internet
   resource :aws_security_group_rule, "#{product}_sg_all_egress" do
     security_group_id sg_ref
     type              :egress
@@ -77,7 +73,6 @@ template(:network) do
     cidr_blocks       ['0.0.0.0/0']
   end
 
-  # ─────────────────────────── Key pair ───────────────────────────────────
   resource :aws_key_pair, "#{product}_key" do
     key_name   product
     public_key File.read("#{Dir.home}/.ssh/id_rsa.pub")
@@ -85,7 +80,6 @@ template(:network) do
   end
   key_name_ref = "${aws_key_pair.#{product}_key.key_name}"
 
-  # ───────────────────── Launch Template  ─────────────────────────────────
   resource :aws_launch_template, product do
     name               "#{product}-nixos-template"
     image_id           ami
@@ -100,21 +94,17 @@ template(:network) do
   end
   launch_template_ref = "${aws_launch_template.#{product}.id}"
 
-  # ────────────────────────── Auto-Scaling groups ────────────────────────
   %w[master_1 master_2 worker_1 worker_2].each do |role|
     resource :aws_autoscaling_group, "#{product}_#{role}" do
       name "#{product}_#{role}"
-
       launch_template(
         id: launch_template_ref,
         version: '$Latest'
       )
-
       desired_capacity 0
       max_size         0
       min_size         0
       vpc_zone_identifier [public_subnet_ref]
-
       tag [
         { key: :colmena, value: role.tr('_', '-'), propagate_at_launch: true },
         { key: :Name,    value: product,           propagate_at_launch: true }
