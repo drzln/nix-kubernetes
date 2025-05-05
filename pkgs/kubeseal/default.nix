@@ -12,7 +12,7 @@ buildGoModule rec {
     rev = version;
     sha256 = "sha256-unPqjheT8/2gVQAwvzOvHtG4qTqggf9o0M5iLwl1eh4=";
   };
-  vendorHash = null;
+  vendorHash = "sha256-unPqjheT8/2gVQAwvzOvHtG4qTqggf9o0M5iLwl1eh4=";
   subPackages = ["cmd/kubeseal"];
   env.CGO_ENABLED = "0";
   ldflags = [
