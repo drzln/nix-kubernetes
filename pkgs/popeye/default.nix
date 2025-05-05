@@ -11,10 +11,10 @@ buildGoModule rec {
     owner = "derailed";
     repo = "popeye";
     rev = version;
-    sha256 = "1q2akgwi1r5xpc2gs7k2k96mfkdq2q9n4f4s3p37gbsm3dd5aspn";
+    sha256 = "sha256-iCsEYbEENDOg69wdWu9QQ8tTGxvaY2i/Hboc6XSYyEM=";
   };
 
-  vendorHash = null;
+  vendorHash = "sha256-iCsEYbEENDOg69wdWu9QQ8tTGxvaY2i/Hboc6XSYyEM=";
 
   subPackages = ["."];
 
