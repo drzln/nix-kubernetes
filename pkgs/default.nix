@@ -50,4 +50,5 @@
   stern = callPackage ./stern {};
   kubeseal = callPackage ./kubeseal {};
   external-secrets-operator = callPackage ./external-secrets-operator {};
+  otelcol = callPackage ./otelcol {};
 }
