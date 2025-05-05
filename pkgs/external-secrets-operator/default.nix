@@ -16,7 +16,7 @@ buildGoModule rec {
 
   vendorHash = "sha256-7W27ZbiHsz1nSJROeYRvuDc6Tk0Br7YszwpOPcNktJQ=";
 
-  subPackages = ["cmd/operator"];
+  subPackages = ["cmd/controller"];
 
   env.CGO_ENABLED = "0";
 
