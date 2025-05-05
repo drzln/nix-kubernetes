@@ -15,23 +15,6 @@ in {
       description = "What part of the cluster this node should run.";
     };
 
-    overlay = mkOption {
-      type = types.nullOr types.anything;
-      default = null;
-      description = "Optional Nixpkgs overlay that will be applied to the cluster packages.";
-    };
-
-    etcdPackage = mkOption {
-      type = types.nullOr types.package;
-      default = null;
-      description = "Custom etcd build to use instead of the default.";
-    };
-
-    containerdPackage = mkOption {
-      type = types.nullOr types.package;
-      default = null;
-    };
-
     nodePortRange = mkOption {
       type = types.nullOr types.str;
       default = null;
