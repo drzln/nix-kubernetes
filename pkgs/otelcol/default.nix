@@ -12,7 +12,7 @@ buildGoModule rec {
     rev = version;
     sha256 = "sha256-WdMQnAYAdyvS0uyRzvLnhi1HeoWqmUQSIq6MdcP7NfY=";
   };
-  vendorHash = "sha256-WdMQnAYAdyvS0uyRzvLnhi1HeoWqmUQSIq6MdcP7NfY=";
+  vendorHash = "sha256-hyD+SwR3EnDkHFmN1KGe8rEBgRp68Yyxs0SftQJVkcU=";
   subPackages = ["."];
   env.CGO_ENABLED = "0";
   ldflags = [
