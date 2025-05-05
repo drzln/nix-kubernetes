@@ -1,3 +1,4 @@
+# flake.nix
 {
   description = "Self-contained Kubernetes stack built entirely with Nix";
   inputs = {
