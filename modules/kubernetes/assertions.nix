@@ -1,15 +1,16 @@
+# modules/kubernetes/assertions.nix
 {
-  lib,
-  config,
+  # lib,
+  # config,
   ...
 }: let
-  cfg = config.kubernetes;
-  isWorker = cfg.role == "worker";
+  # cfg = config.kubernetes;
+  # isWorker = cfg.role == "worker";
 in {
   assertions = [
     {
-      condition = elem cfg.role ["master" "worker" "single"];
-      message = "kubernetes.role must be master / worker / single.";
+      # condition = elem cfg.role ["master" "worker" "single"];
+      # message = "kubernetes.role must be master / worker / single.";
     }
     # {
     #   condition =
