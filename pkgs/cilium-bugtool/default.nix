@@ -1,6 +1,5 @@
 # pkgs/cilium-bugtool/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
   ...
