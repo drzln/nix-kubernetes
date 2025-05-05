@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
+# infra/bin/lib/networking.rb
 
 require 'json'
 
