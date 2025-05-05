@@ -1,3 +1,4 @@
+# pkgs/k9s/default.nix
 {
   buildGoModule,
   fetchFromGitHub,
