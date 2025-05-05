@@ -1,9 +1,10 @@
+# hive.nix
 {inputs, ...}:
 inputs.colmena.lib.makeHive {
   meta.nixpkgs = import inputs.nixpkgs {system = "x86_64-linux";};
 
   defaults = {
-    pkgs,
+    # pkgs,
     lib,
     ...
   }: {
@@ -24,7 +25,10 @@ inputs.colmena.lib.makeHive {
     networking.useDHCP = lib.mkDefault true; # avoids more assertions
   };
 
-  master-1 = {pkgs, ...}: {
+  master-1 = {
+    # pkgs,
+    ...
+  }: {
     imports = [./modules/kubernetes];
     # imports = [inputs.self.nixosModules.kubernetes];
     networking.hostName = "master-1";
