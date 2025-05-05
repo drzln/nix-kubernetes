@@ -1,5 +1,5 @@
+# pkgs/woodpecker-server/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
