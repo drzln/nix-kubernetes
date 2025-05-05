@@ -1,5 +1,5 @@
+# pkgs/csi-snapshot-validation-webhook/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
