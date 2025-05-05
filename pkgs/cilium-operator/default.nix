@@ -1,6 +1,5 @@
 # pkgs/cilium-operator/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
   ...
