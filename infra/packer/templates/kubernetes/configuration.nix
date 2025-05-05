@@ -1,3 +1,4 @@
+# infra/packer/templates/kubernetes/configuration.nix
 {
   # config,
   pkgs,
