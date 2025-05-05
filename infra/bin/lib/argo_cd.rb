@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
+# infra/bin/lib/argo_cd.rb
 
 require 'json'
 
-# ✅ Install ArgoCD
 def install_argo_cd
   puts '🚀 Installing ArgoCD...'
   system('kubectl create namespace argocd || true')
@@ -11,7 +11,6 @@ def install_argo_cd
   puts '✅ ArgoCD installed.'
 end
 
-# ✅ Expose ArgoCD API
 def expose_argo_cd
   puts '🚀 Exposing ArgoCD API...'
   system('kubectl port-forward svc/argocd-server -n argocd 8080:443 &') # Runs in the background
