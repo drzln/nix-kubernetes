@@ -5,7 +5,7 @@
 }:
 buildGoModule rec {
   pname = "external-secrets-operator";
-  version = "v0.9.19";
+  version = "v0.16.1";
   src = fetchFromGitHub {
     owner = "external-secrets";
     repo = "external-secrets";
