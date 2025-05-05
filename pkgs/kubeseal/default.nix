@@ -1,5 +1,5 @@
+# pkgs/kubeseal/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
