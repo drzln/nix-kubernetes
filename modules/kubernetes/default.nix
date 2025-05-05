@@ -35,7 +35,7 @@ in {
     #   type = types.str;
     #   default = "";
     # };
-    
+
     # firewallOpen = mkOption {
     #   type = types.bool;
     #   default = false;
@@ -57,12 +57,11 @@ in {
     #   default = "";
     # };
   };
-  config =
-    mkIf cfg.enable {
-      imports = [
-        ./services/containerd.nix;
-      ];
-    };
+  config = mkIf cfg.enable {
+    imports = [
+      ./services/containerd.nix
+    ];
+  };
   # imports =
   #   [
   #     # ./options.nix
