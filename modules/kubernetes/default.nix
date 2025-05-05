@@ -6,6 +6,10 @@
 with lib; let
   cfg = config.blackmatter.components.kubernetes;
 in {
+  imports = [
+    ./services/containerd.nix
+  ];
+
   options.blackmatter.components.kubernetes = {
     enable = mkEnableOption "Kubernetes";
 
@@ -57,11 +61,9 @@ in {
     #   default = "";
     # };
   };
-  config = mkIf cfg.enable {
-    imports = [
-      ./services/containerd.nix
-    ];
-  };
+  config =
+    mkIf cfg.enable {
+    };
   # imports =
   #   [
   #     # ./options.nix
