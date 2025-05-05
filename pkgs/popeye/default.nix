@@ -5,7 +5,7 @@
 }:
 buildGoModule rec {
   pname = "popeye";
-  version = "v0.10.0"; # adjust to latest if needed
+  version = "v0.10.0";
 
   src = fetchFromGitHub {
     owner = "derailed";
