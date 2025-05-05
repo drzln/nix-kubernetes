@@ -1,6 +1,5 @@
 # pkgs/cilium-cli/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
   ...
