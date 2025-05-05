@@ -1,6 +1,6 @@
 {
   lib,
-  pkgs,
+  # pkgs,
   config,
   pkgsK8s,
   ...
@@ -12,7 +12,6 @@
       systemd_cgroup = true
       sandbox_image = "registry.k8s.io/pause:3.9"
   '';
-
   kubeadmConf =
     ''
       apiVersion: kubeadm.k8s.io/v1beta3
@@ -31,7 +30,6 @@ in {
     "d /var/lib/kubelet 0750 kubelet kubelet"
     "d /etc/kubernetes  0755 root    root"
   ];
-
   environment.etc."containerd/config.toml".text = containerdConf;
   environment.etc."kubeadm-init.yaml".text =
     lib.mkIf (cfg.role != "worker") kubeadmConf;
