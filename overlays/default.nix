@@ -1,3 +1,4 @@
+# overlays/default.nix
 # Combined overlays for nix-kubernetes
 # -------------------------------------------------------------
 # ▸ Custom etcd 3.5.9 (built from source)
