@@ -1,5 +1,5 @@
+# pkgs/tkn/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
