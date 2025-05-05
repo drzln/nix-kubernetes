@@ -1,6 +1,5 @@
 # pkgs/aws-ebs-csi-driver/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
