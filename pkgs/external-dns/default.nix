@@ -1,5 +1,5 @@
+# pkgs/external-dns/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
