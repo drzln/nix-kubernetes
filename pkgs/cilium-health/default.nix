@@ -1,6 +1,5 @@
 # pkgs/cilium-health/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
   ...
