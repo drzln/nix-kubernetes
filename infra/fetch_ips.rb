@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
+# infra/fetch_ips.rb
 
 require 'json'
 require 'aws-sdk-ec2'

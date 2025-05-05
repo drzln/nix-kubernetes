@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
-# colmena.rb
+# infra/colmena.rb
 
 begin
   system('colmena apply --parallel 1')
