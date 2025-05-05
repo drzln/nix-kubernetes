@@ -1,7 +1,8 @@
 # frozen_string_literal: true
+# infra/bin/nuke_config.rb
 
 require 'json'
-require_relative 'config' # ✅ Load shared constants
+require_relative 'config'
 AWS_REGIONS = %w[
   global
   us-east-1
@@ -40,15 +41,14 @@ AWS_REGIONS = %w[
   us-gov-east-1
 ].freeze
 
-# ✅ Generate aws-nuke config file dynamically (Targeting ALL AWS Regions & Excluding IAM User `automation`)
 def generate_nuke_config(account_id, account_alias)
   nuke_config = {
-    'regions' => AWS_REGIONS, # ✅ Nuke ALL regions, including global resources
-    'blocklist' => [DUMMY_BLOCKLIST_ACCOUNT], # ✅ Required to avoid error
-    'bypass-alias-check-accounts' => [account_id], # ✅ Allow nuking without alias check
+    'regions' => AWS_REGIONS,
+    'blocklist' => [DUMMY_BLOCKLIST_ACCOUNT],
+    'bypass-alias-check-accounts' => [account_id],
     'accounts' => {
       account_id => {
-        'account-alias' => account_alias # ✅ Use temp alias or actual alias
+        'account-alias' => account_alias
       }
     }
   }
