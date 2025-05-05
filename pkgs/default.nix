@@ -1,8 +1,5 @@
 # pkgs/default.nix
-{
-  lib,
-  callPackage,
-}: {
+{callPackage}: {
   containerd = callPackage ./containerd {};
   kube-apiserver = callPackage ./kube-apiserver {};
   kube-scheduler = callPackage ./kube-scheduler {};
