@@ -57,6 +57,9 @@ in {
   };
   config =
     mkIf cfg.enable {
+      imports = [
+        ./services/containerd.nix;
+      ];
     };
   # imports =
   #   [
