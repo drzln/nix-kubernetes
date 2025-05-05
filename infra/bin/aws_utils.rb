@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# infra/bin/aws_utils.rb
 
 require_relative 'config' # ✅ Load shared constants
 
