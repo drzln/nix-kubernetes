@@ -5,7 +5,7 @@
 }:
 buildGoModule rec {
   pname = "kubeseal";
-  version = "v0.24.6";
+  version = "v0.29.0";
   src = fetchFromGitHub {
     owner = "bitnami-labs";
     repo = "sealed-secrets";
