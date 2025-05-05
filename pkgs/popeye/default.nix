@@ -1,5 +1,5 @@
+# pkgs/popeye/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
