@@ -1,5 +1,5 @@
+# pkgs/cmctl/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
