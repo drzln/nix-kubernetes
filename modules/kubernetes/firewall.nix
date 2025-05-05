@@ -1,4 +1,4 @@
-# modules/kubernetes/files.nix
+# modules/kubernetes/firewall.nix
 {
   lib,
   config,
