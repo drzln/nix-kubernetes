@@ -1,3 +1,4 @@
+# infra/hive.nix
 {
   inputs,
   dynamicHosts ? import ./dynamic-nodes.nix // {},
