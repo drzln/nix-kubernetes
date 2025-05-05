@@ -46,4 +46,5 @@
   tekton-pipelines-controller = callPackage ./tekton-pipelines-controller {};
   tkn = callPackage ./tkn {};
   k9s = callPackage ./k9s {};
+  popeye = callPackage ./popeye {};
 }
