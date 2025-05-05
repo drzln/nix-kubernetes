@@ -12,7 +12,7 @@ in {
     role = mkOption {
       type = types.enum ["master" "worker" "single"];
       default = "master";
-      description = "What part of the cluster this node should run.";
+      description = "node type";
     };
 
     # nodePortRange = mkOption {
