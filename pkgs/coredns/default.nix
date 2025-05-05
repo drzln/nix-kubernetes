@@ -1,5 +1,5 @@
+# pkgs/coredns/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
@@ -19,11 +19,4 @@ buildGoModule rec {
     "-w"
   ];
   doCheck = false;
-  meta = with lib; {
-    description = "CoreDNS is a DNS server that chains plugins and serves as the cluster DNS in Kubernetes.";
-    homepage = "https://coredns.io";
-    license = licenses.asl20;
-    maintainers = [];
-    platforms = platforms.linux;
-  };
 }
