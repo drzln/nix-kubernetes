@@ -1,5 +1,5 @@
+# pkgs/external-secrets-operator/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
