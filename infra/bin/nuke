@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
+# infra/bin/nuke
 
 require_relative 'aws_utils'
 require_relative 'nuke_config'
 require_relative 'cleanup'
 
-# ✅ Main Execution
 begin
   check_aws_nuke_installed
   account_id = fetch_aws_account_id
