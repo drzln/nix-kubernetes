@@ -19,11 +19,7 @@
           "volume_type": "gp3"
         }
       ],
-      "ami_regions": [
-        "us-west-1",
-        "us-west-2",
-        "eu-west-1"
-      ],
+      "ami_regions": ["us-west-1", "us-west-2", "eu-west-1"],
       "tags": {
         "Name": "pangea-kubernetes-crio",
         "Version": "20250309-215251-5f16728b"
@@ -40,9 +36,8 @@
     },
     {
       "type": "shell",
-      "inline": [
-        "sudo nixos-rebuild switch"
-      ]
+      "inline": ["sudo nixos-rebuild switch"]
     }
   ]
 }
+
