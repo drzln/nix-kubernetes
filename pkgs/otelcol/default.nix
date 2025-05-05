@@ -5,7 +5,7 @@
 }:
 buildGoModule rec {
   pname = "otelcol";
-  version = "v0.101.0";
+  version = "v0.125.0";
   src = fetchFromGitHub {
     owner = "open-telemetry";
     repo = "opentelemetry-collector";
