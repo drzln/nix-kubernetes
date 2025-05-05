@@ -7,6 +7,6 @@
 #  * Leaves anything else in nixpkgs untouched
 ##############################################################################
 self: prev: let
-  k8sPkgs = import ../pkgs {inherit (prev) lib callPackage;};
+  k8sPkgs = import ../pkgs {inherit (prev) callPackage;};
   existingBlackmatter = prev.blackmatter or {};
 in {blackmatter = existingBlackmatter // {k8s = k8sPkgs;};}
