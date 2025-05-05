@@ -1,5 +1,5 @@
+# pkgs/stern/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
