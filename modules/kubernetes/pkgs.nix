@@ -1,5 +1,6 @@
+# modules/kubernetes/pkgs.nix
 {
-  lib,
+  # lib,
   pkgs,
   config,
   ...
