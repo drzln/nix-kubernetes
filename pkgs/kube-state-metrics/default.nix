@@ -1,5 +1,5 @@
+# pkgs/kube-state-metrics/default.nix
 {
-  lib,
   buildGoModule,
   fetchFromGitHub,
 }:
