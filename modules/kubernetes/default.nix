@@ -20,19 +20,29 @@ in {
       description = "node type";
     };
   };
-  config = mkIf cfg.enable {
-    assertions = [
-      {
-        assertion = cfg.role != null;
-        message = "You must specify a valid Kubernetes role.";
-      }
-    ];
+  config = mkIf cfg.enable ({
+      assertions = [
+        {
+          assertion = cfg.role != null;
+          message = "You must specify a valid Kubernetes role.";
+        }
+      ];
 
-    # common settings all roles
-    environment.systemPackages = [
-      pkgs.blackmatter.k8s.kubectl
-    ];
-  };
+      environment.systemPackages = [
+        pkgs.blackmatter.k8s.kubectl
+      ];
+    }
+    // mkIf (cfg.role == "single") {
+      imports = [
+        ./services/containerd.nix
+      ];
+
+      systemd.services.kubernetes-single-hint = {
+        description = "hint: running in single-node mode";
+        wantedBy = ["multi-user.target"];
+        serviceConfig.ExecStart = "${pkgs.coreutils}/bin/echo single node mode enabled";
+      };
+    });
   # imports =
   #   [
   #     # ./options.nix
