@@ -33,9 +33,7 @@ in {
       ];
     }
     // mkIf (cfg.role == "single") {
-      imports = [
-        ./services/containerd.nix
-      ];
+      blackmatter.components.kubernetes.services.containerd.enable = true;
 
       systemd.services.kubernetes-single-hint = {
         description = "hint: running in single-node mode";
