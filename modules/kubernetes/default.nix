@@ -27,6 +27,11 @@ in {
         message = "You must specify a valid Kubernetes role.";
       }
     ];
+
+    # common settings all roles
+    environment.systemPackages = [
+      pkgs.blackmatter.k8s.kubectl
+    ];
   };
   # imports =
   #   [
