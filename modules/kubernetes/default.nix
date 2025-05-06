@@ -5,7 +5,7 @@
   ...
 }:
 with lib; let
-  # cfg = config.blackmatter.components.kubernetes;
+  cfg = config.blackmatter.components.kubernetes;
 in {
   imports = [
     ./services/containerd.nix
@@ -19,52 +19,15 @@ in {
       default = "master";
       description = "node type";
     };
-
-    # nodePortRange = mkOption {
-    #   type = types.nullOr types.str;
-    #   default = null;
-    #   example = "30000-32767";
-    # };
-
-    # extraApiArgs = mkOption {
-    #   type = types.listOf types.str;
-    #   default = [];
-    # };
-
-    # extraKubeletOpts = mkOption {
-    #   type = types.listOf types.str;
-    #   default = [];
-    # };
-
-    # kubeadmExtra = mkOption {
-    #   type = types.str;
-    #   default = "";
-    # };
-
-    # firewallOpen = mkOption {
-    #   type = types.bool;
-    #   default = false;
-    #   description = "Open all required Kubernetes ports on the host firewall.";
-    # };
-
-    # join.address = mkOption {
-    #   type = types.str;
-    #   default = "";
-    # };
-
-    # join.token = mkOption {
-    #   type = types.str;
-    #   default = "";
-    # };
-
-    # join.caHash = mkOption {
-    #   type = types.str;
-    #   default = "";
-    # };
   };
-  # config =
-  #   mkIf cfg.enable {
-  #   };
+  config = mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = cfg.role != null;
+        message = "You must specify a valid Kubernetes role.";
+      }
+    ];
+  };
   # imports =
   #   [
   #     # ./options.nix
