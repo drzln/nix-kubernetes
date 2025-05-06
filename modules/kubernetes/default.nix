@@ -41,20 +41,4 @@ in {
         serviceConfig.ExecStart = "${pkgs.coreutils}/bin/echo single node mode enabled";
       };
     });
-  # imports =
-  #   [
-  #     # ./options.nix
-  #     # ./pkgs.nix
-  #     # ./assertions.nix
-  #     # ./files.nix
-  #     # ./firewall.nix
-  #     # ./services/etcd.nix
-  #     # ./services/apiserver.nix
-  #     # ./services/controller.nix
-  #     # ./services/scheduler.nix
-  #     # ./services/containerd.nix
-  #     # ./services/kubelet.nix
-  #     # ./services/kubeadm.nix
-  #     # ./services/proxy.nix
-  #   ];
 }
