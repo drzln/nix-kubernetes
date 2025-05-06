@@ -39,7 +39,9 @@ in {
       };
     };
     environment.systemPackages = [
+      pkg
       pkgs.blackmatter.k8s.etcdctl
+      pkgs.blackmatter.k8s.etcdutl
     ];
     systemd.tmpfiles.rules = [
       "d /var/lib/etcd 0700 etcd etcd -"
