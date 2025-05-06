@@ -12,14 +12,12 @@ in {
   options.blackmatter.components.kubernetes.services.cilium-agent = {
     enable = mkEnableOption "Enable cilium-agent";
   };
-
   config = mkIf cfg.enable {
     systemd.services.cilium-agent = {
       description = "blackmatter.cilium-agent";
       wantedBy = ["multi-user.target"];
       after = ["network-online.target"];
       wants = ["network-online.target"];
-
       serviceConfig = {
         ExecStart = ''
           ${pkg}/bin/cilium-agent \
@@ -35,19 +33,15 @@ in {
         MountFlags = "shared";
         CapabilityBoundingSet = "CAP_NET_ADMIN CAP_BPF CAP_SYS_ADMIN";
       };
-
       environment = {
         PATH = lib.makeBinPath [pkg pkgs.coreutils pkgs.iproute2];
       };
     };
-
     environment.systemPackages = [pkg];
-
     systemd.tmpfiles.rules = [
       "d /etc/cilium 0755 root root -"
       "d /var/run/cilium 0755 root root -"
     ];
-
-    networking.firewall.allowedUDPPorts = [8472]; # VXLAN (if used)
+    networking.firewall.allowedUDPPorts = [8472];
   };
 }
