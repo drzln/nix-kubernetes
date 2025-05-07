@@ -50,7 +50,10 @@ in {
     }
     // mkIf (cfg.role == "single") {
       blackmatter.components.kubernetes.services.containerd.enable = true;
-      blackmatter.components.kubernetes.services.kubelet.enable = true;
+      blackmatter.components.kubernetes.services.kubelet = {
+        enable = true;
+        staticControlPlane.enable = true;
+      };
       # blackmatter.components.kubernetes.services.kube-apiserver.enable = true;
       # blackmatter.components.kubernetes.services.kube-controller.enable = true;
       # blackmatter.components.kubernetes.services.kube-scheduler.enable = true;
