@@ -73,6 +73,8 @@ in {
             "${pkg}/bin/kubelet"
             "--config=/etc/kubernetes/kubelet/config.yaml"
             "--kubeconfig=/etc/kubernetes/kubelet/kubeconfig.yaml"
+            "--logtostderr=true"
+            "--log-file=/var/log/kubelet.log"
           ]
           ++ cfg.extraFlags
         );
@@ -81,18 +83,6 @@ in {
         KillMode = "process";
         Delegate = true;
         LimitNOFILE = 1048576;
-        CapabilityBoundingSet = [
-          "CAP_SYSLOG"
-          "CAP_CHOWN"
-          "CAP_DAC_OVERRIDE"
-        ];
-        AmbientCapabilities = [
-          "CAP_SYSLOG"
-          "CAP_CHOWN"
-          "CAP_DAC_OVERRIDE"
-        ];
-        PrivateDevices = false;
-        ProtectKernelLogs = false;
       };
       environment = {
         PATH = lib.mkForce (lib.makeBinPath [
