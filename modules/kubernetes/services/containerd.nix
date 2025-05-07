@@ -54,7 +54,7 @@ in {
         KillMode = "process";
       };
       environment = {
-        PATH = lib.makeBinPath [pkg pkgs.iproute2 pkgs.coreutils];
+        PATH = lib.mkForce (lib.makeBinPath [pkg pkgs.iproute2 pkgs.coreutils]);
       };
     };
   };
