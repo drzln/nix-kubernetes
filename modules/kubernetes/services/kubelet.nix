@@ -42,7 +42,7 @@ in {
       after = ["network.target" "containerd.service"];
       wantedBy = ["multi-user.target"];
       serviceConfig = {
-        ExecStartPre = "${pkgs.coreutils}/bin/sh -c 'until test -S /run/containerd/containerd.sock; do sleep 1; done'";
+        # ExecStartPre = "${pkgs.coreutils}/bin/sh -c 'until test -S /run/containerd/containerd.sock; do sleep 1; done'";
         ExecStart = concatStringsSep " " (
           [
             "${pkg}/bin/kubelet"
