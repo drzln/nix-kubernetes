@@ -56,7 +56,7 @@ let
 
   # turn a pod value into an attr-set that drops a file in /etc/kubernetes/manifests
   manifestFile = filename: pod: {
-    "environment.etc.\"kubernetes/manifests/${filename}\".text" =
+    environment.etc."kubernetes/manifests/${filename}".text =
       builtins.toJSON pod;
   };
 
