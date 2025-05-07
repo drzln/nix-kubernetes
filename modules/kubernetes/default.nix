@@ -7,7 +7,12 @@
 with lib; let
   cfg = config.blackmatter.components.kubernetes;
 in {
-  imports = [./services/containerd.nix];
+  imports = [
+    (import ./services/containerd.nix {
+      inherit lib config pkgs;
+      blackmatterPkgs = pkgs.blackmatter.k8s;
+    })
+  ];
   options.blackmatter.components.kubernetes = {
     enable = mkEnableOption "Kubernetes";
     role = mkOption {
