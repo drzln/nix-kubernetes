@@ -66,6 +66,7 @@ in {
       after = ["network.target" "containerd.service"];
       wantedBy = ["multi-user.target"];
       serviceConfig = {
+        User = "root";
         ExecStartPre = "${pkgs.bash}/bin/bash -c 'until [ -S /run/containerd/containerd.sock ]; do sleep 1; done'";
         ExecStart = concatStringsSep " " (
           [
