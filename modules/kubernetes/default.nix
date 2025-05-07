@@ -46,6 +46,7 @@ in {
 
       environment.systemPackages = [
         blackmatterPkgs.kubectl
+        blackmatterPkgs.runc
       ];
     }
     // mkIf (cfg.role == "single") {
@@ -54,6 +55,7 @@ in {
         enable = true;
         staticControlPlane.enable = true;
       };
+
       # blackmatter.components.kubernetes.services.kube-apiserver.enable = true;
       # blackmatter.components.kubernetes.services.kube-controller.enable = true;
       # blackmatter.components.kubernetes.services.kube-scheduler.enable = true;
