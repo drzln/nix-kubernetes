@@ -28,6 +28,9 @@ in {
     environment.etc."kubernetes/kubelet/config.yaml".text = ''
       apiVersion: kubelet.config.k8s.io/v1beta1
       kind: KubeletConfiguration
+      logging:
+        format: "json"
+        verbosity: 2
       authentication:
         x509:
           clientCAFile: /var/lib/blackmatter/pki/ca.crt
@@ -73,8 +76,6 @@ in {
             "${pkg}/bin/kubelet"
             "--config=/etc/kubernetes/kubelet/config.yaml"
             "--kubeconfig=/etc/kubernetes/kubelet/kubeconfig.yaml"
-            "--logging-format=json"
-            "--v=2"
           ]
           ++ cfg.extraFlags
         );
