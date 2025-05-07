@@ -1,42 +1,54 @@
 # pkgs/default.nix
 {callPackage}: {
-  containerd = callPackage ./containerd {};
+  # Kubernetes core
   kube-apiserver = callPackage ./kube-apiserver {};
-  kube-scheduler = callPackage ./kube-scheduler {};
   kube-controller = callPackage ./kube-controller {};
+  kube-scheduler = callPackage ./kube-scheduler {};
   kubelet = callPackage ./kubelet {};
   kubectl = callPackage ./kubectl {};
-  inherit
-    (callPackage ./etcd {})
-    etcd
-    etcdserver
-    etcdctl
-    etcdutl
-    ;
+  containerd = callPackage ./containerd {};
   runc = callPackage ./runc {};
-  cilium-cli = callPackage ./cilium-cli {};
-  cilium-dbg = callPackage ./cilium-dbg {};
+
+  # etcd suite
+  inherit (callPackage ./etcd {}) etcd etcdserver etcdctl etcdutl;
+
+  # Cilium
   cilium-agent = callPackage ./cilium-agent {};
   cilium-operator = callPackage ./cilium-operator {};
+  cilium-cli = callPackage ./cilium-cli {};
   cilium-cni = callPackage ./cilium-cni {};
-  cilium-health = callPackage ./cilium-health {};
+  cilium-dbg = callPackage ./cilium-dbg {};
   cilium-bugtool = callPackage ./cilium-bugtool {};
+  cilium-health = callPackage ./cilium-health {};
   clustermesh-apiserver = callPackage ./clustermesh-apiserver {};
   hubble-relay = callPackage ./hubble-relay {};
   hubble-cli = callPackage ./hubble-cli {};
-  coredns = callPackage ./coredns {};
+
+  # Observability
+  loki = callPackage ./loki {};
+  otelcol = callPackage ./otelcol {};
   metrics-server = callPackage ./metrics-server {};
   kube-state-metrics = callPackage ./kube-state-metrics {};
   node-problem-detector = callPackage ./node-problem-detector {};
+  coredns = callPackage ./coredns {};
+
+  # CSI
   csi-driver-host-path = callPackage ./csi-driver-host-path {};
   csi-snapshot-controller = callPackage ./csi-snapshot-controller {};
   csi-snapshot-validation-webhook = callPackage ./csi-snapshot-validation-webhook {};
   aws-ebs-csi-driver = callPackage ./aws-ebs-csi-driver {};
-  external-dns = callPackage ./external-dns {};
-  cmctl = callPackage ./cmctl {};
+
+  # SPIRE
   spire-server = callPackage ./spire-server {};
   spire-agent = callPackage ./spire-agent {};
   oidc-discovery-provider = callPackage ./oidc-discovery-provider {};
+
+  # Secrets
+  external-secrets-operator = callPackage ./external-secrets-operator {};
+  kubeseal = callPackage ./kubeseal {};
+  cmctl = callPackage ./cmctl {};
+
+  # GitOps / CI / Tooling
   woodpecker-server = callPackage ./woodpecker-server {};
   woodpecker-agent = callPackage ./woodpecker-agent {};
   woodpecker-cli = callPackage ./woodpecker-cli {};
@@ -45,8 +57,5 @@
   k9s = callPackage ./k9s {};
   popeye = callPackage ./popeye {};
   stern = callPackage ./stern {};
-  kubeseal = callPackage ./kubeseal {};
-  external-secrets-operator = callPackage ./external-secrets-operator {};
-  otelcol = callPackage ./otelcol {};
-  loki = callPackage ./loki {};
+  external-dns = callPackage ./external-dns {};
 }
