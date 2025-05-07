@@ -81,9 +81,16 @@ in {
         KillMode = "process";
         Delegate = true;
         LimitNOFILE = 1048576;
-        CapabilityBoundingSet = ["CAP_SYSLOG"];
-        AmbientCapabilities = ["CAP_SYSLOG"];
-        # These two make sure /dev/kmsg is usable:
+        CapabilityBoundingSet = [
+          "CAP_SYSLOG"
+          "CAP_CHOWN"
+          "CAP_DAC_OVERRIDE"
+        ];
+        AmbientCapabilities = [
+          "CAP_SYSLOG"
+          "CAP_CHOWN"
+          "CAP_DAC_OVERRIDE"
+        ];
         PrivateDevices = false;
         ProtectKernelLogs = false;
       };
