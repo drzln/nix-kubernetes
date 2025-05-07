@@ -2,28 +2,28 @@
 {
   description = "kubernetes built with nix";
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nil.url = "github:oxalica/nil";
+    deadnix.url = "github:astro/deadnix";
+    statix.url = "github:nerdypepper/statix";
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-lint.url = "github:nix-community/nixpkgs-lint";
-    statix.url = "github:nerdypepper/statix";
-    deadnix.url = "github:astro/deadnix";
-    nil.url = "github:oxalica/nil";
     colmena = {
       url = "github:zhaofengli/colmena";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
   outputs = inputs @ {
+    nil,
     self,
+    statix,
+    colmena,
     nixpkgs,
+    deadnix,
     flake-utils,
     treefmt-nix,
     nixpkgs-lint,
-    statix,
-    deadnix,
-    nil,
-    colmena,
     ...
   }: let
     blackmatterOverlay = import ./overlays/blackmatter-k8s.nix;
