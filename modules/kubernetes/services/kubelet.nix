@@ -73,7 +73,7 @@ in {
             "${pkg}/bin/kubelet"
             "--config=/etc/kubernetes/kubelet/config.yaml"
             "--kubeconfig=/etc/kubernetes/kubelet/kubeconfig.yaml"
-            "--logging-format=text"
+            "--logging-format=json"
             "--v=2"
           ]
           ++ cfg.extraFlags
