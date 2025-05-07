@@ -33,6 +33,8 @@ in {
       runtimeRequestTimeout: "15m"
       rotateCertificates: true
       failSwapOn: false
+      podManifestPath: "/etc/kubernetes/manifests"
+      containerRuntimeEndpoint: "unix:///run/containerd/containerd.sock"
       clusterDNS:
         - "10.96.0.10"
       clusterDomain: "cluster.local"
@@ -47,9 +49,6 @@ in {
           [
             "${pkg}/bin/kubelet"
             "--config=/etc/kubernetes/kubelet/config.yaml"
-            "--container-runtime-endpoint=unix:///run/containerd/containerd.sock"
-            "--pod-manifest-path=/etc/kubernetes/manifests"
-            "--network-plugin=cni"
             "--cni-conf-dir=/etc/cni/net.d"
             "--cni-bin-dir=${cniBinDir}"
             "--fail-swap-on=false"
