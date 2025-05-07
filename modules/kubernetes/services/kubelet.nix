@@ -28,7 +28,7 @@ in {
     environment.etc."kubernetes/kubelet/config.yaml".text = ''
       # /etc/kubernetes/kubelet/config.yaml
       apiVersion: v1
-      kind: Config
+      kind: KubeletConfiguration
       clusters:
       - cluster:
           certificate-authority: /var/lib/blackmatter/pki/ca.crt
