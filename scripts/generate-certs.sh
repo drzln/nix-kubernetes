@@ -4,21 +4,41 @@ set -euo pipefail
 OUTDIR="./secrets/generated"
 mkdir -p "$OUTDIR"
 
-echo "[+] Generating Kubernetes CA"
+# Define the DNS and IPs we'll SAN across all certs
+cat >"$OUTDIR/san.cnf" <<EOF
+[ req ]
+req_extensions = v3_req
+distinguished_name = dn
+[ dn ]
+[ v3_req ]
+subjectAltName = @alt_names
+[ alt_names ]
+DNS.1 = localhost
+DNS.2 = single
+DNS.3 = single.cluster.local
+DNS.4 = etcd.single.cluster.local
+DNS.5 = kubernetes
+DNS.6 = kubernetes.default
+DNS.7 = kubernetes.default.svc
+DNS.8 = kubernetes.default.svc.cluster.local
+IP.1  = 127.0.0.1
+IP.2  = 10.96.0.1
+IP.3  = 10.96.0.10
+EOF
+
+echo "[+] Generating self-signed CA"
 openssl genrsa -out "$OUTDIR/ca.key" 2048
 openssl req -x509 -new -nodes -key "$OUTDIR/ca.key" -sha256 -days 10000 \
-  -subj "/CN=kubernetes-ca" \
-  -out "$OUTDIR/ca.crt"
+  -subj "/CN=kubernetes-ca" -out "$OUTDIR/ca.crt"
 
-# Function to sign component certs
 generate_cert() {
   local name="$1"
   local cn="$2"
   local org="$3"
 
-  echo "[+] Generating cert for $name"
-  openssl genrsa -out "$OUTDIR/${name}.key" 2048
+  echo "[+] Generating cert for $name (CN=$cn, O=$org)"
 
+  openssl genrsa -out "$OUTDIR/${name}.key" 2048
   openssl req -new -key "$OUTDIR/${name}.key" \
     -subj "/CN=${cn}/O=${org}" \
     -out "$OUTDIR/${name}.csr"
@@ -26,24 +46,13 @@ generate_cert() {
   openssl x509 -req -in "$OUTDIR/${name}.csr" \
     -CA "$OUTDIR/ca.crt" -CAkey "$OUTDIR/ca.key" -CAcreateserial \
     -out "$OUTDIR/${name}.crt" -days 365 \
-    -extensions v3_req -extfile <(echo "
-[ v3_req ]
-keyUsage=critical,digitalSignature,keyEncipherment
-extendedKeyUsage=serverAuth,clientAuth
-")
+    -extensions v3_req -extfile "$OUTDIR/san.cnf"
 }
 
-# Generate kubelet cert
-generate_cert kubelet "system:node:single" "system:nodes"
-
-# API server cert
+# Generate certs for core roles
 generate_cert apiserver "kube-apiserver" "kubernetes"
-
-# etcd cert
+generate_cert kubelet "system:node:single" "system:nodes"
 generate_cert etcd "etcd" "kubernetes"
-
-# admin user (for kubeconfig)
 generate_cert admin "admin" "system:masters"
 
-echo "[✓] All certs generated in $OUTDIR"
-
+echo "[✓] Cert generation complete. Output written to: $OUTDIR"
