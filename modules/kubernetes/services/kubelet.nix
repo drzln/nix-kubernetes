@@ -26,9 +26,24 @@ in {
       "d /etc/cni/net.d 0755 root root -"
     ];
     environment.etc."kubernetes/kubelet/config.yaml".text = ''
-      # /etc/kubernetes/kubelet/config.yaml
-      apiVersion: v1
+      apiVersion: kubelet.config.k8s.io/v1beta1
       kind: KubeletConfiguration
+      authentication:
+        x509:
+          clientCAFile: /var/lib/blackmatter/pki/ca.crt
+      authorization:
+        mode: Webhook
+      clusterDomain: cluster.local
+      clusterDNS:
+        - 10.96.0.10
+      tlsCertFile: /var/lib/blackmatter/pki/kubelet.crt
+      tlsPrivateKeyFile: /var/lib/blackmatter/pki/kubelet.key
+      failSwapOn: false
+      staticPodPath: /etc/kubernetes/manifests
+    '';
+    environment.etc."kubernetes/kubelet/kubeconfig.yaml".text = ''
+      apiVersion: v1
+      kind: Config
       clusters:
       - cluster:
           certificate-authority: /var/lib/blackmatter/pki/ca.crt
@@ -56,6 +71,7 @@ in {
           [
             "${pkg}/bin/kubelet"
             "--config=/etc/kubernetes/kubelet/config.yaml"
+            "--kubeconfig=/etc/kubernetes/kubelet/kubeconfig.yaml"
           ]
           ++ cfg.extraFlags
         );
