@@ -3,11 +3,12 @@
   lib,
   pkgs,
   config,
+  blackmatterPkgs,
   ...
 }:
 with lib; let
   cfg = config.blackmatter.components.kubernetes.services.containerd;
-  pkg = pkgs.blackmatter.k8s.containerd;
+  pkg = blackmatterPkgs.containerd;
 in {
   options.blackmatter.components.kubernetes.services.containerd = {
     enable = mkEnableOption "Enable the containerd service";
@@ -36,7 +37,8 @@ in {
       "d /etc/containerd 0755 root root -"
       "d /run/containerd 0755 root root -"
     ];
-    environment.etc."containerd/config.toml".source = mkIf (cfg.configPath == null) "${pkg}/etc/containerd/config.toml";
+    environment.etc."containerd/config.toml".source =
+      mkIf (cfg.configPath == null) "${pkg}/etc/containerd/config.toml";
     systemd.services.containerd = {
       description = "blackmatter.containerd";
       wantedBy = ["multi-user.target"];
