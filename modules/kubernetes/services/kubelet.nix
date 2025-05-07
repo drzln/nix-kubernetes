@@ -33,7 +33,6 @@ in {
       runtimeRequestTimeout: "15m"
       rotateCertificates: true
       failSwapOn: false
-      podManifestPath: "/etc/kubernetes/manifests"
       containerRuntimeEndpoint: "unix:///run/containerd/containerd.sock"
       clusterDNS:
         - "10.96.0.10"
@@ -49,6 +48,7 @@ in {
           [
             "${pkg}/bin/kubelet"
             "--config=/etc/kubernetes/kubelet/config.yaml"
+            "--pod-manifest-path=/etc/kubernetes/manifests"
             "--fail-swap-on=false"
           ]
           ++ cfg.extraFlags
