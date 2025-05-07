@@ -16,8 +16,7 @@ in
       # sha256 = "sha256-nTVjgNMnB6775ubzK7ezOxR5Z0z5PBxx88CxtbxGxrY=";
       hash = "sha256-oXoDio3l23Z6UyAhb9oDMo1O4TLBbFyLh9sRWXnfLVY=";
     };
-
-    vendorHash = "sha256-ex0wkw6yv7AJtrZXIzZq2GwTPx1C3M7IbHDbe+85b7A="; # ← `nix-prefetch`
+    vendorHash = null;
     subPackages = ["."];
     env.CGO_ENABLED = "0";
     ldflags = [
