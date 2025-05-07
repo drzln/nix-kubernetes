@@ -83,6 +83,10 @@ in {
         KillMode = "process";
         Delegate = true;
         LimitNOFILE = 1048576;
+        CapabilityBoundingSet = ["CAP_SYSLOG"];
+        AmbientCapabilities = ["CAP_SYSLOG"];
+        PrivateDevices = false;
+        ProtectKernelLogs = false;
       };
       environment = {
         PATH = lib.mkForce (lib.makeBinPath [
