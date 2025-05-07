@@ -2,41 +2,23 @@
 {inputs, ...}:
 inputs.colmena.lib.makeHive {
   meta.nixpkgs = import inputs.nixpkgs {system = "x86_64-linux";};
-
-  defaults = {
-    # pkgs,
-    lib,
-    ...
-  }: {
+  defaults = {lib, ...}: {
     _module.args.inputs = inputs;
     system.stateVersion = "24.05";
-
-    ## ───── minimal boot + root fs so eval passes ─────
     fileSystems."/" = lib.mkDefault {
       device = "/dev/disk/by-label/nixos"; # <-- change to your actual root
       fsType = "ext4";
     };
-
     boot.loader.grub = {
       enable = true;
       devices = lib.mkDefault ["/dev/sda"]; # or "/dev/vda", etc.
     };
-
     networking.useDHCP = lib.mkDefault true; # avoids more assertions
   };
-
-  master-1 = {
-    # pkgs,
-    ...
-  }: {
+  master-1 = {...}: {
     imports = [./modules/kubernetes];
-    # imports = [inputs.self.nixosModules.kubernetes];
     networking.hostName = "master-1";
     deployment.targetHost = "192.168.1.10";
-    # kubernetes = {
-    #   enable = true;
-    #   role = "master";
-    # };
   };
 
   # master-2 = {pkgs, ...}: {
