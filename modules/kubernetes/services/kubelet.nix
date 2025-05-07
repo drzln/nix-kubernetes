@@ -81,6 +81,11 @@ in {
         KillMode = "process";
         Delegate = true;
         LimitNOFILE = 1048576;
+        CapabilityBoundingSet = ["CAP_SYSLOG"];
+        AmbientCapabilities = ["CAP_SYSLOG"];
+        # These two make sure /dev/kmsg is usable:
+        PrivateDevices = false;
+        ProtectKernelLogs = false;
       };
       environment = {
         PATH = lib.mkForce (lib.makeBinPath [
