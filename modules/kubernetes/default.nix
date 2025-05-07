@@ -48,6 +48,17 @@ in {
     }
     // mkIf (cfg.role == "single") {
       blackmatter.components.kubernetes.services.containerd.enable = true;
+      # blackmatter.components.kubernetes.services.kubelet.enable = true;
+      # blackmatter.components.kubernetes.services.kube-apiserver.enable = true;
+      # blackmatter.components.kubernetes.services.kube-controller.enable = true;
+      # blackmatter.components.kubernetes.services.kube-scheduler.enable = true;
+      # blackmatter.components.kubernetes.services.etcd.enable = true;
+      # blackmatter.components.kubernetes.services.cilium-agent.enable = true;
+      # blackmatter.components.kubernetes.services.cilium-operator.enable = true;
+      # blackmatter.components.kubernetes.services.hubble-relay.enable = true;
+      # blackmatter.components.kubernetes.services.spire-server.enable = true;
+      # blackmatter.components.kubernetes.services.spire-agent.enable = true;
+      # blackmatter.components.kubernetes.services.spire-oidc.enable = true;
 
       systemd.services.kubernetes-single-hint = {
         description = "hint: running in single-node mode";
