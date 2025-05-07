@@ -8,7 +8,6 @@
 }:
 with lib; let
   pkg = blackmatterPkgs.kubelet;
-  # cniBinDir = "${blackmatterPkgs.cilium-cni}/bin";
   cfg = config.blackmatter.components.kubernetes.services.kubelet;
 in {
   options.blackmatter.components.kubernetes.services.kubelet = {
@@ -27,16 +26,25 @@ in {
       "d /etc/cni/net.d 0755 root root -"
     ];
     environment.etc."kubernetes/kubelet/config.yaml".text = ''
-      kind: KubeletConfiguration
-      apiVersion: kubelet.config.k8s.io/v1beta1
-      cgroupDriver: systemd
-      runtimeRequestTimeout: "15m"
-      rotateCertificates: true
-      failSwapOn: false
-      containerRuntimeEndpoint: "unix:///run/containerd/containerd.sock"
-      clusterDNS:
-        - "10.96.0.10"
-      clusterDomain: "cluster.local"
+      # /etc/kubernetes/kubelet/config.yaml
+      apiVersion: v1
+      kind: Config
+      clusters:
+      - cluster:
+          certificate-authority: /var/lib/blackmatter/pki/ca.crt
+          server: https://127.0.0.1:6443
+        name: local-cluster
+      users:
+      - name: kubelet
+        user:
+          client-certificate: /var/lib/blackmatter/pki/kubelet.crt
+          client-key: /var/lib/blackmatter/pki/kubelet.key
+      contexts:
+      - context:
+          cluster: local-cluster
+          user: kubelet
+        name: default
+      current-context: default
     '';
     systemd.services.kubelet = {
       description = "blackmatter.kubelet";
