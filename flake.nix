@@ -45,9 +45,9 @@
           git
           openssh
           nixpkgs-fmt
+          nil.packages.${system}.default
           statix.packages.${system}.default
           deadnix.packages.${system}.default
-          nil.packages.${system}.default
           colmena.packages.${system}.colmena
         ];
       };
