@@ -6,7 +6,11 @@
 }:
 with lib; let
   cfg = config.blackmatter.components.kubernetes;
-  blackmatterPkgs = pkgs.blackmatter.k8s;
+
+  # Load your prebuilt Kubernetes binaries
+  blackmatterPkgs = import ../../pkgs {inherit pkgs;};
+
+  # Helper to import service modules with blackmatterPkgs injected
   service = name:
     import (./services + "/${name}.nix") {
       inherit lib config pkgs blackmatterPkgs;
@@ -14,17 +18,19 @@ with lib; let
 in {
   imports = [
     (service "containerd")
-    # Add more services like this:
+    # Add others here as you wire them:
     # (service "kubelet")
+    # (service "kube-apiserver")
     # (service "etcd")
+    # (service "cilium-agent")
   ];
 
   options.blackmatter.components.kubernetes = {
-    enable = mkEnableOption "Kubernetes";
+    enable = mkEnableOption "Enable Kubernetes";
     role = mkOption {
       type = types.enum ["master" "worker" "single"];
       default = "master";
-      description = "role";
+      description = "The role this node will play in the cluster.";
     };
   };
 
