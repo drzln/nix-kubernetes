@@ -8,7 +8,7 @@
 }:
 with lib; let
   pkg = blackmatterPkgs.kubelet;
-  cniBinDir = "${blackmatterPkgs.cilium-cni}/bin";
+  # cniBinDir = "${blackmatterPkgs.cilium-cni}/bin";
   cfg = config.blackmatter.components.kubernetes.services.kubelet;
 in {
   options.blackmatter.components.kubernetes.services.kubelet = {
