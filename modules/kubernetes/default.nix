@@ -8,7 +8,9 @@ with lib; let
   cfg = config.blackmatter.components.kubernetes;
 
   # Load your prebuilt Kubernetes binaries
-  blackmatterPkgs = import ../../pkgs {inherit pkgs;};
+  blackmatterPkgs = import ../../pkgs {
+    callPackage = pkgs.callPackage;
+  };
 
   # Helper to import service modules with blackmatterPkgs injected
   service = name:
