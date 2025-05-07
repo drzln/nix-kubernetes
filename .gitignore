@@ -2,3 +2,4 @@ result
 result-man
 .envrc
 .direnv
+secrets/generated
