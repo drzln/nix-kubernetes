@@ -84,8 +84,8 @@ in {
         KillMode = "process";
         Delegate = true;
         LimitNOFILE = 1048576;
-        CapabilityBoundingSet = ["CAP_SYSLOG"];
-        AmbientCapabilities = ["CAP_SYSLOG"];
+        CapabilityBoundingSet = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
+        AmbientCapabilities = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
         DeviceAllow = "/dev/kmsg r";
         PrivateDevices = false; # must disable to use DeviceAllow
         ProtectKernelLogs = false;
