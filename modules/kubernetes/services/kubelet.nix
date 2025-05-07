@@ -49,7 +49,6 @@ in {
           [
             "${pkg}/bin/kubelet"
             "--config=/etc/kubernetes/kubelet/config.yaml"
-            "--cni-conf-dir=/etc/cni/net.d"
             "--cni-bin-dir=${cniBinDir}"
             "--fail-swap-on=false"
           ]
