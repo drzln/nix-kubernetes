@@ -19,16 +19,13 @@ in {
       description = "Additional flags to pass to kubelet binary.";
     };
   };
-
   config = mkIf cfg.enable {
     environment.systemPackages = [pkg];
-
     systemd.tmpfiles.rules = [
       "d /etc/kubernetes/manifests 0755 root root -"
       "d /etc/kubernetes/kubelet 0755 root root -"
       "d /etc/cni/net.d 0755 root root -"
     ];
-
     environment.etc."kubernetes/kubelet/config.yaml".text = ''
       kind: KubeletConfiguration
       apiVersion: kubelet.config.k8s.io/v1beta1
@@ -40,12 +37,10 @@ in {
         - "10.96.0.10"
       clusterDomain: "cluster.local"
     '';
-
     systemd.services.kubelet = {
       description = "blackmatter.kubelet";
       after = ["network.target" "containerd.service"];
       wantedBy = ["multi-user.target"];
-
       serviceConfig = {
         ExecStartPre = "${pkgs.coreutils}/bin/sh -c 'until test -S /run/containerd/containerd.sock; do sleep 1; done'";
         ExecStart = concatStringsSep " " (
@@ -67,7 +62,6 @@ in {
         Delegate = true;
         LimitNOFILE = 1048576;
       };
-
       environment = {
         PATH = lib.mkForce (lib.makeBinPath [
           pkg
