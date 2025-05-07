@@ -20,8 +20,8 @@ with lib; let
 in {
   imports = [
     (service "containerd")
+    (service "kubelet")
     # Add others here as you wire them:
-    # (service "kubelet")
     # (service "kube-apiserver")
     # (service "etcd")
     # (service "cilium-agent")
@@ -50,7 +50,7 @@ in {
     }
     // mkIf (cfg.role == "single") {
       blackmatter.components.kubernetes.services.containerd.enable = true;
-      # blackmatter.components.kubernetes.services.kubelet.enable = true;
+      blackmatter.components.kubernetes.services.kubelet.enable = true;
       # blackmatter.components.kubernetes.services.kube-apiserver.enable = true;
       # blackmatter.components.kubernetes.services.kube-controller.enable = true;
       # blackmatter.components.kubernetes.services.kube-scheduler.enable = true;
