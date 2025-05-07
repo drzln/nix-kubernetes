@@ -56,12 +56,12 @@ in {
         staticControlPlane.enable = true;
       };
 
-      # blackmatter.components.kubernetes.services.kube-apiserver.enable = true;
-      # blackmatter.components.kubernetes.services.kube-controller.enable = true;
-      # blackmatter.components.kubernetes.services.kube-scheduler.enable = true;
       # blackmatter.components.kubernetes.services.etcd.enable = true;
       # blackmatter.components.kubernetes.services.cilium-agent.enable = true;
+      # blackmatter.components.kubernetes.services.kube-apiserver.enable = true;
       # blackmatter.components.kubernetes.services.cilium-operator.enable = true;
+      # blackmatter.components.kubernetes.services.kube-controller.enable = true;
+      # blackmatter.components.kubernetes.services.kube-scheduler.enable = true;
       # blackmatter.components.kubernetes.services.hubble-relay.enable = true;
       # blackmatter.components.kubernetes.services.spire-server.enable = true;
       # blackmatter.components.kubernetes.services.spire-agent.enable = true;
