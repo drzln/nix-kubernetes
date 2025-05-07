@@ -33,7 +33,6 @@
         inherit system;
         overlays = [blackmatterOverlay];
       };
-
       lintBin = "${nixpkgs-lint.packages.${system}.nixpkgs-lint}/bin/nixpkgs-lint";
       statixBin = "${statix.packages.${system}.default}/bin/statix";
       deadnixBin = "${deadnix.packages.${system}.default}/bin/deadnix";
@@ -57,17 +56,14 @@
           ${treefmtBin} --fail .
           touch $out
         '';
-
         nixpkgs-lint = pkgs.runCommand "nixpkgs-lint" {} ''
           ${lintBin} ${self}
           touch $out
         '';
-
         statix = pkgs.runCommand "statix" {} ''
           ${statixBin} check --ignore W03 --ignore W04 ${self}
           touch $out
         '';
-
         deadnix = pkgs.runCommand "deadnix" {} ''
           ${deadnixBin} --fail ${self}
           touch $out
