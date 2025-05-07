@@ -3,40 +3,32 @@
   lib,
   pkgs,
   config,
+  blackmatterPkgs,
   ...
 }:
 with lib; let
-  pkg = pkgs.blackmatter.k8s.kubelet;
+  pkg = blackmatterPkgs.kubelet;
+  cniBinDir = "${blackmatterPkgs.cilium-cni}/bin";
   cfg = config.blackmatter.components.kubernetes.services.kubelet;
 in {
   options.blackmatter.components.kubernetes.services.kubelet = {
-    enable = mkEnableOption "kubelet";
-  };
-  config = mkIf cfg.enable {
-    systemd.services.kubelet = {
-      description = "blackmatter.kubelet";
-      after = ["network.target" "containerd.service"];
-      wantedBy = ["multi-user.target"];
-      serviceConfig = {
-        ExecStart = "${pkg}/bin/kubelet \
-          --config=/etc/kubernetes/kubelet/config.yaml \
-          --container-runtime-endpoint=unix:///run/containerd/containerd.sock \
-          --pod-manifest-path=/etc/kubernetes/manifests";
-        Restart = "always";
-        RestartSec = 2;
-        KillMode = "process";
-        Delegate = true;
-        LimitNOFILE = 1048576;
-      };
-      environment = {
-        PATH = lib.makeBinPath [pkg pkgs.containerd pkgs.iproute2 pkgs.util-linux];
-      };
+    enable = mkEnableOption "Enable the kubelet service";
+    extraFlags = mkOption {
+      type = types.listOf types.str;
+      default = [];
+      description = "Additional flags to pass to kubelet binary.";
     };
+  };
+
+  config = mkIf cfg.enable {
     environment.systemPackages = [pkg];
+
     systemd.tmpfiles.rules = [
       "d /etc/kubernetes/manifests 0755 root root -"
       "d /etc/kubernetes/kubelet 0755 root root -"
+      "d /etc/cni/net.d 0755 root root -"
     ];
+
     environment.etc."kubernetes/kubelet/config.yaml".text = ''
       kind: KubeletConfiguration
       apiVersion: kubelet.config.k8s.io/v1beta1
@@ -44,6 +36,47 @@ in {
       runtimeRequestTimeout: "15m"
       rotateCertificates: true
       failSwapOn: false
+      clusterDNS:
+        - "10.96.0.10"
+      clusterDomain: "cluster.local"
     '';
+
+    systemd.services.kubelet = {
+      description = "blackmatter.kubelet";
+      after = ["network.target" "containerd.service"];
+      wantedBy = ["multi-user.target"];
+
+      serviceConfig = {
+        ExecStart = concatStringsSep " " (
+          [
+            "${pkg}/bin/kubelet"
+            "--config=/etc/kubernetes/kubelet/config.yaml"
+            "--container-runtime-endpoint=unix:///run/containerd/containerd.sock"
+            "--pod-manifest-path=/etc/kubernetes/manifests"
+            "--network-plugin=cni"
+            "--cni-conf-dir=/etc/cni/net.d"
+            "--cni-bin-dir=${cniBinDir}"
+            "--fail-swap-on=false"
+          ]
+          ++ cfg.extraFlags
+        );
+        Restart = "always";
+        RestartSec = 2;
+        KillMode = "process";
+        Delegate = true;
+        LimitNOFILE = 1048576;
+      };
+
+      environment = {
+        PATH = lib.mkForce (lib.makeBinPath [
+          pkg
+          pkgs.containerd
+          pkgs.iproute2
+          pkgs.util-linux
+          pkgs.coreutils
+          blackmatterPkgs.cilium-cni
+        ]);
+      };
+    };
   };
 }
