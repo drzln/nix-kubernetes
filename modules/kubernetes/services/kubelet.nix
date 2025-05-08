@@ -144,42 +144,7 @@
           }
         ];
       }))
-    {
-      environment.etc."kubernetes/controller-manager.kubeconfig".text = ''
-        apiVersion: v1
-        kind: Config
-        clusters:
-        - name: local
-          cluster:
-            certificate-authority: /run/secrets/kubernetes/ca/crt
-            server: https://127.0.0.1:6443
-        users:
-        - name: system:kube-controller-manager
-          user:
-            client-certificate: /run/secrets/kubernetes/controller-manager/crt
-            client-key: /run/secrets/kubernetes/controller-manager/key
-        contexts:
-        - context:
-            cluster: local
-            user: system:kube-controller-manager
-          name: default
-        current-context: default
-      '';
-      environment.etc."kubernetes/bootstrap/node-rbac.yaml".text = ''
-        apiVersion: rbac.authorization.k8s.io/v1
-        kind: ClusterRoleBinding
-        metadata:
-          name: kubelet-node-reader
-        roleRef:
-          apiGroup: rbac.authorization.k8s.io
-          kind: ClusterRole
-          name: system:node
-        subjects:
-        - kind: User
-          name: system:node:single
-          apiGroup: rbac.authorization.k8s.io
-      '';
-    }
+    {}
   ];
 in {
   options.blackmatter.components.kubernetes.services.kubelet = {
@@ -212,65 +177,6 @@ in {
         "d /etc/cni/net.d            0755 root root -"
         "d /var/run/etcd             0700 root root -"
       ];
-      environment.etc."kubernetes/kubelet/config.yaml".text = ''
-        apiVersion: kubelet.config.k8s.io/v1beta1
-        kind: KubeletConfiguration
-        logging:
-          format: "json"
-          verbosity: 2
-        authentication:
-          x509:
-            clientCAFile: ${pki}/ca/crt
-        authorization:
-          mode: Webhook
-        clusterDomain: cluster.local
-        clusterDNS:
-          - 10.96.0.10
-        tlsCertFile:       ${pki}/kubelet/crt
-        tlsPrivateKeyFile: ${pki}/kubelet/key
-        failSwapOn: false
-        staticPodPath: /etc/kubernetes/manifests
-      '';
-      environment.etc."kubernetes/admin.kubeconfig".text = ''
-        apiVersion: v1
-        kind: Config
-        clusters:
-        - name: local
-          cluster:
-            certificate-authority: ${pki}/ca/crt
-            server: https://127.0.0.1:6443
-        users:
-        - name: admin
-          user:
-            client-certificate: ${pki}/admin/crt
-            client-key: ${pki}/admin/key
-        contexts:
-        - context:
-            cluster: local
-            user: admin
-          name: default
-        current-context: default
-      '';
-      environment.etc."kubernetes/kubelet/kubeconfig.yaml".text = ''
-        apiVersion: v1
-        kind: Config
-        clusters:
-        - cluster:
-            certificate-authority: ${pki}/ca/crt
-            server: https://127.0.0.1:6443
-          name: local-cluster
-        users:
-        - name: kubelet
-          user:
-            client-certificate: ${pki}/kubelet/crt
-            client-key:        ${pki}/kubelet/key
-        contexts:
-        - context:
-            cluster: local-cluster
-            user:    kubelet
-          name: default
-        current-context: default
-      '';
       systemd.services.kubelet = {
         description = "blackmatter.kubelet";
         after = ["network.target" "containerd.service" "systemd-tmpfiles-setup.service"];
