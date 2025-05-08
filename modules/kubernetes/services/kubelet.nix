@@ -7,7 +7,7 @@
   ...
 }: let
   inherit (lib) mkIf mkMerge mkEnableOption mkOption types concatStringsSep;
-  pki = "/var/lib/kubernetes/certs";
+  pki = "/var/lib/blackmatter/certs";
   scr = "/run/secrets/kubernetes";
   pkg = blackmatterPkgs.kubelet;
   cfg = config.blackmatter.components.kubernetes.services.kubelet;
