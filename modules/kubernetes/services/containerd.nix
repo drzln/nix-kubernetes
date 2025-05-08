@@ -10,67 +10,61 @@ with lib; let
   cfg = config.blackmatter.components.kubernetes.services.containerd;
   pkg = blackmatterPkgs.containerd;
   runcBin = "${pkgs.runc}/bin/runc";
-
-  # Path where the package might ship a default config.toml
   defaultConfigPath = "${pkg}/etc/containerd/config.toml";
 
-  # Only read it if it actually exists in the store
+  # Read the stock config only if it exists
   baseConfig =
     if builtins.pathExists defaultConfigPath
     then builtins.readFile defaultConfigPath
     else "";
 
-  # Your DNS + runc overrides
-  dnsAndRuncOverrides = ''
+  # Always-present overrides for runc + dnsmasq
+  overrides = ''
     [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
       runtime_type   = "io.containerd.runc.v2"
       runtime_engine = "${runcBin}"
 
     [dns]
-      # Use the file dnsmasq maintains with real upstream servers
       resolv_conf = "/etc/dnsmasq-resolv.conf"
   '';
 
-  # Merge them, dropping the blank baseConfig if none
+  # Simple merge: if there was no base, just use overrides
   mergedConfig =
-    lib.concatStringsSep "\n\n"
-    (builtins.filterString (c: c != "") [baseConfig dnsAndRuncOverrides]);
+    if baseConfig == ""
+    then overrides
+    else baseConfig + "\n\n" + overrides;
 in {
   options.blackmatter.components.kubernetes.services.containerd = {
     enable = mkEnableOption "Enable the containerd service";
-    settings = mkOption {
-      type = types.attrs;
-      default = {};
-      description = "Structured containerd config overrides (merges into default).";
-    };
     configPath = mkOption {
       type = types.nullOr types.path;
       default = null;
-      description = "If set, skip our generated config.toml and use this path instead.";
+      description = "If set, use this file instead of our generated config.toml";
     };
     extraFlags = mkOption {
       type = types.listOf types.str;
       default = [];
-      description = "Extra flags to pass to the containerd daemon.";
+      description = "Extra flags to append to the containerd daemon command line";
     };
   };
 
   config = mkIf cfg.enable {
-    # install the binaries
     environment.systemPackages = [pkg pkgs.runc];
-
-    # directory placeholders
     systemd.tmpfiles.rules = [
       "d /etc/containerd 0755 root root -"
       "d /run/containerd 0755 root root -"
     ];
 
-    # drop in either user-specified configPath or our merged blob
+    # Drop in either your custom path or our merged blob
     environment.etc."containerd/config.toml".source =
-      mkIf (cfg.configPath != null) (toString cfg.configPath);
+      if cfg.configPath != null
+      then toString cfg.configPath
+      else null;
 
     environment.etc."containerd/config.toml".text =
-      mkIf (cfg.configPath == null) mergedConfig;
+      if cfg.configPath == null
+      then mergedConfig
+      else null;
 
     systemd.services.containerd = {
       description = "blackmatter.containerd";
