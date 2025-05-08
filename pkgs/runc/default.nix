@@ -14,7 +14,7 @@ buildGoModule rec {
   };
   vendorHash = null;
   subPackages = ["."];
-  CGO_ENABLED = 0;
+  env.CGO_ENABLED = 0;
   buildFlags = ''
     -tags ""
     -ldflags "-s -w -X main.version=${version}"
