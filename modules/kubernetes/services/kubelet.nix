@@ -27,6 +27,13 @@
             type = "Directory";
           };
         }
+        {
+          name = "etcd-data";
+          hostPath = {
+            path = "/var/run/etcd";
+            type = "DirectoryOrCreate";
+          };
+        }
       ];
       containers = [
         {
@@ -38,6 +45,10 @@
               name = "pki";
               mountPath = pki;
               readOnly = true;
+            }
+            {
+              name = "etcd-data";
+              mountPath = "/var/run/etcd";
             }
           ];
         }
@@ -122,19 +133,6 @@
           name: system:node:single
           apiGroup: rbac.authorization.k8s.io
       '';
-
-      # systemd.services.kubelet-rbac-bootstrap = {
-      #   wantedBy = ["multi-user.target"];
-      #   after = ["kubelet.service"];
-      #   requires = ["kubelet.service"];
-      #   serviceConfig = {
-      #     Type = "oneshot";
-      #     ExecStart = pkgs.writeShellScript "apply-node-rbac" ''
-      #       until ${pkgs.kubectl}/bin/kubectl get nodes; do sleep 2; done
-      #       ${pkgs.kubectl}/bin/kubectl apply -f /etc/kubernetes/bootstrap/node-rbac.yaml
-      #     '';
-      #   };
-      # };
     }
   ];
 in {
@@ -172,6 +170,7 @@ in {
         "d /etc/kubernetes/manifests 0755 root root -"
         "d /etc/kubernetes/kubelet   0755 root root -"
         "d /etc/cni/net.d            0755 root root -"
+        "d /var/run/etcd             0700 root root -"
       ];
 
       environment.etc."kubernetes/kubelet/config.yaml".text = ''
