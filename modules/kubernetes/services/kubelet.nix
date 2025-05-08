@@ -123,18 +123,18 @@
           apiGroup: rbac.authorization.k8s.io
       '';
 
-      systemd.services.kubelet-rbac-bootstrap = {
-        wantedBy = ["multi-user.target"];
-        after = ["kubelet.service"];
-        requires = ["kubelet.service"];
-        serviceConfig = {
-          Type = "oneshot";
-          ExecStart = pkgs.writeShellScript "apply-node-rbac" ''
-            until ${pkgs.kubectl}/bin/kubectl get nodes; do sleep 2; done
-            ${pkgs.kubectl}/bin/kubectl apply -f /etc/kubernetes/bootstrap/node-rbac.yaml
-          '';
-        };
-      };
+      # systemd.services.kubelet-rbac-bootstrap = {
+      #   wantedBy = ["multi-user.target"];
+      #   after = ["kubelet.service"];
+      #   requires = ["kubelet.service"];
+      #   serviceConfig = {
+      #     Type = "oneshot";
+      #     ExecStart = pkgs.writeShellScript "apply-node-rbac" ''
+      #       until ${pkgs.kubectl}/bin/kubectl get nodes; do sleep 2; done
+      #       ${pkgs.kubectl}/bin/kubectl apply -f /etc/kubernetes/bootstrap/node-rbac.yaml
+      #     '';
+      #   };
+      # };
     }
   ];
 in {
