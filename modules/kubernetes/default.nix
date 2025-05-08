@@ -46,6 +46,7 @@ in {
 
       environment.systemPackages = [
         blackmatterPkgs.kubectl
+        blackmatterPkgs.containerd
         pkgs.runc
       ];
     }
