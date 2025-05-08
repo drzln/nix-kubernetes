@@ -8,7 +8,7 @@
 }: let
   cfg = config.blackmatter.components.kubernetes.services.etcd;
   pkg = blackmatterPkgs.etcd;
-  pki = "/run/secrets/kubernetes"; # consistent with kube-apiserver
+  pki = "/run/secrets/kubernetes";
   scheme =
     if cfg.useTLS
     then "https"
@@ -16,46 +16,38 @@
 in {
   options.blackmatter.components.kubernetes.services.etcd = {
     enable = lib.mkEnableOption "Enable the etcd service";
-
     advertiseAddress = lib.mkOption {
       type = lib.types.str;
       default = "127.0.0.1";
       description = "IP address etcd advertises to clients/peers (e.g. 127.0.0.1 or host IP)";
     };
-
     useTLS = lib.mkOption {
       type = lib.types.bool;
       default = false;
       description = "Enable TLS for etcd using secrets from /run/secrets/kubernetes";
     };
   };
-
   config = lib.mkIf cfg.enable {
     users.users.etcd = {
       isSystemUser = true;
       group = "etcd";
     };
     users.groups.etcd = {};
-
     environment.systemPackages = [
       pkg
       blackmatterPkgs.etcdctl
       blackmatterPkgs.etcdutl
     ];
-
     systemd.tmpfiles.rules = [
       "d /var/lib/etcd 0700 etcd etcd -"
     ];
-
     systemd.services.etcd = {
       description = "blackmatter.etcd";
       wantedBy = ["multi-user.target"];
       after = ["network.target"];
-
       serviceConfig = {
         User = "etcd";
         Group = "etcd";
-
         ExecStart = lib.concatStringsSep " " (
           [
             "${pkg}/bin/etcd"
@@ -80,18 +72,16 @@ in {
             "--peer-client-cert-auth=true"
           ]
         );
-
         Restart = "always";
         RestartSec = 2;
         LimitNOFILE = 40000;
       };
-
       environment = {
         PATH = lib.mkForce (lib.makeBinPath [
           pkg
+          pkgs.bash
           pkgs.coreutils
           pkgs.nettools
-          pkgs.bash
           blackmatterPkgs.etcdctl
         ]);
       };
