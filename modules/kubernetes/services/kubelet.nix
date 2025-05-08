@@ -1,4 +1,5 @@
 # modules/kubernetes/services/kubelet.nix
+# modules/kubernetes/services/kubelet.nix
 {
   lib,
   pkgs,
@@ -37,7 +38,6 @@
       }
     ]
     ++ extraVolumes;
-
   mkPod = name: args: image: extra: {
     apiVersion = "v1";
     kind = "Pod";
@@ -45,13 +45,13 @@
     spec = {
       hostNetwork = true;
       priorityClassName = "system-cluster-critical";
-      volumes = mkStaticPodVolumes extra.volumes;
+      volumes = mkStaticPodVolumes (extra.volumes or []);
       containers = [
         {
           name = name;
           image = image;
           command = args;
-          volumeMounts = mkStaticPodVolumeMounts extra.volumeMounts;
+          volumeMounts = mkStaticPodVolumeMounts (extra.volumeMounts or []);
         }
       ];
     };
@@ -68,40 +68,36 @@
       kubeScheduler = "registry.k8s.io/kube-scheduler:${cfg.staticControlPlane.kubernetesVersion}";
     };
   in [
-    (
-      manifestFile "etcd.json" (mkPod "etcd" [
-          "etcd"
-          "--name=node0"
-          "--data-dir=/var/run/etcd"
-          "--advertise-client-urls=https://127.0.0.1:2379"
-          "--listen-client-urls=https://0.0.0.0:2379"
-          "--client-cert-auth=true"
-          "--trusted-ca-file=${pki}/ca/crt"
-          "--cert-file=${pki}/etcd/crt"
-          "--key-file=${pki}/etcd/key"
-        ]
-        images.etcd {})
-    )
-    (
-      manifestFile "kube-apiserver.json" (mkPod "kube-apiserver" [
-          "kube-apiserver"
-          "--advertise-address=127.0.0.1"
-          "--secure-port=6443"
-          "--etcd-servers=https://127.0.0.1:2379"
-          "--etcd-cafile=${pki}/ca/crt"
-          "--etcd-certfile=${pki}/etcd/crt"
-          "--etcd-keyfile=${pki}/etcd/key"
-          "--client-ca-file=${pki}/ca/crt"
-          "--tls-cert-file=${pki}/apiserver/crt"
-          "--tls-private-key-file=${pki}/apiserver/key"
-          "--service-cluster-ip-range=${svcCIDR}"
-          "--service-account-issuer=https://kubernetes.default.svc"
-          "--service-account-key-file=${pki}/ca/crt"
-          "--service-account-signing-key-file=${pki}/ca/key"
-          "--authorization-mode=Node,RBAC"
-        ]
-        images.kubeApiserver {})
-    )
+    (manifestFile "etcd.json" (mkPod "etcd" [
+        "etcd"
+        "--name=node0"
+        "--data-dir=/var/run/etcd"
+        "--advertise-client-urls=https://127.0.0.1:2379"
+        "--listen-client-urls=https://0.0.0.0:2379"
+        "--client-cert-auth=true"
+        "--trusted-ca-file=${pki}/ca/crt"
+        "--cert-file=${pki}/etcd/crt"
+        "--key-file=${pki}/etcd/key"
+      ]
+      images.etcd {}))
+    (manifestFile "kube-apiserver.json" (mkPod "kube-apiserver" [
+        "kube-apiserver"
+        "--advertise-address=127.0.0.1"
+        "--secure-port=6443"
+        "--etcd-servers=https://127.0.0.1:2379"
+        "--etcd-cafile=${pki}/ca/crt"
+        "--etcd-certfile=${pki}/etcd/crt"
+        "--etcd-keyfile=${pki}/etcd/key"
+        "--client-ca-file=${pki}/ca/crt"
+        "--tls-cert-file=${pki}/apiserver/crt"
+        "--tls-private-key-file=${pki}/apiserver/key"
+        "--service-cluster-ip-range=${svcCIDR}"
+        "--service-account-issuer=https://kubernetes.default.svc"
+        "--service-account-key-file=${pki}/ca/crt"
+        "--service-account-signing-key-file=${pki}/ca/key"
+        "--authorization-mode=Node,RBAC"
+      ]
+      images.kubeApiserver {}))
     (manifestFile "kube-controller-manager.json" (mkPod "kube-controller-manager" [
         "kube-controller-manager"
         "--kubeconfig=/etc/kubernetes/controller-manager.kubeconfig"
