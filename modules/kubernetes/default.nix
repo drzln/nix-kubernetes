@@ -6,13 +6,9 @@
 }:
 with lib; let
   cfg = config.blackmatter.components.kubernetes;
-
-  # Load your prebuilt Kubernetes binaries
   blackmatterPkgs = import ../../pkgs {
     callPackage = pkgs.callPackage;
   };
-
-  # Helper to import service modules with blackmatterPkgs injected
   service = name:
     import (./services + "/${name}.nix") {
       inherit lib config pkgs blackmatterPkgs;
@@ -26,7 +22,6 @@ in {
     # (service "kube-apiserver")
     # (service "cilium-agent")
   ];
-
   options.blackmatter.components.kubernetes = {
     enable = mkEnableOption "Enable Kubernetes";
     role = mkOption {
@@ -35,7 +30,6 @@ in {
       description = "The role this node will play in the cluster.";
     };
   };
-
   config = mkIf cfg.enable ({
       assertions = [
         {
@@ -43,7 +37,6 @@ in {
           message = "You must specify a valid Kubernetes role.";
         }
       ];
-
       environment.systemPackages = [
         blackmatterPkgs.kubectl
         blackmatterPkgs.containerd
