@@ -12,7 +12,7 @@
 let
   inherit (lib) mkIf mkMerge mkEnableOption mkOption types concatStringsSep;
 
-  pki = "/var/lib/blackmatter/pki";
+  pki = "/run/secrets/kubernetes";
   pkg = blackmatterPkgs.kubelet;
   cfg = config.blackmatter.components.kubernetes.services.kubelet;
 
