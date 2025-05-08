@@ -213,6 +213,7 @@ in {
           name: default
         current-context: default
       '';
+
       environment.etc."kubernetes/kubelet/kubeconfig.yaml".text = ''
         apiVersion: v1
         kind: Config
