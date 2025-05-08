@@ -1,4 +1,5 @@
 # modules/kubernetes/services/kubelet.nix
+# modules/kubernetes/services/kubelet.nix
 {
   lib,
   pkgs,
@@ -22,17 +23,13 @@
       volumes = [
         {
           name = "pki";
-          hostPath = {
-            path = pki;
-            type = "Directory";
-          };
+          hostPath.path = pki;
+          hostPath.type = "Directory";
         }
         {
           name = "etcd-data";
-          hostPath = {
-            path = "/var/run/etcd";
-            type = "DirectoryOrCreate";
-          };
+          hostPath.path = "/var/run/etcd";
+          hostPath.type = "DirectoryOrCreate";
         }
       ];
       containers = [
@@ -237,7 +234,7 @@ in {
 
       systemd.services.kubelet = {
         description = "blackmatter.kubelet";
-        after = ["network.target" "containerd.service"];
+        after = ["network.target" "containerd.service" "systemd-tmpfiles-setup.service"];
         wantedBy = ["multi-user.target"];
 
         environment.PATH = lib.mkForce (lib.makeBinPath [
@@ -254,7 +251,17 @@ in {
           User = "root";
 
           ExecStartPre = ''
-            ${pkgs.bash}/bin/bash -c 'until [ -S /run/containerd/containerd.sock ]; do sleep 1; done'
+            echo "[kubelet] Waiting for containerd socket..."
+            until [ -S /run/containerd/containerd.sock ]; do sleep 1; done
+
+            echo "[kubelet] Waiting for required certificates in ${pki}..."
+            until [ -f ${pki}/ca/crt ] && \
+                  [ -f ${pki}/kubelet/crt ] && \
+                  [ -f ${pki}/kubelet/key ] && \
+                  [ -f ${pki}/admin/crt ] && \
+                  [ -f ${pki}/admin/key ]; do
+              sleep 1
+            done
           '';
 
           ExecStart = concatStringsSep " " ([
@@ -279,7 +286,10 @@ in {
       };
     }
     (mkIf cfg.staticControlPlane.enable (mkMerge (
-      staticManifests ++ [{networking.firewall.allowedTCPPorts = [6443 2379 2380 10257 10259];}]
+      staticManifests
+      ++ [
+        {networking.firewall.allowedTCPPorts = [6443 2379 2380 10257 10259];}
+      ]
     )))
   ]);
 }
