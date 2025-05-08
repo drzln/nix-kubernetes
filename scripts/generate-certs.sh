@@ -4,14 +4,23 @@ set -euo pipefail
 OUTDIR="./secrets/generated"
 mkdir -p "$OUTDIR"
 
-# Define the DNS and IPs we'll SAN across all certs
 cat >"$OUTDIR/san.cnf" <<EOF
 [ req ]
+default_bits = 2048
+prompt = no
+default_md = sha256
 req_extensions = v3_req
 distinguished_name = dn
+
 [ dn ]
+CN = dummy
+
 [ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature, keyEncipherment
+extendedKeyUsage = clientAuth, serverAuth
 subjectAltName = @alt_names
+
 [ alt_names ]
 DNS.1 = localhost
 DNS.2 = single
@@ -27,9 +36,11 @@ IP.3  = 10.96.0.10
 EOF
 
 echo "[+] Generating self-signed CA"
-openssl genrsa -out "$OUTDIR/ca.key" 2048
-openssl req -x509 -new -nodes -key "$OUTDIR/ca.key" -sha256 -days 10000 \
-  -subj "/CN=kubernetes-ca" -out "$OUTDIR/ca.crt"
+openssl genrsa -out "$OUTDIR/ca.key" 4096
+openssl req -x509 -new -key "$OUTDIR/ca.key" \
+  -subj "/CN=kubernetes-ca" \
+  -days 10000 -sha256 \
+  -out "$OUTDIR/ca.crt"
 
 generate_cert() {
   local name="$1"
@@ -46,10 +57,9 @@ generate_cert() {
   openssl x509 -req -in "$OUTDIR/${name}.csr" \
     -CA "$OUTDIR/ca.crt" -CAkey "$OUTDIR/ca.key" -CAcreateserial \
     -out "$OUTDIR/${name}.crt" -days 365 \
-    -extensions v3_req -extfile "$OUTDIR/san.cnf"
+    -extfile "$OUTDIR/san.cnf" -extensions v3_req
 }
 
-# Generate certs for core roles
 generate_cert apiserver "kube-apiserver" "kubernetes"
 generate_cert kubelet "system:node:single" "system:nodes"
 generate_cert etcd "etcd" "kubernetes"
