@@ -210,6 +210,7 @@ in
 
           environment.PATH = lib.mkForce (lib.makeBinPath [
             pkg
+            pkgs.runc
             pkgs.containerd
             pkgs.iproute2
             pkgs.util-linux
