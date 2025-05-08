@@ -48,6 +48,7 @@ in {
         blackmatterPkgs.kubectl
         blackmatterPkgs.containerd
         pkgs.runc
+        pkgs.cri-tools
       ];
     }
     // mkIf (cfg.role == "single") {
