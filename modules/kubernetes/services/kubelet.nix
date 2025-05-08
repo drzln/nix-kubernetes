@@ -270,17 +270,16 @@ in {
           User = "root";
 
           ExecStartPre = ''
+            # echo "[kubelet] Waiting for required certificates in ${pki}..."
+            # until [ -f ${pki}/ca/crt ] && \
+            #       [ -f ${pki}/kubelet/crt ] && \
+            #       [ -f ${pki}/kubelet/key ] && \
+            #       [ -f ${pki}/admin/crt ] && \
+            #       [ -f ${pki}/admin/key ]; do
+            #   sleep 1
+            # done
             # echo "[kubelet] Waiting for containerd socket..."
             # until [ -S /run/containerd/containerd.sock ]; do sleep 1; done
-
-            echo "[kubelet] Waiting for required certificates in ${pki}..."
-            until [ -f ${pki}/ca/crt ] && \
-                  [ -f ${pki}/kubelet/crt ] && \
-                  [ -f ${pki}/kubelet/key ] && \
-                  [ -f ${pki}/admin/crt ] && \
-                  [ -f ${pki}/admin/key ]; do
-              sleep 1
-            done
           '';
 
           ExecStart = concatStringsSep " " ([
