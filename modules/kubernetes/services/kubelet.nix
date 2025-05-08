@@ -110,14 +110,14 @@
         volumes = [
           {
             name = "kubeconfig";
-            hostPath.path = "${pki}/controller-manager/kubeconfig";
+            hostPath.path = "${pki}/configs/controller-manager/kubeconfig";
             hostPath.type = "File";
           }
         ];
         volumeMounts = [
           {
             name = "kubeconfig";
-            mountPath = "${pki}/controller-manager/kubeconfig";
+            mountPath = "${pki}/configs/controller-manager/kubeconfig";
             subPath = "controller-manager.kubeconfig";
             readOnly = true;
           }
