@@ -12,11 +12,13 @@ with lib; let
   runcBin = "${pkgs.runc}/bin/runc";
   defaultConfigPath = "${pkg}/etc/containerd/config.toml";
 
+  # Read the package default config.toml if it exists
   baseConfig =
     if builtins.pathExists defaultConfigPath
     then builtins.readFile defaultConfigPath
     else "";
 
+  # DNS and runtime overrides
   overrides = ''
     [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
       runtime_type   = "io.containerd.runc.v2"
@@ -32,38 +34,45 @@ with lib; let
     else baseConfig + "\n\n" + overrides;
 in {
   options.blackmatter.components.kubernetes.services.containerd = {
-    enable = mkEnableOption "Enable the containerd service";
-    configPath = mkOption {
-      type = types.nullOr types.path;
+    enable = lib.mkEnableOption "Enable the containerd service";
+
+    configPath = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
       default = null;
-      description = "If set, use this file instead of our generated config.toml";
+      description = "Optional override path for containerd config.toml.";
     };
-    extraFlags = mkOption {
-      type = types.listOf types.str;
+
+    extraFlags = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
       default = [];
-      description = "Extra flags to append to the containerd daemon command line";
+      description = "Extra CLI flags to pass to containerd.";
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     environment.systemPackages = [pkg pkgs.runc];
+
     systemd.tmpfiles.rules = [
       "d /etc/containerd 0755 root root -"
       "d /run/containerd 0755 root root -"
     ];
 
-    # Only one entry here—no nulls!
+    # Proper single-attrset assignment (not a list or null)
     environment.etc."containerd/config.toml" =
       if cfg.configPath != null
-      then [{source = cfg.configPath;}]
-      else [{text = mergedConfig;}];
+      then {
+        source = cfg.configPath;
+      }
+      else {
+        text = mergedConfig;
+      };
 
     systemd.services.containerd = {
       description = "blackmatter.containerd";
       wantedBy = ["multi-user.target"];
       after = ["network.target"];
       serviceConfig = {
-        ExecStart = concatStringsSep " " (
+        ExecStart = lib.concatStringsSep " " (
           [
             "${pkg}/bin/containerd"
             "--config"
@@ -78,7 +87,7 @@ in {
         LimitNOFILE = 1048576;
       };
       environment = {
-        PATH = mkForce (makeBinPath [pkg pkgs.runc pkgs.iproute2 pkgs.coreutils]);
+        PATH = lib.mkForce (lib.makeBinPath [pkg pkgs.runc pkgs.iproute2 pkgs.coreutils]);
       };
     };
   };
