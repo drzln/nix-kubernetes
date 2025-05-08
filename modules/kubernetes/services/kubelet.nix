@@ -115,6 +115,26 @@
       images.kubeScheduler))
 
     {
+      environment.etc."kubernetes/controller-manager.kubeconfig".text = ''
+        apiVersion: v1
+        kind: Config
+        clusters:
+        - name: local
+          cluster:
+            certificate-authority: ${pki}/ca/crt
+            server: https://127.0.0.1:6443
+        users:
+        - name: system:kube-controller-manager
+          user:
+            client-certificate: ${pki}/controller-manager/crt
+            client-key: ${pki}/controller-manager/key
+        contexts:
+        - context:
+            cluster: local
+            user: system:kube-controller-manager
+          name: default
+        current-context: default
+      '';
       environment.etc."kubernetes/bootstrap/node-rbac.yaml".text = ''
         apiVersion: rbac.authorization.k8s.io/v1
         kind: ClusterRoleBinding
