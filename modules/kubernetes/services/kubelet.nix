@@ -82,6 +82,10 @@
       images.etcd {}))
     (manifestFile "kube-apiserver.json" (mkPod "kube-apiserver" [
         "kube-apiserver"
+        "--kubelet-client-certificate=${pki}/apiserver.crt"
+        "--kubelet-client-key=${pki}/apiserver.key"
+        "--kubelet-certificate-authority=${pki}/ca.crt"
+        "--kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalIP"
         "--advertise-address=127.0.0.1"
         "--secure-port=6443"
         "--etcd-servers=https://127.0.0.1:2379"
