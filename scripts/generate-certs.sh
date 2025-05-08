@@ -4,6 +4,11 @@ set -euo pipefail
 OUTDIR="./secrets/generated"
 mkdir -p "$OUTDIR"
 
+NODE_IP="${1:-192.168.50.153}" # Allow override via CLI
+NODE_HOST="${2:-plo}"          # Default node name
+
+echo "[+] Generating SAN config with IP=${NODE_IP}, Hostname=${NODE_HOST}"
+
 cat >"$OUTDIR/san.cnf" <<EOF
 [ req ]
 default_bits = 2048
@@ -23,16 +28,19 @@ subjectAltName = @alt_names
 
 [ alt_names ]
 DNS.1 = localhost
-DNS.2 = single
-DNS.3 = single.cluster.local
-DNS.4 = etcd.single.cluster.local
-DNS.5 = kubernetes
-DNS.6 = kubernetes.default
-DNS.7 = kubernetes.default.svc
-DNS.8 = kubernetes.default.svc.cluster.local
+DNS.2 = ${NODE_HOST}
+DNS.3 = ${NODE_HOST}.cluster.local
+DNS.4 = single
+DNS.5 = single.cluster.local
+DNS.6 = etcd.single.cluster.local
+DNS.7 = kubernetes
+DNS.8 = kubernetes.default
+DNS.9 = kubernetes.default.svc
+DNS.10 = kubernetes.default.svc.cluster.local
 IP.1  = 127.0.0.1
 IP.2  = 10.96.0.1
 IP.3  = 10.96.0.10
+IP.4  = ${NODE_IP}
 EOF
 
 echo "[+] Generating self-signed CA"
@@ -61,7 +69,7 @@ generate_cert() {
 }
 
 generate_cert apiserver "kube-apiserver" "kubernetes"
-generate_cert kubelet "system:node:single" "system:nodes"
+generate_cert kubelet "system:node:${NODE_HOST}" "system:nodes"
 generate_cert etcd "etcd" "kubernetes"
 generate_cert admin "admin" "system:masters"
 generate_cert controller-manager "system:kube-controller-manager" "system:masters"
