@@ -7,7 +7,8 @@
   ...
 }: let
   inherit (lib) mkIf mkMerge mkEnableOption mkOption types concatStringsSep;
-  pki = "/run/secrets/kubernetes";
+  pki = "/var/lib/kubernetes/certs";
+  scr = "/run/secrets/kubernetes";
   pkg = blackmatterPkgs.kubelet;
   cfg = config.blackmatter.components.kubernetes.services.kubelet;
   mkStaticPodVolumeMounts = extraMounts:
@@ -74,9 +75,9 @@
         "--advertise-client-urls=https://127.0.0.1:2379"
         "--listen-client-urls=https://0.0.0.0:2379"
         "--client-cert-auth=true"
-        "--trusted-ca-file=${pki}/ca/crt"
-        "--cert-file=${pki}/etcd/crt"
-        "--key-file=${pki}/etcd/key"
+        "--trusted-ca-file=${pki}/ca.crt"
+        "--cert-file=${pki}/etcd.crt"
+        "--key-file=${pki}/etcd.key"
       ]
       images.etcd {}))
     (manifestFile "kube-apiserver.json" (mkPod "kube-apiserver" [
@@ -84,60 +85,60 @@
         "--advertise-address=127.0.0.1"
         "--secure-port=6443"
         "--etcd-servers=https://127.0.0.1:2379"
-        "--etcd-cafile=${pki}/ca/crt"
-        "--etcd-certfile=${pki}/etcd/crt"
-        "--etcd-keyfile=${pki}/etcd/key"
-        "--client-ca-file=${pki}/ca/crt"
-        "--tls-cert-file=${pki}/apiserver/crt"
-        "--tls-private-key-file=${pki}/apiserver/key"
+        "--etcd-cafile=${pki}/ca.crt"
+        "--etcd-certfile=${pki}/etcd.crt"
+        "--etcd-keyfile=${pki}/etcd.key"
+        "--client-ca-file=${pki}/ca.crt"
+        "--tls-cert-file=${pki}/apiserver.crt"
+        "--tls-private-key-file=${pki}/apiserver.key"
         "--service-cluster-ip-range=${svcCIDR}"
         "--service-account-issuer=https://kubernetes.default.svc"
-        "--service-account-key-file=${pki}/ca/crt"
-        "--service-account-signing-key-file=${pki}/ca/key"
+        "--service-account-key-file=${pki}/ca.crt"
+        "--service-account-signing-key-file=${pki}/ca.key"
         "--authorization-mode=Node,RBAC"
       ]
       images.kubeApiserver {}))
     (manifestFile "kube-controller-manager.json" (mkPod "kube-controller-manager" [
         "kube-controller-manager"
-        "--kubeconfig=${pki}/configs/controller-manager/kubeconfig"
-        "--cluster-signing-cert-file=${pki}/ca/crt"
-        "--cluster-signing-key-file=${pki}/ca/key"
-        "--root-ca-file=${pki}/ca/crt"
-        "--service-account-private-key-file=${pki}/ca/key"
+        "--kubeconfig=${scr}/configs/controller-manager/kubeconfig"
+        "--cluster-signing-cert-file=${pki}/ca.crt"
+        "--cluster-signing-key-file=${pki}/ca.key"
+        "--root-ca-file=${pki}/ca.crt"
+        "--service-account-private-key-file=${pki}/ca.key"
         "--controllers=*,bootstrapsigner,tokencleaner"
       ]
       images.kubeControllerManager {
         volumes = [
           {
             name = "kubeconfig";
-            hostPath.path = "${pki}/configs/controller-manager/kubeconfig";
+            hostPath.path = "${scr}/configs/controller-manager/kubeconfig";
             hostPath.type = "File";
           }
         ];
         volumeMounts = [
           {
             name = "kubeconfig";
-            mountPath = "${pki}/configs/controller-manager/kubeconfig";
+            mountPath = "${scr}/configs/controller-manager/kubeconfig";
             readOnly = true;
           }
         ];
       }))
     (manifestFile "kube-scheduler.json" (mkPod "kube-scheduler" [
         "kube-scheduler"
-        "--kubeconfig=${pki}/configs/scheduler/kubeconfig"
+        "--kubeconfig=${scr}/configs/scheduler/kubeconfig"
       ]
       images.kubeScheduler {
         volumes = [
           {
             name = "kubeconfig";
-            hostPath.path = "${pki}/configs/scheduler/kubeconfig";
+            hostPath.path = "${scr}/configs/scheduler/kubeconfig";
             hostPath.type = "File";
           }
         ];
         volumeMounts = [
           {
             name = "kubeconfig";
-            mountPath = "${pki}/configs/scheduler/kubeconfig";
+            mountPath = "${scr}/configs/scheduler/kubeconfig";
             readOnly = true;
           }
         ];
@@ -192,8 +193,8 @@ in {
           User = "root";
           ExecStart = concatStringsSep " " ([
               "${pkg}/bin/kubelet"
-              "--config=${pki}/configs/kubelet/config"
-              "--kubeconfig=${pki}/configs/kubelet/kubeconfig"
+              "--config=${scr}/configs/kubelet/config"
+              "--kubeconfig=${scr}/configs/kubelet/kubeconfig"
             ]
             ++ cfg.extraFlags);
           Restart = "always";
