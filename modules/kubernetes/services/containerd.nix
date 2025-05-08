@@ -12,13 +12,11 @@ with lib; let
   runcBin = "${pkgs.runc}/bin/runc";
   defaultConfigPath = "${pkg}/etc/containerd/config.toml";
 
-  # Read the stock config only if it exists
   baseConfig =
     if builtins.pathExists defaultConfigPath
     then builtins.readFile defaultConfigPath
     else "";
 
-  # Always-present overrides for runc + dnsmasq
   overrides = ''
     [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
       runtime_type   = "io.containerd.runc.v2"
@@ -28,7 +26,6 @@ with lib; let
       resolv_conf = "/etc/dnsmasq-resolv.conf"
   '';
 
-  # Simple merge: if there was no base, just use overrides
   mergedConfig =
     if baseConfig == ""
     then overrides
@@ -55,16 +52,11 @@ in {
       "d /run/containerd 0755 root root -"
     ];
 
-    # Drop in either your custom path or our merged blob
-    environment.etc."containerd/config.toml".source =
+    # Only one entry here—no nulls!
+    environment.etc."containerd/config.toml" =
       if cfg.configPath != null
-      then toString cfg.configPath
-      else null;
-
-    environment.etc."containerd/config.toml".text =
-      if cfg.configPath == null
-      then mergedConfig
-      else null;
+      then [{source = cfg.configPath;}]
+      else [{text = mergedConfig;}];
 
     systemd.services.containerd = {
       description = "blackmatter.containerd";
