@@ -18,7 +18,7 @@ in
     };
     vendorHash = null;
     subPackages = ["."];
-    env.CGO_ENABLED = "0";
+    CGO_ENABLED = "0";
     ldflags = [
       "-s"
       "-w"
