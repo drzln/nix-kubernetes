@@ -19,8 +19,8 @@ buildGoModule rec {
     -tags ""
     -ldflags "-s -w -X main.version=${version}"
   '';
-  installPhase = ''
-    install -D -m755 $GOBIN/runc $out/bin/runc
-  '';
+  # installPhase = ''
+  #   install -D -m755 $GOBIN/runc $out/bin/runc
+  # '';
   doCheck = false;
 }
