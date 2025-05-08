@@ -56,7 +56,7 @@ in {
         enable = true;
         staticControlPlane.enable = true;
       };
-      blackmatter.components.kubernetes.services.etcd.enable = true;
+      blackmatter.components.kubernetes.services.etcd.enable = false;
 
       # blackmatter.components.kubernetes.services.cilium-agent.enable = true;
       # blackmatter.components.kubernetes.services.kube-apiserver.enable = true;
