@@ -14,7 +14,7 @@ buildGoModule rec {
   };
   vendorHash = null;
   subPackages = ["."];
-  CGO_ENABLED = "0"; # static binary, no cgo
+  env.CGO_ENABLED = "0"; # static binary, no cgo
   ldflags = ["-s" "-w" "-X" "main.version=${version}"];
   doCheck = false; # upstream tests need root / network
 }
