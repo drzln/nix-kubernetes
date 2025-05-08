@@ -193,6 +193,26 @@ in {
         staticPodPath: /etc/kubernetes/manifests
       '';
 
+      environment.etc."kubernetes/admin.kubeconfig".text = ''
+        apiVersion: v1
+        kind: Config
+        clusters:
+        - name: local
+          cluster:
+            certificate-authority: ${pki}/ca/crt
+            server: https://127.0.0.1:6443
+        users:
+        - name: admin
+          user:
+            client-certificate: ${pki}/admin/crt
+            client-key: ${pki}/admin/key
+        contexts:
+        - context:
+            cluster: local
+            user: admin
+          name: default
+        current-context: default
+      '';
       environment.etc."kubernetes/kubelet/kubeconfig.yaml".text = ''
         apiVersion: v1
         kind: Config
