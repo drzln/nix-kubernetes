@@ -270,8 +270,8 @@ in {
           User = "root";
 
           ExecStartPre = ''
-            echo "[kubelet] Waiting for containerd socket..."
-            until [ -S /run/containerd/containerd.sock ]; do sleep 1; done
+            # echo "[kubelet] Waiting for containerd socket..."
+            # until [ -S /run/containerd/containerd.sock ]; do sleep 1; done
 
             echo "[kubelet] Waiting for required certificates in ${pki}..."
             until [ -f ${pki}/ca/crt ] && \
