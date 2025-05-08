@@ -12,9 +12,6 @@
   pkg = blackmatterPkgs.kubelet;
   cfg = config.blackmatter.components.kubernetes.services.kubelet;
 
-  # -------------------------------------------------------------------------
-  # Helper: build a minimal static-pod JSON definition with image override
-  # -------------------------------------------------------------------------
   mkPod = name: args: image: {
     apiVersion = "v1";
     kind = "Pod";
@@ -22,7 +19,6 @@
     spec = {
       hostNetwork = true;
       priorityClassName = "system-cluster-critical";
-
       volumes = [
         {
           name = "pki";
@@ -32,7 +28,6 @@
           };
         }
       ];
-
       containers = [
         {
           name = name;
@@ -111,6 +106,36 @@
         "--kubeconfig=${pki}/scheduler.kubeconfig"
       ]
       images.kubeScheduler))
+
+    {
+      environment.etc."kubernetes/bootstrap/node-rbac.yaml".text = ''
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          name: kubelet-node-reader
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: system:node
+        subjects:
+        - kind: User
+          name: system:node:single
+          apiGroup: rbac.authorization.k8s.io
+      '';
+
+      systemd.services.kubelet-rbac-bootstrap = {
+        wantedBy = ["multi-user.target"];
+        after = ["kubelet.service"];
+        requires = ["kubelet.service"];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = pkgs.writeShellScript "apply-node-rbac" ''
+            until ${pkgs.kubectl}/bin/kubectl get nodes; do sleep 2; done
+            ${pkgs.kubectl}/bin/kubectl apply -f /etc/kubernetes/bootstrap/node-rbac.yaml
+          '';
+        };
+      };
+    }
   ];
 in {
   options.blackmatter.components.kubernetes.services.kubelet = {
