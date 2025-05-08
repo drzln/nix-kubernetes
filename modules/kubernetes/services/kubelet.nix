@@ -99,7 +99,7 @@
       images.kubeApiserver {}))
     (manifestFile "kube-controller-manager.json" (mkPod "kube-controller-manager" [
         "kube-controller-manager"
-        "--kubeconfig=/etc/kubernetes/controller-manager.kubeconfig"
+        "--kubeconfig=${pki}/controller-manager.kubeconfig"
         "--cluster-signing-cert-file=${pki}/ca/crt"
         "--cluster-signing-key-file=${pki}/ca/key"
         "--root-ca-file=${pki}/ca/crt"
@@ -110,14 +110,14 @@
         volumes = [
           {
             name = "kubeconfig";
-            hostPath.path = "/etc/kubernetes/controller-manager.kubeconfig";
+            hostPath.path = "${pki}/controller-manager.kubeconfig";
             hostPath.type = "File";
           }
         ];
         volumeMounts = [
           {
             name = "kubeconfig";
-            mountPath = "/etc/kubernetes/controller-manager.kubeconfig";
+            mountPath = "${pki}/controller-manager.kubeconfig";
             subPath = "controller-manager.kubeconfig";
             readOnly = true;
           }
@@ -125,20 +125,20 @@
       }))
     (manifestFile "kube-scheduler.json" (mkPod "kube-scheduler" [
         "kube-scheduler"
-        "--kubeconfig=/etc/kubernetes/scheduler.kubeconfig"
+        "--kubeconfig=${pki}/scheduler.kubeconfig"
       ]
       images.kubeScheduler {
         volumes = [
           {
             name = "kubeconfig";
-            hostPath.path = "/etc/kubernetes/scheduler.kubeconfig";
+            hostPath.path = "${pki}/scheduler.kubeconfig";
             hostPath.type = "File";
           }
         ];
         volumeMounts = [
           {
             name = "kubeconfig";
-            mountPath = "/etc/kubernetes/scheduler.kubeconfig";
+            mountPath = "${pki}/scheduler.kubeconfig";
             subPath = "scheduler.kubeconfig";
             readOnly = true;
           }
