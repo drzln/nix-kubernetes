@@ -21,9 +21,9 @@ in {
   imports = [
     (service "containerd")
     (service "kubelet")
+    (service "etcd")
     # Add others here as you wire them:
     # (service "kube-apiserver")
-    # (service "etcd")
     # (service "cilium-agent")
   ];
 
@@ -56,8 +56,8 @@ in {
         enable = true;
         staticControlPlane.enable = true;
       };
+      blackmatter.components.kubernetes.services.etcd.enable = true;
 
-      # blackmatter.components.kubernetes.services.etcd.enable = true;
       # blackmatter.components.kubernetes.services.cilium-agent.enable = true;
       # blackmatter.components.kubernetes.services.kube-apiserver.enable = true;
       # blackmatter.components.kubernetes.services.cilium-operator.enable = true;
