@@ -99,7 +99,7 @@
 
     (manifestFile "kube-controller-manager.json" (mkPod "kube-controller-manager" [
         "kube-controller-manager"
-        "--kubeconfig=${pki}/controller-manager.kubeconfig"
+        "--kubeconfig=/etc/kubernetes/controller-manager.kubeconfig"
         "--cluster-signing-cert-file=${pki}/ca/crt"
         "--cluster-signing-key-file=${pki}/ca/key"
         "--root-ca-file=${pki}/ca/crt"
@@ -110,11 +110,32 @@
 
     (manifestFile "kube-scheduler.json" (mkPod "kube-scheduler" [
         "kube-scheduler"
-        "--kubeconfig=${pki}/scheduler.kubeconfig"
+        "--kubeconfig=/etc/kubernetes/scheduler.kubeconfig"
       ]
       images.kubeScheduler))
 
     {
+      environment.etc."kubernetes/scheduler.kubeconfig".text = ''
+        apiVersion: v1
+        kind: Config
+        clusters:
+        - name: local
+          cluster:
+            certificate-authority: ${pki}/ca/crt
+            server: https://127.0.0.1:6443
+        users:
+        - name: system:kube-scheduler
+          user:
+            client-certificate: ${pki}/scheduler/crt
+            client-key: ${pki}/scheduler/key
+        contexts:
+        - context:
+            cluster: local
+            user: system:kube-scheduler
+          name: default
+        current-context: default
+      '';
+
       environment.etc."kubernetes/controller-manager.kubeconfig".text = ''
         apiVersion: v1
         kind: Config
