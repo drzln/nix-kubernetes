@@ -46,7 +46,7 @@ in {
 
       environment.systemPackages = [
         blackmatterPkgs.kubectl
-        blackmatterPkgs.runc
+        pkgs.runc
       ];
     }
     // mkIf (cfg.role == "single") {

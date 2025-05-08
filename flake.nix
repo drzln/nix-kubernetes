@@ -43,6 +43,7 @@
         buildInputs = with pkgs; [
           go
           git
+          runc
           openssh
           nixpkgs-fmt
           nil.packages.${system}.default
