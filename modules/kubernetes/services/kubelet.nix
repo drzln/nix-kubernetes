@@ -71,9 +71,9 @@ let
       "--advertise-client-urls=https://127.0.0.1:2379"
       "--listen-client-urls=https://0.0.0.0:2379"
       "--client-cert-auth=true"
-      "--trusted-ca-file=${pki}/ca.crt"
-      "--cert-file=${pki}/etcd.crt"
-      "--key-file=${pki}/etcd.key"
+      "--trusted-ca-file=${pki}/ca/crt"
+      "--cert-file=${pki}/etcd/crt"
+      "--key-file=${pki}/etcd/key"
     ]))
 
     (manifestFile "kube-apiserver.json" (mkPod "kube-apiserver" [
@@ -81,16 +81,16 @@ let
       "--advertise-address=127.0.0.1"
       "--secure-port=6443"
       "--etcd-servers=https://127.0.0.1:2379"
-      "--etcd-cafile=${pki}/ca.crt"
-      "--etcd-certfile=${pki}/etcd.crt"
-      "--etcd-keyfile=${pki}/etcd.key"
-      "--client-ca-file=${pki}/ca.crt"
-      "--tls-cert-file=${pki}/apiserver.crt"
-      "--tls-private-key-file=${pki}/apiserver.key"
+      "--etcd-cafile=${pki}/ca/crt"
+      "--etcd-certfile=${pki}/etcd/crt"
+      "--etcd-keyfile=${pki}/etcd/key"
+      "--client-ca-file=${pki}/ca/crt"
+      "--tls-cert-file=${pki}/apiserver/crt"
+      "--tls-private-key-file=${pki}/apiserver/key"
       "--service-cluster-ip-range=${svcCIDR}"
       "--service-account-issuer=https://kubernetes.default.svc"
-      "--service-account-key-file=${pki}/ca.crt"
-      "--service-account-signing-key-file=${pki}/ca.key"
+      "--service-account-key-file=${pki}/ca/crt"
+      "--service-account-signing-key-file=${pki}/ca/key"
       "--authorization-mode=Node,RBAC"
     ]))
 
@@ -98,10 +98,10 @@ let
       (mkPod "kube-controller-manager" [
         "kube-controller-manager"
         "--kubeconfig=${pki}/controller-manager.kubeconfig"
-        "--cluster-signing-cert-file=${pki}/ca.crt"
-        "--cluster-signing-key-file=${pki}/ca.key"
-        "--root-ca-file=${pki}/ca.crt"
-        "--service-account-private-key-file=${pki}/ca.key"
+        "--cluster-signing-cert-file=${pki}/ca/crt"
+        "--cluster-signing-key-file=${pki}/ca/key"
+        "--root-ca-file=${pki}/ca/crt"
+        "--service-account-private-key-file=${pki}/ca/key"
         "--controllers=*,bootstrapsigner,tokencleaner"
       ]))
 
@@ -170,14 +170,14 @@ in
             verbosity: 2
           authentication:
             x509:
-              clientCAFile: ${pki}/ca.crt
+              clientCAFile: ${pki}/ca/crt
           authorization:
             mode: Webhook
           clusterDomain: cluster.local
           clusterDNS:
             - 10.96.0.10
-          tlsCertFile:       ${pki}/kubelet.crt
-          tlsPrivateKeyFile: ${pki}/kubelet.key
+          tlsCertFile:       ${pki}/kubelet/crt
+          tlsPrivateKeyFile: ${pki}/kubelet/key
           failSwapOn:  false
           staticPodPath: /etc/kubernetes/manifests
         '';
@@ -187,14 +187,14 @@ in
           kind: Config
           clusters:
           - cluster:
-              certificate-authority: ${pki}/ca.crt
+              certificate-authority: ${pki}/ca/crt
               server: https://127.0.0.1:6443
             name: local-cluster
           users:
           - name: kubelet
             user:
-              client-certificate: ${pki}/kubelet.crt
-              client-key:        ${pki}/kubelet.key
+              client-certificate: ${pki}/kubelet/crt
+              client-key:        ${pki}/kubelet/key
           contexts:
           - context:
               cluster: local-cluster
