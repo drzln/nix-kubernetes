@@ -118,7 +118,6 @@
           {
             name = "kubeconfig";
             mountPath = "${pki}/configs/controller-manager/kubeconfig";
-            subPath = "controller-manager.kubeconfig";
             readOnly = true;
           }
         ];
@@ -139,7 +138,6 @@
           {
             name = "kubeconfig";
             mountPath = "${pki}/scheduler/kubeconfig";
-            subPath = "scheduler.kubeconfig";
             readOnly = true;
           }
         ];
