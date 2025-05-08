@@ -32,7 +32,10 @@ in {
     };
   };
   config = mkIf cfg.enable {
-    environment.systemPackages = [pkg];
+    environment.systemPackages = [
+      pkg
+      pkgs.runc
+    ];
     systemd.tmpfiles.rules = [
       "d /etc/containerd 0755 root root -"
       "d /run/containerd 0755 root root -"
