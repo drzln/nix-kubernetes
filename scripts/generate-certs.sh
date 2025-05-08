@@ -54,5 +54,7 @@ generate_cert apiserver "kube-apiserver" "kubernetes"
 generate_cert kubelet "system:node:single" "system:nodes"
 generate_cert etcd "etcd" "kubernetes"
 generate_cert admin "admin" "system:masters"
+generate_cert controller-manager "system:kube-controller-manager" "system:masters"
+generate_cert scheduler "system:kube-scheduler" "system:masters"
 
 echo "[✓] Cert generation complete. Output written to: $OUTDIR"
