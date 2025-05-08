@@ -12,7 +12,7 @@ buildGoModule rec {
     rev = "v${version}";
     hash = "sha256-nTVjgNMnB6775ubzK7ezOxR5Z0z5PBxx88CxtbxGxrY=";
   };
-  vendorHash = "sha256-QK9F2tp8l7+KT9B2wyu1W9n6bt5ioei5dz8mD5vx9q0=";
+  vendorHash = null;
   subPackages = ["."];
   CGO_ENABLED = "0"; # static binary, no cgo
   ldflags = ["-s" "-w" "-X" "main.version=${version}"];
