@@ -5,8 +5,7 @@
   config,
   blackmatterPkgs,
   ...
-}:
-with lib; let
+}: let
   cfg = config.blackmatter.components.kubernetes.services.containerd;
   pkg = blackmatterPkgs.containerd;
   runcBin = "${pkgs.runc}/bin/runc";
