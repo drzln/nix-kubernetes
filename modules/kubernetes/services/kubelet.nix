@@ -124,20 +124,20 @@
       }))
     (manifestFile "kube-scheduler.json" (mkPod "kube-scheduler" [
         "kube-scheduler"
-        "--kubeconfig=${pki}/scheduler/kubeconfig"
+        "--kubeconfig=${pki}/configs/scheduler/kubeconfig"
       ]
       images.kubeScheduler {
         volumes = [
           {
             name = "kubeconfig";
-            hostPath.path = "${pki}/scheduler/kubeconfig";
+            hostPath.path = "${pki}/configs/scheduler/kubeconfig";
             hostPath.type = "File";
           }
         ];
         volumeMounts = [
           {
             name = "kubeconfig";
-            mountPath = "${pki}/scheduler/kubeconfig";
+            mountPath = "${pki}/configs/scheduler/kubeconfig";
             readOnly = true;
           }
         ];
