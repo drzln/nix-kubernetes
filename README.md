@@ -40,7 +40,7 @@
 ### Prerequisites
 
 - Install [Nix](https://nixos.org/download.html) with flakes enabled.
-- Install [direnv](https://direnv.net/) and [lorri](https://github.com/target/lorri) for environment management (optional but recommended).
+- Install [direnv](https://direnv.net/)
 
 ### Clone the Repository
 
