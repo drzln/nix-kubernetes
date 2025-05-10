@@ -10,7 +10,7 @@ with lib; let
     callPackage = pkgs.callPackage;
   };
   service = name:
-    import (./services + "/${name}.nix") {
+    import (./services + "/${name}") {
       inherit lib config pkgs blackmatterPkgs;
     };
 in {

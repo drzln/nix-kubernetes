@@ -1,4 +1,4 @@
-# modules/kubernetes/services/kubelet.nix
+# modules/kubernetes/services/kubelet/default.nix
 {
   lib,
   pkgs,
