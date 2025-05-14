@@ -10,6 +10,7 @@
 in {
   imports = [
     ./options.nix
+    ./assets.nix
   ];
 
   config = lib.mkIf cfg.enable (lib.mkMerge [

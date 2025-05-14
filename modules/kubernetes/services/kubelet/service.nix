@@ -8,9 +8,6 @@
   scr = "/run/secrets/kubernetes";
   pkg = blackmatterPkgs.kubelet;
 in {
-  imports = [
-    ./assets.nix
-  ];
   environment.systemPackages = [pkg];
   systemd.tmpfiles.rules = [
     "d /etc/kubernetes/manifests 0755 root root -"
