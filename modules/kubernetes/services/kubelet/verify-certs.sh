@@ -1,4 +1,5 @@
-#!/usr/bin/env sh
+#!/usr/bin/env nix-shell
+#!nix-shell -i bash -p openssl
 set -euo pipefail
 OPENSSL_BIN=openssl
 CA_CRT="./secrets/generated/ca.crt"
