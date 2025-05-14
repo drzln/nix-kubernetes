@@ -9,6 +9,8 @@
   pkg = blackmatterPkgs.kubelet;
 in {
   environment.systemPackages = [pkg];
+  environment.etc."kubernetes/scripts/generate-assets.sh".text = builtins.readFile ./generate-assets.sh;
+  environment.etc."kubernetes/scripts/verify-assets.sh".text = builtins.readFile ./verify-assets.sh;
   systemd.services.kubelet-generate-assets = lib.mkIf cfg.generateAssets {
     description = "Generate kubelet TLS and config files";
     wantedBy = ["multi-user.target"];
