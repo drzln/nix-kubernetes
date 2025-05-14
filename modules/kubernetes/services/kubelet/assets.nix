@@ -3,6 +3,7 @@
   pkgs,
   lib,
   cfg,
+  ...
 }: {
   environment.etc."kubernetes/scripts/generate-assets.sh".text = builtins.readFile ./generate-assets.sh;
   environment.etc."kubernetes/scripts/verify-assets.sh".text = builtins.readFile ./verify-assets.sh;
