@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p openssl iproute2 coreutils gnugrep gawk
+#!nix-shell --impure --expr 'with (import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-24.05.tar.gz") {}); mkShell { buildInputs = [ openssl iproute2 coreutils gnugrep gawk ]; }' -i bash
 set -euo pipefail
 OUTDIR="/var/lib/blackmatter/certs"
 rm -rf "$OUTDIR"
