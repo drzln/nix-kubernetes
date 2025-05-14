@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 set -euo pipefail
 OUTDIR="/var/lib/blackmatter/certs"
 rm -rf "$OUTDIR"
