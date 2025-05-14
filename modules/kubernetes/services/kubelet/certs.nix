@@ -1,5 +1,11 @@
 # modules/kubernetes/services/kubelet/certs.nix
-{pkgs, ...}: let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}: let
+  cfg = config.blackmatter.components.kubernetes.services.kubelet.assets;
   kubeletCertGen = pkgs.stdenv.mkDerivation {
     pname = "kubelet-cert-gen";
     version = "1.0";
@@ -24,12 +30,14 @@
     '';
   };
 in {
-  systemd.services.kubelet-generate-certs = {
-    description = "Generate TLS certs and configs for kubelet";
-    wantedBy = ["multi-user.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${kubeletCertGen}/bin/generate-certs.sh";
+  config = lib.mkIf cfg.enable {
+    systemd.services.kubelet-generate-certs = {
+      description = "Generate TLS certs and configs for kubelet";
+      wantedBy = ["multi-user.target"];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${kubeletCertGen}/bin/generate-certs.sh";
+      };
     };
   };
 }
