@@ -5,7 +5,7 @@
   lib,
   ...
 }: let
-  cfg = config.blackmatter.components.kubernetes.services.kubelet.assets;
+  cfg = config.blackmatter.components.kubernetes.services.kubelet.certs;
   kubeletCertGen = pkgs.stdenv.mkDerivation {
     pname = "kubelet-cert-gen";
     version = "1.0";
