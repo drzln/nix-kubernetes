@@ -6,7 +6,6 @@
     ./service.nix
     ./static-pods.nix
   ];
-
   config.blackmatter.components.kubernetes.services.kubelet = {
     enable = false;
     assets.enable = false;
