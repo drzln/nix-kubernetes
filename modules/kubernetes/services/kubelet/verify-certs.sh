@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 set -euo pipefail
-OPENSSL_BIN=@openssl@
+OPENSSL_BIN=openssl
 
 CA_CRT="./secrets/generated/ca.crt"
 CERT_DIR="./secrets/generated"
