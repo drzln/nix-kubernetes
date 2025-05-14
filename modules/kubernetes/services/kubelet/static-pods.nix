@@ -2,6 +2,7 @@
 {
   lib,
   cfg,
+  ...
 }: let
   scr = "/run/secrets/kubernetes";
   pki = "/var/lib/blackmatter/certs";

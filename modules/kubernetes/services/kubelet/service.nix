@@ -4,6 +4,7 @@
   pkgs,
   lib,
   cfg,
+  ...
 }: let
   scr = "/run/secrets/kubernetes";
   pkg = blackmatterPkgs.kubelet;
