@@ -9,7 +9,7 @@ in {
   imports = [
     ./options.nix
     ./assets.nix
-    # ./service.nix
+    ./service.nix
     # (lib.mkIf cfg.staticControlPlane.enable ./static-pods.nix)
   ];
 }
