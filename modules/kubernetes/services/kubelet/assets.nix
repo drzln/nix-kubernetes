@@ -11,7 +11,7 @@
     wantedBy = ["multi-user.target"];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.bash}/bin/bash /etc/kubernetes/scripts/generate-assets.sh ${cfg.nodeIP} ${cfg.nodeName}";
+      ExecStart = "${pkgs.bash}/bin/bash /etc/kubernetes/scripts/generate-assets.sh";
     };
   };
   systemd.services.kubelet-verify-assets = lib.mkIf cfg.generateAssets {
