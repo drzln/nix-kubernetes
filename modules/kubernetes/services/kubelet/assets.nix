@@ -1,13 +1,8 @@
 # modules/kubernetes/services/kubelet/assets.nix
-{
-  pkgs,
-  lib,
-  cfg,
-  ...
-}: {
+{pkgs, ...}: {
   environment.etc."kubernetes/scripts/generate-assets.sh".text = builtins.readFile ./generate-assets.sh;
   environment.etc."kubernetes/scripts/verify-assets.sh".text = builtins.readFile ./verify-assets.sh;
-  systemd.services.kubelet-generate-assets = lib.mkIf cfg.generateAssets {
+  systemd.services.kubelet-generate-assets = {
     description = "Generate TLS certs and configs for kubelet";
     wantedBy = ["multi-user.target"];
     serviceConfig = {
@@ -15,7 +10,7 @@
       ExecStart = "${pkgs.bash}/bin/bash /etc/kubernetes/scripts/generate-assets.sh";
     };
   };
-  systemd.services.kubelet-verify-assets = lib.mkIf cfg.generateAssets {
+  systemd.services.kubelet-verify-assets = {
     description = "Verify TLS assets for kubelet";
     wantedBy = ["multi-user.target"];
     before = ["kubelet.service"];
