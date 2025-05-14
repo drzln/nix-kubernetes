@@ -8,8 +8,8 @@
 in {
   imports = [
     ./options.nix
-    ./service.nix
     ./assets.nix
+    # ./service.nix
     # (lib.mkIf cfg.staticControlPlane.enable ./static-pods.nix)
   ];
 }
