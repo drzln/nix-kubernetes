@@ -1,4 +1,5 @@
-#!/usr/bin/env sh
+#!/usr/bin/env nix-shell
+#!nix-shell -i bash -p openssl iproute2 coreutils gnugrep gawk
 set -euo pipefail
 
 NODE_IP="$(ip route get 1 | awk '{print $(NF-2); exit}')"
