@@ -3,7 +3,6 @@
   blackmatterPkgs,
   pkgs,
   lib,
-  cfg,
   ...
 }: let
   scr = "/run/secrets/kubernetes";
@@ -42,14 +41,11 @@ in {
       Delegate = true;
       RestartSec = 2;
       User = "root";
-      ExecStart = lib.concatStringsSep " " (
-        [
-          "${pkg}/bin/kubelet"
-          "--config=${scr}/configs/kubelet/config"
-          "--kubeconfig=${scr}/configs/kubelet/kubeconfig"
-        ]
-        ++ cfg.extraFlags
-      );
+      ExecStart = lib.concatStringsSep " " [
+        "${pkg}/bin/kubelet"
+        "--config=${scr}/configs/kubelet/config"
+        "--kubeconfig=${scr}/configs/kubelet/kubeconfig"
+      ];
     };
   };
 }
