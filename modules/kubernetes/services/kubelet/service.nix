@@ -29,7 +29,7 @@ in {
       pkg
     ]);
     serviceConfig = {
-      After = ["kubelet-verify-assets.service"];
+      After = ["kubelet-verify-certs.service"];
       CapabilityBoundingSet = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
       AmbientCapabilities = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
       DeviceAllow = ["/dev/kmsg r"];
