@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 set -euo pipefail
+OPENSSL_BIN=@openssl@
 
 CA_CRT="./secrets/generated/ca.crt"
 CERT_DIR="./secrets/generated"
@@ -14,10 +15,10 @@ for name in apiserver kubelet etcd admin controller-manager scheduler; do
   echo "[*] Verifying $name.crt"
 
   # 1. Check cert matches CA
-  openssl verify -CAfile "$CA_CRT" "$CRT"
+  "$OPENSSL_BIN" verify -CAfile "$CA_CRT" "$CRT"
 
   # 2. Check that the cert is valid and shows expected usages
-  openssl x509 -in "$CRT" -noout -text | grep -E 'Subject:|Issuer:|Key Usage|Extended Key Usage'
+  "$OPENSSL_BIN" x509 -in "$CRT" -noout -text | grep -E 'Subject:|Issuer:|Key Usage|Extended Key Usage'
 
   # 3. Check that cert matches its private key
   CERT_HASH=$(openssl x509 -in "$CRT" -noout -modulus | openssl md5)
