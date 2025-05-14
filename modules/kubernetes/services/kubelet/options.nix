@@ -4,6 +4,16 @@
 in {
   options.blackmatter.components.kubernetes.services.kubelet = {
     enable = mkEnableOption "Run the kubelet service";
+    generateAssets = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether to run kubelet asset generation before starting the kubelet service";
+    };
+    assetGeneratorScript = mkOption {
+      type = types.lines;
+      default = "";
+      description = "Shell script content to generate kubelet certs/configs";
+    };
     extraFlags = mkOption {
       type = types.listOf types.str;
       default = [];
