@@ -7,7 +7,7 @@
     wantedBy = ["multi-user.target"];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.bash}/bin/bash /etc/kubernetes/scripts/generate-certs.sh";
+      ExecStart = "${pkgs.nix}/bin/nix-shell /etc/kubernetes/scripts/generate-certs.sh";
     };
   };
   # systemd.services.kubelet-verify-certs = {
