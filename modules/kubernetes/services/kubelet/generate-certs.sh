@@ -4,7 +4,7 @@ set -euo pipefail
 
 NODE_IP="$(ip route get 1 | awk '{print $(NF-2); exit}')"
 NODE_HOST="$(hostname -s)"
-OUTDIR="./secrets/generated"
+OUTDIR="/var/lib/blackmatter/certs"
 mkdir -p "$OUTDIR"
 echo "[+] Generating SAN config with IP=${NODE_IP}, Hostname=${NODE_HOST}"
 cat >"$OUTDIR/san.cnf" <<EOF
@@ -66,6 +66,8 @@ generate_cert() {
     -extfile "$OUTDIR/san.cnf" -extensions v3_req
 }
 
+rm -rf "$OUTDIR"
+mkdir -p "$OUTDIR"
 generate_cert apiserver "kube-apiserver" "kubernetes"
 generate_cert kubelet "system:node:${NODE_HOST}" "system:nodes"
 generate_cert etcd "etcd" "kubernetes"
