@@ -1,12 +1,10 @@
 # modules/kubernetes/services/kubelet/assets.nix
 {pkgs, ...}: {
+  environment.systemPackages = with pkgs; [
+    openssl
+  ];
   environment.etc."kubernetes/scripts/generate-certs.sh".text = builtins.readFile ./generate-certs.sh;
-  environment.etc."kubernetes/scripts/verify-certs.sh".text = pkgs.replaceVars {
-    src = ./verify-certs.sh;
-    vars = {
-      openssl = "${pkgs.openssl}/bin/openssl";
-    };
-  };
+  environment.etc."kubernetes/scripts/verify-certs.sh".text = builtins.readFile ./verify-certs.sh;
   systemd.services.kubelet-generate-certs = {
     description = "Generate TLS certs and configs for kubelet";
     wantedBy = ["multi-user.target"];
