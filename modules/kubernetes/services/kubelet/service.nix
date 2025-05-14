@@ -12,12 +12,22 @@ in {
   environment.etc."kubernetes/scripts/generate-assets.sh".text = builtins.readFile ./generate-assets.sh;
   environment.etc."kubernetes/scripts/verify-assets.sh".text = builtins.readFile ./verify-assets.sh;
   systemd.services.kubelet-generate-assets = lib.mkIf cfg.generateAssets {
-    description = "Generate kubelet TLS and config files";
+    description = "Generate and verify TLS assets for kubelet";
     wantedBy = ["multi-user.target"];
     before = ["kubelet.service"];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.writeShellScript "kubelet-gen-assets" cfg.assetGeneratorScript}";
+      ExecStart = "${pkgs.bash}/bin/bash /etc/kubernetes/scripts/generate-assets.sh ${cfg.nodeIP} ${cfg.nodeName}";
+    };
+  };
+  systemd.services.kubelet-verify-assets = lib.mkIf cfg.generateAssets {
+    description = "Verify TLS assets for kubelet";
+    wantedBy = ["multi-user.target"];
+    before = ["kubelet.service"];
+    after = ["kubelet-generate-assets.service"];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.bash}/bin/bash /etc/kubernetes/scripts/verify-assets.sh";
     };
   };
   systemd.tmpfiles.rules = [
@@ -40,7 +50,7 @@ in {
       pkg
     ]);
     serviceConfig = {
-      After = ["kubelet-generate-assets.service"];
+      After = ["kubelet-verify-assets.service"];
       CapabilityBoundingSet = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
       AmbientCapabilities = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
       DeviceAllow = ["/dev/kmsg r"];
