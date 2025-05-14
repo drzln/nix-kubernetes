@@ -3,18 +3,14 @@
   kubeletCertGen = pkgs.stdenv.mkDerivation {
     pname = "kubelet-cert-gen";
     version = "1.0";
-
     src = ./generate-certs.sh;
     dontUnpack = true;
-
     nativeBuildInputs = with pkgs; [makeWrapper];
-
     installPhase = ''
       mkdir -p $out/bin
       cp $src $out/bin/generate-certs.sh
       chmod +x $out/bin/generate-certs.sh
       patchShebangs $out/bin
-
       wrapProgram $out/bin/generate-certs.sh \
         --prefix PATH : ${pkgs.lib.makeBinPath [
         pkgs.bash
