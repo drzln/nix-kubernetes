@@ -6,6 +6,7 @@
     src = ./generate-certs.sh;
     dontUnpack = true;
     nativeBuildInputs = [pkgs.makeWrapper];
+    buildInputs = with pkgs;[ iproute2 gawk ];
     installPhase = ''
       mkdir -p $out/bin
       cp $src $out/bin/generate-certs.sh
