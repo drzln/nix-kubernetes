@@ -11,6 +11,7 @@
     enable = false;
     assets.enable = false;
     service.enable = false;
+    static-pods.enable = false;
     staticControlPlane.enable = false;
   };
 }
