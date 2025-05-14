@@ -5,7 +5,7 @@
     version = "1.0";
     src = ./generate-certs.sh;
     dontUnpack = true;
-    nativeBuildInputs = [pkgs.makeWrapper pkgs.stdenv.patchShebangs];
+    nativeBuildInputs = [pkgs.makeWrapper];
     installPhase = ''
       mkdir -p $out/bin
       cp $src $out/bin/generate-certs.sh
