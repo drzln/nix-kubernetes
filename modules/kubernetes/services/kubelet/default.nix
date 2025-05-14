@@ -3,8 +3,8 @@
   imports = [
     # ./options.nix
     ./certs.nix
-    ./service.nix
-    ./static-pods.nix
+    # ./service.nix
+    # ./static-pods.nix
   ];
   # config.blackmatter.components.kubernetes.services.kubelet = {
   #   enable = false;
