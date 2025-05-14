@@ -1,7 +1,7 @@
 # modules/kubernetes/services/kubelet/assets.nix
 {pkgs, ...}: {
   environment.etc."kubernetes/scripts/generate-certs.sh".text = builtins.readFile ./generate-certs.sh;
-  environment.etc."kubernetes/scripts/verify-certs.sh".source = pkgs.replaceVars {
+  environment.etc."kubernetes/scripts/verify-certs.sh".text = pkgs.replaceVars {
     src = ./verify-certs.sh;
     openssl = "${pkgs.openssl}/bin/openssl";
   };
