@@ -8,8 +8,6 @@
   ];
   config.blackmatter.components.kubernetes.services.kubelet = {
     enable = false;
-    certs.enable = false;
-    service.enable = false;
     staticControlPlane.enable = false;
   };
 }
