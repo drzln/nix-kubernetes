@@ -1,5 +1,7 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p openssl
+#!nix-shell -i bash
+#!nix-shell -p openssl
+#!nix-shell -I nixpkgs=https://nixos.org/channels/nixos-24.05/nixexprs.tar.xz
 set -euo pipefail
 OPENSSL_BIN=openssl
 CA_CRT="./secrets/generated/ca.crt"
