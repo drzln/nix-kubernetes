@@ -23,6 +23,7 @@
         pkgs.gawk
         pkgs.gnugrep
         pkgs.openssl
+        pkgs.inetutils
       ]}
     '';
   };
