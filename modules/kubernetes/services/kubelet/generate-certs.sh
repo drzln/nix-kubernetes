@@ -1,14 +1,11 @@
 #!/usr/bin/env sh
 set -euo pipefail
 
+NODE_IP="$(ip route get 1 | awk '{print $(NF-2); exit}')"
+NODE_HOST="$(hostname -s)"
 OUTDIR="./secrets/generated"
 mkdir -p "$OUTDIR"
-
-NODE_IP="${1:-192.168.50.153}" # Allow override via CLI
-NODE_HOST="${2:-plo}"          # Default node name
-
 echo "[+] Generating SAN config with IP=${NODE_IP}, Hostname=${NODE_HOST}"
-
 cat >"$OUTDIR/san.cnf" <<EOF
 [ req ]
 default_bits = 2048
