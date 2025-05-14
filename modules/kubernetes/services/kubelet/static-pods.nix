@@ -5,23 +5,31 @@
   ...
 }: let
   cfg = config.blackmatter.components.kubernetes.services.kubelet.staticControlPlane;
-
   scr = "/run/secrets/kubernetes";
   pki = "/var/lib/blackmatter/certs";
   svcCIDR = cfg.serviceCIDR;
   version = cfg.kubernetesVersion;
-
   images = {
     etcd = "quay.io/coreos/etcd:v3.5.9";
     kubeApiserver = "registry.k8s.io/kube-apiserver:${version}";
     kubeControllerManager = "registry.k8s.io/kube-controller-manager:${version}";
     kubeScheduler = "registry.k8s.io/kube-scheduler:${version}";
   };
-
   podLib = import ./pod-lib.nix {inherit lib;};
 in {
-  options.blackmatter.components.kubernetes.services.kubelet.staticControlPlane.enable =
-    lib.mkEnableOption "Generate static pod manifests for etcd and control plane components";
+  options.blackmatter.components.kubernetes.services.kubelet.staticControlPlane = {
+    enable = lib.mkEnableOption "Generate static pod manifests for etcd and control plane components";
+    kubernetesVersion = lib.mkOption {
+      type = lib.types.str;
+      default = "v1.30.1";
+      description = "Control plane image version (e.g. v1.30.1).";
+    };
+    serviceCIDR = lib.mkOption {
+      type = lib.types.str;
+      default = "10.96.0.0/12";
+      description = "Service IP range for the cluster.";
+    };
+  };
 
   config = lib.mkIf cfg.enable {
     environment.etc."kubernetes/manifests" = {
