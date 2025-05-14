@@ -9,6 +9,15 @@
   pkg = blackmatterPkgs.kubelet;
 in {
   environment.systemPackages = [pkg];
+  systemd.services.kubelet-generate-assets = lib.mkIf cfg.generateAssets {
+    description = "Generate kubelet TLS and config files";
+    wantedBy = ["multi-user.target"];
+    before = ["kubelet.service"];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.writeShellScript "kubelet-gen-assets" cfg.assetGeneratorScript}";
+    };
+  };
   systemd.tmpfiles.rules = [
     "d /etc/kubernetes/manifests 0755 root root -"
     "d /etc/kubernetes/kubelet   0755 root root -"
@@ -29,6 +38,7 @@ in {
       pkg
     ]);
     serviceConfig = {
+      After = ["kubelet-generate-assets.service"];
       CapabilityBoundingSet = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
       AmbientCapabilities = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
       DeviceAllow = ["/dev/kmsg r"];
