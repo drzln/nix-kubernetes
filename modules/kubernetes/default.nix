@@ -31,6 +31,9 @@ in {
           message = "You must specify a valid Kubernetes role.";
         }
       ];
+      environment.sessionVariables = {
+        KUBECONFIG = "/run/secrets/kubernetes/configs/admin/kubeconfig";
+      };
       environment.systemPackages = [
         blackmatterPkgs.blackmatter.k8s.kubectl
         blackmatterPkgs.blackmatter.k8s.containerd
