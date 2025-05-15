@@ -32,6 +32,16 @@ in {
       before = ["kubelet.service"];
       wantedBy = ["multi-user.target"];
       serviceConfig = {
+        Wants = [
+          "kubelet-generate-certs.service"
+          "static-pods.service"
+        ];
+        After = [
+          "network.target"
+          "containerd.service"
+          "systemd-tmpfiles-setup.service"
+          "kubelet-generate-certs.service"
+        ];
         Type = "oneshot";
         RemainAfterExit = true;
         ExecStart = ''
