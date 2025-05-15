@@ -5,7 +5,7 @@
   lib,
   ...
 }: let
-  cfg = config.blackmatter.components.kubernetes.services.kubelet.certs;
+  cfg = config.blackmatter.components.kubernetes.kubelet.certs;
   kubeletCertGen = pkgs.stdenv.mkDerivation {
     pname = "kubelet-cert-gen";
     version = "1.0";
@@ -30,7 +30,7 @@
     '';
   };
 in {
-  options.blackmatter.components.kubernetes.services.kubelet.certs = {
+  options.blackmatter.components.kubernetes.kubelet.certs = {
     enable = lib.mkEnableOption "certificate placement";
   };
   config = lib.mkIf cfg.enable {
