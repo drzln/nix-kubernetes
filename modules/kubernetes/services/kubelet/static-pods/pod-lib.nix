@@ -29,6 +29,7 @@
           {
             name = "pki";
             hostPath.path = pki;
+            hostPath.type = "DirectoryOrCreate";
           }
         ];
       };
