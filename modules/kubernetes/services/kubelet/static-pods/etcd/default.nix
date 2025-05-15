@@ -8,5 +8,5 @@
   image = "quay.io/coreos/etcd:v3.5.9";
   manifest =
     podLib.manifestFile "etcd.json"
-    (podLib.mkEtcdPod pki image {});
+    (podLib.mkEtcdPod pki image);
 in {inherit manifest;}
