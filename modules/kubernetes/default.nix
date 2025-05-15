@@ -12,8 +12,8 @@ with lib; let
 in {
   imports = [
     (service "containerd")
-    (service "kubelet")
-    (service "etcd")
+    # (service "kubelet")
+    # (service "etcd")
   ];
   options.blackmatter.components.kubernetes = {
     enable = mkEnableOption "Enable Kubernetes";

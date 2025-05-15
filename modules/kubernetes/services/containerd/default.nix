@@ -33,7 +33,7 @@
     then overrides
     else baseConfig + "\n\n" + overrides;
 in {
-  options.blackmatter.components.kubernetes.services.containerd = {
+  options.blackmatter.components.kubernetes.containerd = {
     enable = lib.mkEnableOption "Enable the containerd service";
 
     configPath = lib.mkOption {
@@ -51,13 +51,10 @@ in {
 
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [pkg pkgs.runc];
-
     systemd.tmpfiles.rules = [
       "d /etc/containerd 0755 root root -"
       "d /run/containerd 0755 root root -"
     ];
-
-    # Proper single-attrset assignment (not a list or null)
     environment.etc."containerd/config.toml" =
       if cfg.configPath != null
       then {
@@ -66,7 +63,6 @@ in {
       else {
         text = mergedConfig;
       };
-
     systemd.services.containerd = {
       description = "blackmatter.containerd";
       wantedBy = ["multi-user.target"];
