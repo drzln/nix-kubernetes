@@ -49,6 +49,7 @@ in {
         pulumiPackages.pulumi-go
         pulumiPackages.pulumi-command
         pulumiPackages.pulumi-aws-native
+        pulumiPackages.pulumi-kubernetes
         pulumiPackages.pulumi-python
       ];
       _module.args.blackmatterPkgs = blackmatterPkgs;
