@@ -59,55 +59,55 @@
     ]
     image;
 
-  # mkControllerManagerPod = pki: scr: image:
-  #   mkPod pki "kube-controller-manager" [
-  #     "kube-controller-manager"
-  #     "--kubeconfig=${scr}/configs/controller-manager/kubeconfig"
-  #     "--cluster-signing-cert-file=${pki}/ca.crt"
-  #     "--cluster-signing-key-file=${pki}/ca.key"
-  #     "--root-ca-file=${pki}/ca.crt"
-  #     "--service-account-private-key-file=${pki}/ca.key"
-  #   ]
-  #   image {
-  #     volumes = [
-  #       {
-  #         name = "kubeconfig";
-  #         hostPath = {
-  #           path = "${scr}/configs/controller-manager/kubeconfig";
-  #           type = "File";
-  #         };
-  #       }
-  #     ];
-  #     volumeMounts = [
-  #       {
-  #         name = "kubeconfig";
-  #         mountPath = "${scr}/configs/controller-manager/kubeconfig";
-  #         readOnly = true;
-  #       }
-  #     ];
-  #   };
+  mkControllerManagerPod = pki: scr: image:
+    mkPod pki "kube-controller-manager" [
+      "kube-controller-manager"
+      "--kubeconfig=${scr}/configs/controller-manager/kubeconfig"
+      "--cluster-signing-cert-file=${pki}/ca.crt"
+      "--cluster-signing-key-file=${pki}/ca.key"
+      "--root-ca-file=${pki}/ca.crt"
+      "--service-account-private-key-file=${pki}/ca.key"
+    ]
+    image {
+      volumes = [
+        {
+          name = "kubeconfig";
+          hostPath = {
+            path = "${scr}/configs/controller-manager/kubeconfig";
+            type = "File";
+          };
+        }
+      ];
+      volumeMounts = [
+        {
+          name = "kubeconfig";
+          mountPath = "${scr}/configs/controller-manager/kubeconfig";
+          readOnly = true;
+        }
+      ];
+    };
 
-  # mkSchedulerPod = scr: image:
-  #   mkPod "/dev/null" "kube-scheduler" [
-  #     "kube-scheduler"
-  #     "--kubeconfig=${scr}/configs/scheduler/kubeconfig"
-  #   ]
-  #   image {
-  #     volumes = [
-  #       {
-  #         name = "kubeconfig";
-  #         hostPath = {
-  #           path = "${scr}/configs/scheduler/kubeconfig";
-  #           type = "File";
-  #         };
-  #       }
-  #     ];
-  #     volumeMounts = [
-  #       {
-  #         name = "kubeconfig";
-  #         mountPath = "${scr}/configs/scheduler/kubeconfig";
-  #         readOnly = true;
-  #       }
-  #     ];
-  #   };
+  mkSchedulerPod = scr: image:
+    mkPod "/dev/null" "kube-scheduler" [
+      "kube-scheduler"
+      "--kubeconfig=${scr}/configs/scheduler/kubeconfig"
+    ]
+    image {
+      volumes = [
+        {
+          name = "kubeconfig";
+          hostPath = {
+            path = "${scr}/configs/scheduler/kubeconfig";
+            type = "File";
+          };
+        }
+      ];
+      volumeMounts = [
+        {
+          name = "kubeconfig";
+          mountPath = "${scr}/configs/scheduler/kubeconfig";
+          readOnly = true;
+        }
+      ];
+    };
 }

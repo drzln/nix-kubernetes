@@ -7,7 +7,7 @@
 }: let
   cfg = config.blackmatter.components.kubernetes.kubelet.static-pods;
   pki = "/var/lib/blackmatter/certs";
-  # scr = "/run/secrets/kubernetes";
+  scr = "/run/secrets/kubernetes";
   svcCIDR = cfg.serviceCIDR;
   version = cfg.kubernetesVersion;
 
@@ -28,11 +28,11 @@
     "kube-apiserver.json" = podLib.manifestFile "kube-apiserver.json"
       (podLib.mkApiServerPod pki svcCIDR images.kubeApiserver);
 
-    # "kube-controller-manager.json" = podLib.manifestFile "kube-controller-manager.json"
-    #   (podLib.mkControllerManagerPod pki scr images.kubeControllerManager);
+    "kube-controller-manager.json" = podLib.manifestFile "kube-controller-manager.json"
+      (podLib.mkControllerManagerPod pki scr images.kubeControllerManager);
 
-    # "kube-scheduler.json" = podLib.manifestFile "kube-scheduler.json"
-    #   (podLib.mkSchedulerPod scr images.kubeScheduler);
+    "kube-scheduler.json" = podLib.manifestFile "kube-scheduler.json"
+      (podLib.mkSchedulerPod scr images.kubeScheduler);
   };
 
   manifestsDir = "/etc/kubernetes/manifests";
