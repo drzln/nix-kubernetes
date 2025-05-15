@@ -42,6 +42,13 @@ in {
         go
         delve
         gopls
+        pulumi
+        pulumictl
+        pulumi-esc
+        pulumi-bin
+        pulumiPackages.pulumi-command
+        pulumiPackages.pulumi-aws-native
+        pulumiPackages.pulumi-langauge-go
       ];
       _module.args.blackmatterPkgs = blackmatterPkgs;
     }
