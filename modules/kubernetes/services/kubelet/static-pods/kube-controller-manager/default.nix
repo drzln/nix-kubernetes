@@ -13,7 +13,10 @@ in {
     type = lib.types.package;
     description = "The generated static pod manifest for kube-controller-manager";
   };
+
   config.manifest = podLib.manifestFile "kube-controller-manager.json" (
-    podLib.mkControllerManagerPod pki scr image
+    podLib.mkControllerManagerPod {
+      inherit pki scr image;
+    }
   );
 }
