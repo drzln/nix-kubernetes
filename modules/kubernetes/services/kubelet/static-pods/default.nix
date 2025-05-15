@@ -8,10 +8,10 @@
   cfg = config.blackmatter.components.kubernetes.kubelet.static-pods;
   script = pkgs.writeShellScriptBin "setup-manifests" (builtins.readFile ./setup-manifests.sh);
   podManifests = lib.flatten [
-    (import ./etcd {inherit config pkgs lib;}).manifest
-    (import ./kube-apiserver {inherit config pkgs lib;}).manifest
-    (import ./kube-scheduler {inherit config pkgs lib;}).manifest
-    (import ./kube-controller-manager {inherit config pkgs lib;}).manifest
+    (import ./etcd {inherit config pkgs lib;}).config.manifest
+    # (import ./kube-apiserver {inherit config pkgs lib;}).manifest
+    # (import ./kube-scheduler {inherit config pkgs lib;}).manifest
+    # (import ./kube-controller-manager {inherit config pkgs lib;}).manifest
   ];
 in {
   imports = [
