@@ -4,10 +4,11 @@
   pkgs,
   config,
   blackmatterPkgs,
+
   ...
 }: let
   cfg = config.blackmatter.components.kubernetes.services.containerd;
-  pkg = blackmatterPkgs.containerd;
+  pkg = blackmatterPkgs.blackmatter.k8s.containerd;
   runcBin = "${pkgs.runc}/bin/runc";
   defaultConfigPath = "${pkg}/etc/containerd/config.toml";
 
