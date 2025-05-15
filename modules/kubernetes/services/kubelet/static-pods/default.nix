@@ -31,8 +31,8 @@
     "kube-controller-manager.json" = podLib.manifestFile "kube-controller-manager.json"
       (podLib.mkControllerManagerPod pki scr images.kubeControllerManager);
 
-    "kube-scheduler.json" = podLib.manifestFile "kube-scheduler.json"
-      (podLib.mkSchedulerPod scr images.kubeScheduler);
+    # "kube-scheduler.json" = podLib.manifestFile "kube-scheduler.json"
+    #   (podLib.mkSchedulerPod scr images.kubeScheduler);
   };
 
   manifestsDir = "/etc/kubernetes/manifests";
