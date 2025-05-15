@@ -9,16 +9,17 @@
   pki = "/var/lib/blackmatter/certs";
   # scr = "/run/secrets/kubernetes";
   # svcCIDR = cfg.serviceCIDR;
-  # version = cfg.kubernetesVersion;
+  version = cfg.kubernetesVersion;
 
   images = {
     etcd = "quay.io/coreos/etcd:v3.5.9";
-    # kubeApiserver = "registry.k8s.io/kube-apiserver:${version}";
-    # kubeControllerManager = "registry.k8s.io/kube-controller-manager:${version}";
-    # kubeScheduler = "registry.k8s.io/kube-scheduler:${version}";
+    kubeApiserver = "registry.k8s.io/kube-apiserver:${version}";
+    kubeControllerManager = "registry.k8s.io/kube-controller-manager:${version}";
+    kubeScheduler = "registry.k8s.io/kube-scheduler:${version}";
   };
 
   podLib = import ./pod-lib.nix {inherit lib pkgs;};
+
   manifests = {
     "etcd.json" =
       podLib.manifestFile "etcd.json"
@@ -65,9 +66,9 @@ in {
           manifestsDir = "/etc/kubernetes/manifests";
           copyCmds = lib.concatStringsSep "\n" (
             lib.mapAttrsToList (
-              file: json: let
-                jsonFile = pkgs.writeText "${file}" (builtins.toJSON json);
-              in "${pkgs.coreutils}/bin/install -m644 ${jsonFile} ${manifestsDir}/${file}"
+              file: drv:
+              # Correctly use the derivation directly instead of JSON conversion
+              "${pkgs.coreutils}/bin/install -m644 ${drv} ${manifestsDir}/${file}"
             )
             manifests
           );
