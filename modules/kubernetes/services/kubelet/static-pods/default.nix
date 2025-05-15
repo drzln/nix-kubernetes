@@ -1,4 +1,5 @@
 # modules/kubernetes/services/kubelet/static-pods/default.nix
+# modules/kubernetes/services/kubelet/static-pods/default.nix
 {
   config,
   pkgs,
@@ -7,8 +8,8 @@
 }: let
   cfg = config.blackmatter.components.kubernetes.kubelet.static-pods;
   pki = "/var/lib/blackmatter/certs";
-  # scr = "/run/secrets/kubernetes";
-  # svcCIDR = cfg.serviceCIDR;
+  scr = "/run/secrets/kubernetes";
+  svcCIDR = cfg.serviceCIDR;
   version = cfg.kubernetesVersion;
 
   images = {
@@ -25,16 +26,13 @@
       podLib.manifestFile "etcd.json"
       (podLib.mkEtcdPod pki images.etcd);
 
-    # "kube-apiserver.json" =
-    #   podLib.manifestFile "kube-apiserver.json"
+    # "kube-apiserver.json" = podLib.manifestFile "kube-apiserver.json"
     #   (podLib.mkApiServerPod pki svcCIDR images.kubeApiserver);
 
-    # "kube-controller-manager.json" =
-    #   podLib.manifestFile "kube-controller-manager.json"
+    # "kube-controller-manager.json" = podLib.manifestFile "kube-controller-manager.json"
     #   (podLib.mkControllerManagerPod pki scr images.kubeControllerManager);
 
-    # "kube-scheduler.json" =
-    #   podLib.manifestFile "kube-scheduler.json"
+    # "kube-scheduler.json" = podLib.manifestFile "kube-scheduler.json"
     #   (podLib.mkSchedulerPod scr images.kubeScheduler);
   };
 in {
@@ -66,13 +64,15 @@ in {
           manifestsDir = "/etc/kubernetes/manifests";
           copyCmds = lib.concatStringsSep "\n" (
             lib.mapAttrsToList (
-              file: derivation: "${pkgs.coreutils}/bin/install -m644 ${toString derivation} ${manifestsDir}/${file}"
+              file: derivation: "${pkgs.coreutils}/bin/install -m644 ${derivation} ${manifestsDir}/${file}"
             )
             manifests
           );
         in ''
-          ${pkgs.coreutils}/bin/mkdir -p ${manifestsDir}
-          ${copyCmds}
+          ${pkgs.runtimeShell} -c '
+            ${pkgs.coreutils}/bin/mkdir -p ${manifestsDir}
+            ${copyCmds}
+          '
         '';
       };
     };
