@@ -6,16 +6,16 @@
   ...
 }: let
   cfg = config.blackmatter.components.kubernetes.kubelet.static-pods;
-  scr = "/run/secrets/kubernetes";
+  # scr = "/run/secrets/kubernetes";
   pki = "/var/lib/blackmatter/certs";
-  svcCIDR = cfg.serviceCIDR;
-  version = cfg.kubernetesVersion;
+  # svcCIDR = cfg.serviceCIDR;
+  # version = cfg.kubernetesVersion;
 
   images = {
     etcd = "quay.io/coreos/etcd:v3.5.9";
-    kubeApiserver = "registry.k8s.io/kube-apiserver:${version}";
-    kubeControllerManager = "registry.k8s.io/kube-controller-manager:${version}";
-    kubeScheduler = "registry.k8s.io/kube-scheduler:${version}";
+    # kubeApiserver = "registry.k8s.io/kube-apiserver:${version}";
+    # kubeControllerManager = "registry.k8s.io/kube-controller-manager:${version}";
+    # kubeScheduler = "registry.k8s.io/kube-scheduler:${version}";
   };
 
   podLib = import ./pod-lib.nix {inherit lib pkgs;};
@@ -24,17 +24,17 @@
       podLib.manifestFile "etcd.json"
       (podLib.mkEtcdPod pki images.etcd);
 
-    "kube-apiserver.json" =
-      podLib.manifestFile "kube-apiserver.json"
-      (podLib.mkApiServerPod pki svcCIDR images.kubeApiserver);
+    # "kube-apiserver.json" =
+    #   podLib.manifestFile "kube-apiserver.json"
+    #   (podLib.mkApiServerPod pki svcCIDR images.kubeApiserver);
 
-    "kube-controller-manager.json" =
-      podLib.manifestFile "kube-controller-manager.json"
-      (podLib.mkControllerManagerPod pki scr images.kubeControllerManager);
+    # "kube-controller-manager.json" =
+    #   podLib.manifestFile "kube-controller-manager.json"
+    #   (podLib.mkControllerManagerPod pki scr images.kubeControllerManager);
 
-    "kube-scheduler.json" =
-      podLib.manifestFile "kube-scheduler.json"
-      (podLib.mkSchedulerPod scr images.kubeScheduler);
+    # "kube-scheduler.json" =
+    #   podLib.manifestFile "kube-scheduler.json"
+    #   (podLib.mkSchedulerPod scr images.kubeScheduler);
   };
 in {
   options.blackmatter.components.kubernetes.kubelet.static-pods = {
