@@ -1,8 +1,10 @@
 # modules/kubernetes/services/kubelet/pod-lib.nix
 {pkgs, ...}: rec {
+  # Writes a JSON manifest file from a podSpec
   manifestFile = name: podSpec:
     pkgs.writeText name (builtins.toJSON podSpec);
 
+  # Base Pod constructor
   mkPod = pki: name: args: image: extraOpts:
     {
       apiVersion = "v1";
@@ -33,6 +35,7 @@
     }
     // extraOpts;
 
+  # etcd pod specification
   mkEtcdPod = pki: image:
     mkPod pki "etcd" [
       "etcd"
@@ -47,6 +50,7 @@
     ]
     image {};
 
+  # kube-apiserver pod specification
   mkApiServerPod = pki: svcCIDR: image:
     mkPod pki "kube-apiserver" [
       "kube-apiserver"
@@ -61,6 +65,7 @@
     ]
     image {};
 
+  # kube-controller-manager pod specification
   mkControllerManagerPod = pki: scr: image:
     mkPod pki "kube-controller-manager" [
       "kube-controller-manager"
@@ -71,45 +76,60 @@
       "--service-account-private-key-file=${pki}/ca.key"
     ]
     image {
-      volumes = [
-        {
-          name = "kubeconfig";
-          hostPath = {
-            path = "${scr}/configs/controller-manager/kubeconfig";
-            type = "File";
-          };
-        }
-      ];
-      volumeMounts = [
-        {
-          name = "kubeconfig";
-          mountPath = "${scr}/configs/controller-manager/kubeconfig";
-          readOnly = true;
-        }
-      ];
+      spec = {
+        volumes = [
+          {
+            name = "kubeconfig";
+            hostPath = {
+              path = "${scr}/configs/controller-manager/kubeconfig";
+              type = "File";
+            };
+          }
+        ];
+        containers = [
+          {
+            name = "kube-controller-manager";
+            volumeMounts = [
+              {
+                name = "kubeconfig";
+                mountPath = "${scr}/configs/controller-manager/kubeconfig";
+                readOnly = true;
+              }
+            ];
+          }
+        ];
+      };
     };
 
+  # kube-scheduler pod specification
   mkSchedulerPod = scr: image:
     mkPod "/dev/null" "kube-scheduler" [
       "kube-scheduler"
       "--kubeconfig=${scr}/configs/scheduler/kubeconfig"
     ]
     image {
-      volumes = [
-        {
-          name = "kubeconfig";
-          hostPath = {
-            path = "${scr}/configs/scheduler/kubeconfig";
-            type = "File";
-          };
-        }
-      ];
-      volumeMounts = [
-        {
-          name = "kubeconfig";
-          mountPath = "${scr}/configs/scheduler/kubeconfig";
-          readOnly = true;
-        }
-      ];
+      spec = {
+        volumes = [
+          {
+            name = "kubeconfig";
+            hostPath = {
+              path = "${scr}/configs/scheduler/kubeconfig";
+              type = "File";
+            };
+          }
+        ];
+        containers = [
+          {
+            name = "kube-scheduler";
+            volumeMounts = [
+              {
+                name = "kubeconfig";
+                mountPath = "${scr}/configs/scheduler/kubeconfig";
+                readOnly = true;
+              }
+            ];
+          }
+        ];
+      };
     };
 }
