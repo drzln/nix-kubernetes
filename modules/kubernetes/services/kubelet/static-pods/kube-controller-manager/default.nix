@@ -1,3 +1,4 @@
+# modules/kubernetes/services/kubelet/static-pods/kube-controller-manager/default.nix
 {
   pkgs,
   lib,
@@ -7,9 +8,14 @@
   scr = "/run/secrets/kubernetes";
   podLib = import ../pod-lib.nix {inherit pkgs lib;};
   image = "registry.k8s.io/kube-controller-manager:v1.30.1";
-  manifest =
-    podLib.manifestFile "kube-controller-manager.json"
-    (podLib.mkControllerManagerPod pki scr image {
+in {
+  options.manifest = lib.mkOption {
+    type = lib.types.package;
+    description = "The generated static pod manifest for kube-controller-manager";
+  };
+
+  config.manifest = podLib.manifestFile "kube-controller-manager.json" (
+    podLib.mkControllerManagerPod pki scr image {
       volumes = [
         {
           name = "kubeconfig";
@@ -26,5 +32,6 @@
           readOnly = true;
         }
       ];
-    });
-in {inherit manifest;}
+    }
+  );
+}
