@@ -16,7 +16,7 @@
 in {
   imports = [
     ./etcd
-    ./kube-apiserver
+    # ./kube-apiserver
     # ./kube-scheduler
     # ./kube-controller-manager
   ];
