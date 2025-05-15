@@ -5,7 +5,7 @@
   lib,
   ...
 }: let
-  cfg = config.blackmatter.components.kubernetes.static-pods;
+  cfg = config.blackmatter.components.kubernetes.kubelet.static-pods;
   script = pkgs.writeShellScriptBin "setup-manifests" (builtins.readFile ./setup-manifests.sh);
   podManifests = lib.flatten [
     (import ./etcd {inherit config pkgs lib;}).manifest
@@ -20,7 +20,7 @@ in {
     # ./kube-scheduler
     ./kube-controller-manager
   ];
-  options.blackmatter.components.kubernetes.static-pods.enable =
+  options.blackmatter.components.kubernetes.kubelet.static-pods.enable =
     lib.mkEnableOption "Enable static pods for Kubernetes components";
   config = lib.mkIf cfg.enable {
     systemd.services.static-pods = {
