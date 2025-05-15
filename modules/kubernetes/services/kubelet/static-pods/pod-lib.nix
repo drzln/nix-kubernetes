@@ -50,7 +50,10 @@
   }: {
     apiVersion = "v1";
     kind = "Pod";
-    metadata = {inherit name;};
+    metadata = {
+      inherit name;
+      namespace = "kube-system";
+    };
     spec =
       {
         inherit hostNetwork;
