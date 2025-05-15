@@ -18,7 +18,7 @@ in {
     ./etcd
     ./kube-apiserver
     # ./kube-scheduler
-    ./kube-controller-manager
+    # ./kube-controller-manager
   ];
   options.blackmatter.components.kubernetes.kubelet.static-pods.enable =
     lib.mkEnableOption "Enable static pods for Kubernetes components";
