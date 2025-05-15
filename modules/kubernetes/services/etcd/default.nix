@@ -18,8 +18,8 @@ in {
     enable = lib.mkEnableOption "Enable the etcd service";
     advertiseAddress = lib.mkOption {
       type = lib.types.str;
-      default = "127.0.0.1";
-      description = "IP address etcd advertises to clients/peers (e.g. 127.0.0.1 or host IP)";
+      default = "0.0.0.0";
+      description = "IP address etcd advertises to clients/peers (e.g. 0.0.0.0 or host IP)";
     };
     useTLS = lib.mkOption {
       type = lib.types.bool;
@@ -53,7 +53,7 @@ in {
             "${pkg}/bin/etcd"
             "--name node1"
             "--data-dir /var/lib/etcd"
-            "--listen-client-urls ${scheme}://${cfg.advertiseAddress}:2379,${scheme}://127.0.0.1:2379"
+            "--listen-client-urls ${scheme}://${cfg.advertiseAddress}:2379,${scheme}://0.0.0.0:2379"
             "--advertise-client-urls ${scheme}://${cfg.advertiseAddress}:2379"
             "--listen-peer-urls ${scheme}://${cfg.advertiseAddress}:2380"
             "--initial-advertise-peer-urls ${scheme}://${cfg.advertiseAddress}:2380"
