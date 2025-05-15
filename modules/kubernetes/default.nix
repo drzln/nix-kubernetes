@@ -1,7 +1,7 @@
 {
   lib,
-  config,
-  pkgs,
+  # config,
+  # pkgs,
   ...
 }:
 with lib; let
@@ -16,7 +16,7 @@ with lib; let
 in {
   imports = [
     ./services/containerd
-    ./services/kubelet
+    # ./services/kubelet
     # (service "containerd")
     # (service "kubelet")
     # (service "etcd")
