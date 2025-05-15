@@ -27,7 +27,6 @@ in {
     systemd.services.kubelet = {
       description = "blackmatter.kubelet";
       wantedBy = ["multi-user.target"];
-      after = ["network.target" "containerd.service" "systemd-tmpfiles-setup.service"];
 
       environment.PATH = lib.mkForce (lib.makeBinPath [
         blackmatterPkgs.cilium-cni
@@ -40,7 +39,12 @@ in {
       ]);
 
       serviceConfig = {
-        After = ["kubelet-generate-certs.service"];
+        After = [
+          "network.target"
+          "containerd.service"
+          "systemd-tmpfiles-setup.service"
+          "kubelet-generate-certs.service"
+        ];
         CapabilityBoundingSet = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
         AmbientCapabilities = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
         DeviceAllow = ["/dev/kmsg r"];
