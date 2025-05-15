@@ -48,7 +48,6 @@ in {
       blackmatter.components.kubernetes.services.containerd.enable = true;
       blackmatter.components.kubernetes.services.kubelet = {
         enable = true;
-        staticControlPlane.enable = true;
       };
       blackmatter.components.kubernetes.services.etcd.enable = false;
 
