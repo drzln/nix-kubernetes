@@ -13,6 +13,7 @@ in {
     description = "The generated static pod manifest for etcd";
   };
 
-  config.manifest =
-    podLib.manifestFile "etcd.json" (podLib.mkEtcdPod pki image);
+  config.manifest = podLib.manifestFile "etcd.json" (podLib.mkEtcdPod {
+    inherit pki image;
+  });
 }
