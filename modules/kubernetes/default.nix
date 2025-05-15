@@ -40,7 +40,7 @@ in {
       _module.args.blackmatterPkgs = blackmatterPkgs;
     }
     (mkIf (cfg.role == "single") {
-      blackmatter.components.kubernetes.containerd.enable = false;
+      blackmatter.components.kubernetes.containerd.enable = true;
       # blackmatter.components.kubernetes.kubelet.enable = false;
       # blackmatter.components.kubernetes.services.etcd.enable = false;
 
