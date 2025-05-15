@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
-MANIFESTS_DIR="/etc/kubernetes/manifests"
-mkdir -p "$MANIFESTS_DIR"
+
+manifest_dir="/etc/kubernetes/manifests"
+mkdir -p "$manifest_dir"
+
 for manifest in "$@"; do
-  install -m644 "$manifest" "$MANIFESTS_DIR/"
+  base_name=$(basename "$manifest" | sed 's/^.*-\(.*\)$/\1/') # remove nix hash
+  install -m644 "$manifest" "$manifest_dir/$base_name"
 done
