@@ -8,7 +8,7 @@
 }: let
   cfg = config.blackmatter.components.kubernetes.kubelet;
   scr = "/run/secrets/kubernetes";
-  pkg = blackmatterPkgs.kubelet;
+  pkg = blackmatterPkgs.blackmatter.k8s.kubelet;
 in {
   options.blackmatter.components.kubernetes.kubelet = {
     enable = lib.mkEnableOption "Enable the kubelet systemd service unit";
@@ -29,7 +29,7 @@ in {
       wantedBy = ["multi-user.target"];
 
       environment.PATH = lib.mkForce (lib.makeBinPath [
-        blackmatterPkgs.cilium-cni
+        blackmatterPkgs.blackmatter.k8s.cilium-cni
         pkgs.containerd
         pkgs.util-linux
         pkgs.coreutils
