@@ -17,7 +17,7 @@ in {
   imports = [
     ./etcd
     ./kube-apiserver
-    ./kube-scheduler
+    # ./kube-scheduler
     ./kube-controller-manager
   ];
   options.blackmatter.components.kubernetes.static-pods.enable =
