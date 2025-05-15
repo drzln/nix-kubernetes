@@ -11,5 +11,5 @@
   svcCIDR = cfg.serviceCIDR;
   manifest =
     podLib.manifestFile "kube-apiserver.json"
-    (podLib.mkApiServerPod pki svcCIDR image {});
+    (podLib.mkApiServerPod pki svcCIDR image);
 in {inherit manifest;}
