@@ -89,27 +89,27 @@
       ];
     };
 
-  # mkSchedulerPod = scr: image:
-  #   mkPod "/dev/null" "kube-scheduler" [
-  #     "kube-scheduler"
-  #     "--kubeconfig=${scr}/configs/scheduler/kubeconfig"
-  #   ]
-  #   image {
-  #     volumes = [
-  #       {
-  #         name = "kubeconfig";
-  #         hostPath = {
-  #           path = "${scr}/configs/scheduler/kubeconfig";
-  #           type = "File";
-  #         };
-  #       }
-  #     ];
-  #     volumeMounts = [
-  #       {
-  #         name = "kubeconfig";
-  #         mountPath = "${scr}/configs/scheduler/kubeconfig";
-  #         readOnly = true;
-  #       }
-  #     ];
-  #   };
+  mkSchedulerPod = scr: image:
+    mkPod "/dev/null" "kube-scheduler" [
+      "kube-scheduler"
+      "--kubeconfig=${scr}/configs/scheduler/kubeconfig"
+    ]
+    image {
+      volumes = [
+        {
+          name = "kubeconfig";
+          hostPath = {
+            path = "${scr}/configs/scheduler/kubeconfig";
+            type = "File";
+          };
+        }
+      ];
+      volumeMounts = [
+        {
+          name = "kubeconfig";
+          mountPath = "${scr}/configs/scheduler/kubeconfig";
+          readOnly = true;
+        }
+      ];
+    };
 }
