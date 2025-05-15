@@ -12,7 +12,10 @@ in {
     type = lib.types.package;
     description = "The generated static pod manifest for kube-scheduler";
   };
+
   config.manifest = podLib.manifestFile "kube-scheduler.json" (
-    podLib.mkSchedulerPod scr image
+    podLib.mkSchedulerPod {
+      inherit scr image;
+    }
   );
 }
