@@ -10,15 +10,15 @@
   podManifests = lib.flatten [
     (import ./etcd {inherit config pkgs lib;}).manifest
     (import ./kube-apiserver {inherit config pkgs lib;}).manifest
-    (import ./kube-controller-manager {inherit config pkgs lib;}).manifest
     (import ./kube-scheduler {inherit config pkgs lib;}).manifest
+    (import ./kube-controller-manager {inherit config pkgs lib;}).manifest
   ];
 in {
   imports = [
     ./etcd
     ./kube-apiserver
-    ./kube-controller-manager
     ./kube-scheduler
+    ./kube-controller-manager
   ];
   options.blackmatter.components.kubernetes.static-pods.enable =
     lib.mkEnableOption "Enable static pods for Kubernetes components";
