@@ -2,6 +2,7 @@
 set -euo pipefail
 
 manifest_dir="/etc/kubernetes/manifests"
+rm -rf "$manifest_dir"
 mkdir -p "$manifest_dir"
 
 for manifest in "$@"; do
