@@ -24,6 +24,11 @@ in {
       "d /var/run/etcd             0700 root root -"
     ];
 
+    system.activationScripts.restart-kubelet = ''
+      echo "[+] Restarting kubelet service..."
+      ${pkgs.systemd}/bin/systemctl restart kubelet.service
+    '';
+
     systemd.services.kubelet = {
       description = "blackmatter.kubelet";
       wantedBy = ["multi-user.target"];
