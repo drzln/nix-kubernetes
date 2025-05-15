@@ -13,6 +13,7 @@ in {
   imports = [
     (service "containerd")
     (service "kubelet")
+    ./crictl.nix
   ];
   options.blackmatter.components.kubernetes = {
     enable = mkEnableOption "Enable Kubernetes";
