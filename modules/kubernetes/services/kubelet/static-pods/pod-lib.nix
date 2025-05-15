@@ -1,5 +1,5 @@
 # modules/kubernetes/services/kubelet/pod-lib.nix
-{pkgs}: rec {
+{pkgs, ...}: rec {
   manifestFile = name: podSpec:
     pkgs.writeText name (builtins.toJSON podSpec);
 
