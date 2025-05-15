@@ -1,55 +1,86 @@
 # modules/kubernetes/services/kubelet/pod-lib.nix
-{pkgs, ...}: let
-  mkStaticPodVolumes = pki: extra:
-    [
-      {
-        name = "pki";
-        hostPath.path = pki;
-        hostPath.type = "Directory";
-      }
-      {
-        name = "etcd-data";
-        hostPath.path = "/var/run/etcd";
-        hostPath.type = "DirectoryOrCreate";
-      }
-    ]
-    ++ extra;
+{
+  lib,
+  pkgs,
+}: rec {
+  manifestFile = name: podSpec:
+    pkgs.writeText name (builtins.toJSON podSpec);
 
-  mkStaticPodVolumeMounts = pki: extra:
-    [
-      {
-        name = "pki";
-        mountPath = pki;
-        readOnly = true;
-      }
-      {
-        name = "etcd-data";
-        mountPath = "/var/run/etcd";
-      }
-    ]
-    ++ extra;
-
-  mkPod = pki: name: args: image: extra: {
-    apiVersion = "v1";
-    kind = "Pod";
-    metadata.name = name;
-    spec = {
-      hostNetwork = true;
-      priorityClassName = "system-cluster-critical";
-      volumes = mkStaticPodVolumes pki (extra.volumes or []);
-      containers = [
-        {
-          name = name;
-          image = image;
-          command = args;
-          volumeMounts = mkStaticPodVolumeMounts pki (extra.volumeMounts or []);
+  mkPod = pki: name: args: image: extraOpts:
+    lib.recursiveUpdate {
+      apiVersion = "v1";
+      kind = "Pod";
+      metadata = {inherit name;};
+      spec =
+        lib.recursiveUpdate {
+          containers = [
+            {
+              name = name;
+              image = image;
+              command = args;
+              volumeMounts = [
+                {
+                  name = "pki";
+                  mountPath = pki;
+                  readOnly = true;
+                }
+              ];
+            }
+          ];
+          hostNetwork = true;
+          volumes = [
+            {
+              name = "pki";
+              hostPath.path = pki;
+            }
+          ];
         }
-      ];
+        extraOpts;
     };
-  };
 
-  manifestFile = filename: pod:
-    pkgs.writeText filename (builtins.toJSON pod); # Directly returns the file path derivation
-in {
-  inherit mkPod manifestFile;
+  mkEtcdPod = pki: image:
+    mkPod pki "etcd" [
+      "etcd"
+      "--name=node0"
+      "--data-dir=/var/run/etcd"
+      "--advertise-client-urls=https://127.0.0.1:2379"
+      "--listen-client-urls=https://0.0.0.0:2379"
+      "--client-cert-auth=true"
+      "--trusted-ca-file=${pki}/ca.crt"
+      "--cert-file=${pki}/etcd.crt"
+      "--key-file=${pki}/etcd.key"
+    ]
+    image {};
+
+  mkApiServerPod = pki: svcCIDR: image:
+    mkPod pki "kube-apiserver" [
+      "kube-apiserver"
+      "--advertise-address=127.0.0.1"
+      "--secure-port=6443"
+      "--etcd-servers=https://127.0.0.1:2379"
+      "--client-ca-file=${pki}/ca.crt"
+      "--tls-cert-file=${pki}/apiserver.crt"
+      "--tls-private-key-file=${pki}/apiserver.key"
+      "--service-cluster-ip-range=${svcCIDR}"
+      "--authorization-mode=Node,RBAC"
+    ]
+    image {};
+
+  mkControllerManagerPod = pki: scr: image:
+    mkPod pki "kube-controller-manager" [
+      "kube-controller-manager"
+      "--kubeconfig=${scr}/configs/controller-manager/kubeconfig"
+      "--cluster-signing-cert-file=${pki}/ca.crt"
+      "--cluster-signing-key-file=${pki}/ca.key"
+      "--root-ca-file=${pki}/ca.crt"
+      "--service-account-private-key-file=${pki}/ca.key"
+    ]
+    image {};
+
+  mkSchedulerPod = scr: image:
+    mkPod "/dev/null" "kube-scheduler" [
+      "kube-scheduler"
+      "--kubeconfig=${scr}/configs/scheduler/kubeconfig"
+    ]
+    image {};
 }
