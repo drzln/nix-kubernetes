@@ -101,7 +101,7 @@ in {
       inherit image;
       command = [
         "kube-apiserver"
-        "--advertise-address=127.0.0.1"
+        "--advertise-address=0.0.0.0"
         "--secure-port=6443"
         "--etcd-servers=https://127.0.0.1:2379"
         "--etcd-cafile=${pki}/ca.crt"
