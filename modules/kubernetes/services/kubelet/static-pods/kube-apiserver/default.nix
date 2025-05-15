@@ -13,6 +13,7 @@ in {
     type = lib.types.package;
     description = "The generated static pod manifest for kube-apiserver";
   };
-  config.manifest =
-    podLib.manifestFile "kube-apiserver.json" (podLib.mkApiServerPod pki svcCIDR image);
+  config.manifest = podLib.manifestFile "kube-apiserver.json" (podLib.mkApiServerPod {
+    inherit pki svcCIDR image;
+  });
 }
