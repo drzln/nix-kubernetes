@@ -16,7 +16,7 @@ in {
   };
   config = lib.mkIf cfg.enable {
     blackmatter.components.kubernetes.kubelet.certs.enable = true;
-    blackmatter.components.kubernetes.kubelet.static-pods.enable = false;
+    blackmatter.components.kubernetes.kubelet.static-pods.enable = true;
     blackmatter.components.kubernetes.kubelet.service.enable = false;
   };
 }
