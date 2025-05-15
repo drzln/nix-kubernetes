@@ -3,7 +3,7 @@
   imports = [
     ./options.nix
     ./certs.nix
-    # ./service.nix
-    # ./static-pods.nix
+    ./service.nix
+    ./static-pods.nix
   ];
 }
