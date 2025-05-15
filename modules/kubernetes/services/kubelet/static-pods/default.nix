@@ -23,6 +23,10 @@ in {
   options.blackmatter.components.kubernetes.kubelet.static-pods.enable =
     lib.mkEnableOption "Enable static pods for Kubernetes components";
   config = lib.mkIf cfg.enable {
+    system.activationScripts.restart-static-pods = ''
+      echo "[+] Restarting static-pods service..."
+      ${pkgs.systemd}/bin/systemctl restart static-pods.service
+    '';
     systemd.services.static-pods = {
       description = "Setup static pod manifests";
       before = ["kubelet.service"];
