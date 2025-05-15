@@ -1,29 +1,27 @@
 {
   lib,
-  # config,
-  # pkgs,
+  config,
+  pkgs,
   ...
 }:
 with lib; let
-  # cfg = config.blackmatter.components.kubernetes;
-  # blackmatterPkgs = import ../../pkgs {
-  #   callPackage = pkgs.callPackage;
-  # };
-  # service = name:
-  #   import (./services + "/${name}") {
-  #     inherit lib config pkgs blackmatterPkgs;
-  #   };
+  cfg = config.blackmatter.components.kubernetes;
+
+  # Internal encapsulation of your custom packages via your overlay
+  blackmatterPkgs = import ../../overlays/blackmatter-k8s.nix pkgs pkgs;
+
+  # Simple helper function to import service modules cleanly
+  service = name:
+    import (./services + "/${name}") {
+      inherit lib config pkgs blackmatterPkgs;
+    };
 in {
   imports = [
-    ./services/containerd
-    # ./services/kubelet
-    # (service "containerd")
-    # (service "kubelet")
-    # (service "etcd")
-    # Add others here as you wire them:
-    # (service "kube-apiserver")
-    # (service "cilium-agent")
+    (service "containerd")
+    (service "kubelet")
+    (service "etcd")
   ];
+
   options.blackmatter.components.kubernetes = {
     enable = mkEnableOption "Enable Kubernetes";
     role = mkOption {
@@ -32,30 +30,36 @@ in {
       description = "The role this node will play in the cluster.";
     };
   };
-  # config = mkIf cfg.enable ({
-  #     assertions = [
-  #       {
-  #         assertion = cfg.role != null;
-  #         message = "You must specify a valid Kubernetes role.";
-  #       }
-  #     ];
-  #     environment.systemPackages = [
-  #       blackmatterPkgs.kubectl
-  #       blackmatterPkgs.containerd
-  #       pkgs.runc
-  #       pkgs.cri-tools
-  #     ];
-  #   }
-  #   // mkIf (cfg.role == "single") {
-  #     blackmatter.components.kubernetes.services.containerd.enable = true;
-  #     blackmatter.components.kubernetes.services.kubelet = {
-  #       enable = true;
-  #     };
-  #     blackmatter.components.kubernetes.services.etcd.enable = false;
-  #     systemd.services.kubernetes-single-hint = {
-  #       description = "hint: running in single-node mode";
-  #       wantedBy = ["multi-user.target"];
-  #       serviceConfig.ExecStart = "${pkgs.coreutils}/bin/echo single node mode enabled";
-  #     };
-  #   });
+
+  # Pass internal packages explicitly to modules, fully encapsulated
+  config = mkIf cfg.enable (mkMerge [
+    {
+      assertions = [
+        {
+          assertion = cfg.role != null;
+          message = "You must specify a valid Kubernetes role.";
+        }
+      ];
+
+      environment.systemPackages = [
+        blackmatterPkgs.blackmatter.k8s.kubectl
+        blackmatterPkgs.blackmatter.k8s.containerd
+        pkgs.runc
+        pkgs.cri-tools
+      ];
+    }
+
+    # Node role-specific configuration
+    (mkIf (cfg.role == "single") {
+      blackmatter.components.kubernetes.services.containerd.enable = true;
+      blackmatter.components.kubernetes.services.kubelet.enable = true;
+      blackmatter.components.kubernetes.services.etcd.enable = false;
+
+      systemd.services.kubernetes-single-hint = {
+        description = "Hint: Kubernetes is running in single-node mode";
+        wantedBy = ["multi-user.target"];
+        serviceConfig.ExecStart = "${pkgs.coreutils}/bin/echo 'Single-node mode enabled'";
+      };
+    })
+  ]);
 }
