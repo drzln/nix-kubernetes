@@ -6,11 +6,11 @@
   blackmatterPkgs,
   ...
 }: let
-  cfg = config.blackmatter.components.kubernetes.services.kubelet.service;
+  cfg = config.blackmatter.components.kubernetes.kubelet;
   scr = "/run/secrets/kubernetes";
   pkg = blackmatterPkgs.kubelet;
 in {
-  options.blackmatter.components.kubernetes.services.kubelet.service = {
+  options.blackmatter.components.kubernetes.kubelet = {
     enable = lib.mkEnableOption "Enable the kubelet systemd service unit";
   };
 
