@@ -39,6 +39,7 @@ in {
       ]);
 
       serviceConfig = {
+        Wants = ["kubelet-generate-certs.service"];
         After = [
           "network.target"
           "containerd.service"
