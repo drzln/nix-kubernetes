@@ -46,9 +46,10 @@ in {
         pulumictl
         pulumi-esc
         pulumi-bin
+        pulumiPackages.pulumi-go
         pulumiPackages.pulumi-command
         pulumiPackages.pulumi-aws-native
-        pulumiPackages.pulumi-langauge-go
+        pulumiPackages.pulumi-typescript
       ];
       _module.args.blackmatterPkgs = blackmatterPkgs;
     }
