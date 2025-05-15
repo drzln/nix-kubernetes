@@ -36,7 +36,6 @@ in {
   config = lib.mkIf cfg.enable {
     systemd.services.kubelet-generate-certs = {
       description = "Generate TLS certs and configs for kubelet";
-      wantedBy = ["multi-user.target"];
       serviceConfig = {
         Type = "oneshot";
         ExecStart = "${kubeletCertGen}/bin/generate-certs.sh";
