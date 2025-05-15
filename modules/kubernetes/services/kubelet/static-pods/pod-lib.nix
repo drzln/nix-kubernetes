@@ -1,41 +1,35 @@
 # modules/kubernetes/services/kubelet/pod-lib.nix
-{
-  lib,
-  pkgs,
-}: rec {
+{pkgs}: rec {
   manifestFile = name: podSpec:
     pkgs.writeText name (builtins.toJSON podSpec);
 
-  mkPod = pki: name: args: image: extraOpts:
-    lib.recursiveUpdate {
-      apiVersion = "v1";
-      kind = "Pod";
-      metadata = {inherit name;};
-      spec =
-        lib.recursiveUpdate {
-          containers = [
-            {
-              inherit name image;
-              command = args;
-              volumeMounts = [
-                {
-                  name = "pki";
-                  mountPath = pki;
-                  readOnly = true;
-                }
-              ];
-            }
-          ];
-          hostNetwork = true;
-          volumes = [
+  mkPod = pki: name: args: image: {
+    apiVersion = "v1";
+    kind = "Pod";
+    metadata = {inherit name;};
+    spec = {
+      containers = [
+        {
+          inherit name image;
+          command = args;
+          volumeMounts = [
             {
               name = "pki";
-              hostPath.path = pki;
+              mountPath = pki;
+              readOnly = true;
             }
           ];
         }
-        extraOpts;
+      ];
+      hostNetwork = true;
+      volumes = [
+        {
+          name = "pki";
+          hostPath.path = pki;
+        }
+      ];
     };
+  };
 
   mkEtcdPod = pki: image:
     mkPod pki "etcd" [
@@ -49,7 +43,7 @@
       "--cert-file=${pki}/etcd.crt"
       "--key-file=${pki}/etcd.key"
     ]
-    image {};
+    image;
 
   # mkApiServerPod = pki: svcCIDR: image:
   #   mkPod pki "kube-apiserver" [
