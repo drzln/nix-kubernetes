@@ -49,7 +49,7 @@ in {
         pulumiPackages.pulumi-go
         pulumiPackages.pulumi-command
         pulumiPackages.pulumi-aws-native
-        pulumiPackages.pulumi-typescript
+        pulumiPackages.pulumi-python
       ];
       _module.args.blackmatterPkgs = blackmatterPkgs;
     }
