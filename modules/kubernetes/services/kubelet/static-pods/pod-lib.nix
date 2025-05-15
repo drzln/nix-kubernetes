@@ -1,139 +1,170 @@
 # modules/kubernetes/services/kubelet/pod-lib.nix
-{pkgs, ...}: rec {
-  # Writes a JSON manifest file from a podSpec
+{pkgs, ...}: let
+  # Create JSON manifest file from podSpec
   manifestFile = name: podSpec:
     pkgs.writeText name (builtins.toJSON podSpec);
 
-  # Base Pod constructor
-  mkPod = pki: name: args: image: extraOpts:
-    {
-      apiVersion = "v1";
-      kind = "Pod";
-      metadata = {inherit name;};
-      spec = {
-        containers = [
-          {
-            inherit name image;
-            command = args;
-            volumeMounts = [
-              {
-                name = "pki";
-                mountPath = pki;
-                readOnly = true;
-              }
-            ];
-          }
-        ];
-        hostNetwork = true;
-        volumes = [
-          {
-            name = "pki";
-            hostPath.path = pki;
-            hostPath.type = "DirectoryOrCreate";
-          }
-        ];
-      };
-    }
-    // extraOpts;
-
-  # etcd pod specification
-  mkEtcdPod = pki: image:
-    mkPod pki "etcd" [
-      "etcd"
-      "--name=node0"
-      "--data-dir=/var/run/etcd"
-      "--advertise-client-urls=https://127.0.0.1:2379"
-      "--listen-client-urls=https://0.0.0.0:2379"
-      "--client-cert-auth=true"
-      "--trusted-ca-file=${pki}/ca.crt"
-      "--cert-file=${pki}/etcd.crt"
-      "--key-file=${pki}/etcd.key"
-    ]
-    image {};
-
-  # kube-apiserver pod specification
-  mkApiServerPod = pki: svcCIDR: image:
-    mkPod pki "kube-apiserver" [
-      "kube-apiserver"
-      "--advertise-address=127.0.0.1"
-      "--secure-port=6443"
-      "--etcd-servers=https://127.0.0.1:2379"
-      "--client-ca-file=${pki}/ca.crt"
-      "--tls-cert-file=${pki}/apiserver.crt"
-      "--tls-private-key-file=${pki}/apiserver.key"
-      "--service-account-issuer=https://kubernetes.default.svc.cluster.local"
-      "--service-account-signing-key-file=${pki}/sa.key"
-      "--service-account-key-file=${pki}/sa.pub"
-      "--service-cluster-ip-range=${svcCIDR}"
-      "--authorization-mode=Node,RBAC"
-    ]
-    image {};
-
-  # kube-controller-manager pod specification
-  mkControllerManagerPod = pki: scr: image:
-    mkPod pki "kube-controller-manager" [
-      "kube-controller-manager"
-      "--kubeconfig=${scr}/configs/controller-manager/kubeconfig"
-      "--cluster-signing-cert-file=${pki}/ca.crt"
-      "--cluster-signing-key-file=${pki}/ca.key"
-      "--root-ca-file=${pki}/ca.crt"
-      "--service-account-private-key-file=${pki}/ca.key"
-    ]
-    image {
-      spec = {
-        volumes = [
-          {
-            name = "kubeconfig";
-            hostPath = {
-              path = "${scr}/configs/controller-manager/kubeconfig";
-              type = "File";
-            };
-          }
-        ];
-        containers = [
-          {
-            name = "kube-controller-manager";
-            volumeMounts = [
-              {
-                name = "kubeconfig";
-                mountPath = "${scr}/configs/controller-manager/kubeconfig";
-                readOnly = true;
-              }
-            ];
-          }
-        ];
+  # Common base volume definitions
+  volumes = {
+    pki = pkiPath: {
+      name = "pki";
+      hostPath = {
+        path = pkiPath;
+        type = "DirectoryOrCreate";
       };
     };
 
-  # kube-scheduler pod specification
-  mkSchedulerPod = scr: image:
-    mkPod "/dev/null" "kube-scheduler" [
-      "kube-scheduler"
-      "--kubeconfig=${scr}/configs/scheduler/kubeconfig"
-    ]
-    image {
-      spec = {
-        volumes = [
-          {
-            name = "kubeconfig";
-            hostPath = {
-              path = "${scr}/configs/scheduler/kubeconfig";
-              type = "File";
-            };
-          }
-        ];
+    kubeconfig = kubeconfigPath: {
+      name = "kubeconfig";
+      hostPath = {
+        path = kubeconfigPath;
+        type = "File";
+      };
+    };
+  };
+
+  # Common container volume mount definitions
+  volumeMounts = {
+    pki = mountPath: {
+      name = "pki";
+      mountPath = mountPath;
+      readOnly = true;
+    };
+
+    kubeconfig = mountPath: {
+      name = "kubeconfig";
+      mountPath = mountPath;
+      readOnly = true;
+    };
+  };
+
+  # Base Pod constructor
+  mkPod = {
+    name,
+    image,
+    command,
+    podVolumes ? [],
+    containerVolumeMounts ? [],
+    hostNetwork ? true,
+    extraOpts ? {},
+  }: {
+    apiVersion = "v1";
+    kind = "Pod";
+    metadata = {inherit name;};
+    spec =
+      {
+        inherit hostNetwork;
         containers = [
           {
-            name = "kube-scheduler";
-            volumeMounts = [
-              {
-                name = "kubeconfig";
-                mountPath = "${scr}/configs/scheduler/kubeconfig";
-                readOnly = true;
-              }
-            ];
+            inherit name image command;
+            volumeMounts = containerVolumeMounts;
           }
         ];
-      };
+        volumes = podVolumes;
+      }
+      // extraOpts;
+  };
+in {
+  inherit manifestFile;
+
+  # ETCD pod specification
+  mkEtcdPod = {
+    pki,
+    image,
+  }:
+    mkPod {
+      name = "etcd";
+      inherit image;
+      command = [
+        "etcd"
+        "--name=node0"
+        "--data-dir=/var/run/etcd"
+        "--advertise-client-urls=https://127.0.0.1:2379"
+        "--listen-client-urls=https://0.0.0.0:2379"
+        "--client-cert-auth=true"
+        "--trusted-ca-file=${pki}/ca.crt"
+        "--cert-file=${pki}/etcd.crt"
+        "--key-file=${pki}/etcd.key"
+      ];
+      podVolumes = [(volumes.pki pki)];
+      containerVolumeMounts = [(volumeMounts.pki pki)];
+    };
+
+  # kube-apiserver pod specification
+  mkApiServerPod = {
+    pki,
+    svcCIDR,
+    image,
+  }:
+    mkPod {
+      name = "kube-apiserver";
+      inherit image;
+      command = [
+        "kube-apiserver"
+        "--advertise-address=127.0.0.1"
+        "--secure-port=6443"
+        "--etcd-servers=https://127.0.0.1:2379"
+        "--etcd-cafile=${pki}/ca.crt"
+        "--etcd-certfile=${pki}/apiserver.crt"
+        "--etcd-keyfile=${pki}/apiserver.key"
+        "--client-ca-file=${pki}/ca.crt"
+        "--tls-cert-file=${pki}/apiserver.crt"
+        "--tls-private-key-file=${pki}/apiserver.key"
+        "--service-account-issuer=https://kubernetes.default.svc.cluster.local"
+        "--service-account-signing-key-file=${pki}/sa.key"
+        "--service-account-key-file=${pki}/sa.pub"
+        "--service-cluster-ip-range=${svcCIDR}"
+        "--authorization-mode=Node,RBAC"
+      ];
+      podVolumes = [(volumes.pki pki)];
+      containerVolumeMounts = [(volumeMounts.pki pki)];
+    };
+
+  # kube-controller-manager pod specification
+  mkControllerManagerPod = {
+    pki,
+    scr,
+    image,
+  }:
+    mkPod {
+      name = "kube-controller-manager";
+      inherit image;
+      command = [
+        "kube-controller-manager"
+        "--kubeconfig=${scr}/configs/controller-manager/kubeconfig"
+        "--cluster-signing-cert-file=${pki}/ca.crt"
+        "--cluster-signing-key-file=${pki}/ca.key"
+        "--root-ca-file=${pki}/ca.crt"
+        "--service-account-private-key-file=${pki}/ca.key"
+      ];
+      podVolumes = [
+        (volumes.pki pki)
+        (volumes.kubeconfig "${scr}/configs/controller-manager/kubeconfig")
+      ];
+      containerVolumeMounts = [
+        (volumeMounts.pki pki)
+        (volumeMounts.kubeconfig "${scr}/configs/controller-manager/kubeconfig")
+      ];
+    };
+
+  # kube-scheduler pod specification
+  mkSchedulerPod = {
+    scr,
+    image,
+  }:
+    mkPod {
+      name = "kube-scheduler";
+      inherit image;
+      command = [
+        "kube-scheduler"
+        "--kubeconfig=${scr}/configs/scheduler/kubeconfig"
+      ];
+      hostNetwork = true;
+      podVolumes = [
+        (volumes.kubeconfig "${scr}/configs/scheduler/kubeconfig")
+      ];
+      containerVolumeMounts = [
+        (volumeMounts.kubeconfig "${scr}/configs/scheduler/kubeconfig")
+      ];
     };
 }
