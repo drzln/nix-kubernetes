@@ -2,8 +2,8 @@
 {...}: {
   imports = [
     ./options.nix
-    ./certs.nix
-    ./service.nix
+    # ./certs.nix
+    # ./service.nix
     # ./static-pods.nix
   ];
 }
