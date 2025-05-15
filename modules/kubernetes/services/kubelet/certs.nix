@@ -41,5 +41,9 @@ in {
         ExecStart = "${kubeletCertGen}/bin/generate-certs.sh";
       };
     };
+    system.activationScripts.restart-kubelet-certs = ''
+      echo "[+] Restarting kubelet-generate-certs service..."
+      ${pkgs.systemd}/bin/systemctl restart kubelet-generate-certs.service
+    '';
   };
 }
