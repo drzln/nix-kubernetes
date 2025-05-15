@@ -62,7 +62,8 @@
       "--tls-cert-file=${pki}/apiserver.crt"
       "--tls-private-key-file=${pki}/apiserver.key"
       "--service-account-issuer=https://kubernetes.default.svc.cluster.local"
-      "--service-account-signing-key-file=${pki}/ca.key"
+      "--service-account-signing-key-file=${pki}/sa.key"
+      "--service-account-key-file=${pki}/sa.pub"
       "--service-cluster-ip-range=${svcCIDR}"
       "--authorization-mode=Node,RBAC"
     ]
