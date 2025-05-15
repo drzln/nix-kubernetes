@@ -39,12 +39,16 @@ in {
       ]);
 
       serviceConfig = {
-        Wants = ["kubelet-generate-certs.service"];
+        Wants = [
+          "kubelet-generate-certs.service"
+          "static-pods.service"
+        ];
         After = [
           "network.target"
           "containerd.service"
           "systemd-tmpfiles-setup.service"
           "kubelet-generate-certs.service"
+          "static-pods.service"
         ];
         CapabilityBoundingSet = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
         AmbientCapabilities = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
