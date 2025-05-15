@@ -150,6 +150,7 @@ in {
   # kube-scheduler pod specification
   mkSchedulerPod = {
     scr,
+    pki,
     image,
   }:
     mkPod {
@@ -159,11 +160,12 @@ in {
         "kube-scheduler"
         "--kubeconfig=${scr}/configs/scheduler/kubeconfig"
       ];
-      hostNetwork = true;
       podVolumes = [
+        (volumes.pki pki)
         (volumes.kubeconfig "${scr}/configs/scheduler/kubeconfig")
       ];
       containerVolumeMounts = [
+        (volumeMounts.pki pki)
         (volumeMounts.kubeconfig "${scr}/configs/scheduler/kubeconfig")
       ];
     };

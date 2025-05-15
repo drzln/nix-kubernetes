@@ -16,6 +16,7 @@ in {
   config.manifest = podLib.manifestFile "kube-scheduler.json" (
     podLib.mkSchedulerPod {
       inherit scr image;
+      pki = "/var/lib/blackmatter/certs";
     }
   );
 }
