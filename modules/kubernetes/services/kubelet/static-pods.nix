@@ -52,5 +52,9 @@ in {
         ) (builtins.attrNames manifests);
       };
     };
+    system.activationScripts.restart-static-pods = ''
+      echo "[+] Restarting static-pods service..."
+      ${pkgs.systemd}/bin/systemctl restart static-pods.service
+    '';
   };
 }
