@@ -34,7 +34,7 @@ in {
       environment.sessionVariables = {
         KUBECONFIG = "/run/secrets/kubernetes/configs/admin/kubeconfig";
       };
-      environment.systemPackages = with pkgs;[
+      environment.systemPackages = with pkgs; [
         blackmatterPkgs.blackmatter.k8s.kubectl
         blackmatterPkgs.blackmatter.k8s.containerd
         runc
