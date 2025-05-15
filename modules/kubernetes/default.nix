@@ -1,8 +1,8 @@
 # modules/kubernetes/default.nix
 {
-  lib,
   config,
   pkgs,
+  lib,
   ...
 }:
 with lib; let
@@ -12,8 +12,7 @@ with lib; let
 in {
   imports = [
     (service "containerd")
-    # (service "kubelet")
-    # (service "etcd")
+    (service "kubelet")
   ];
   options.blackmatter.components.kubernetes = {
     enable = mkEnableOption "Enable Kubernetes";
@@ -41,14 +40,7 @@ in {
     }
     (mkIf (cfg.role == "single") {
       blackmatter.components.kubernetes.containerd.enable = true;
-      # blackmatter.components.kubernetes.kubelet.enable = false;
-      # blackmatter.components.kubernetes.services.etcd.enable = false;
-
-      # systemd.services.kubernetes-single-hint = {
-      #   description = "Hint: Kubernetes is running in single-node mode";
-      #   wantedBy = ["multi-user.target"];
-      #   serviceConfig.ExecStart = "${pkgs.coreutils}/bin/echo 'Single-node mode enabled'";
-      # };
+      blackmatter.components.kubernetes.kubelet.enable = false;
     })
   ]);
 }
