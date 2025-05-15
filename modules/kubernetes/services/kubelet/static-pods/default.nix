@@ -6,23 +6,25 @@
   ...
 }: let
   cfg = config.blackmatter.components.kubernetes.kubelet.static-pods;
-  pki = "/var/lib/blackmatter/certs";
+  # pki = "/var/lib/blackmatter/certs";
   # scr = "/run/secrets/kubernetes";
   # svcCIDR = cfg.serviceCIDR;
   # version = cfg.kubernetesVersion;
 
-  images = {
-    etcd = "quay.io/coreos/etcd:v3.5.9";
-    # kubeApiserver = "registry.k8s.io/kube-apiserver:${version}";
-    # kubeControllerManager = "registry.k8s.io/kube-controller-manager:${version}";
-    # kubeScheduler = "registry.k8s.io/kube-scheduler:${version}";
-  };
+  # images = {
+  #   etcd = "quay.io/coreos/etcd:v3.5.9";
+  #   # kubeApiserver = "registry.k8s.io/kube-apiserver:${version}";
+  #   # kubeControllerManager = "registry.k8s.io/kube-controller-manager:${version}";
+  #   # kubeScheduler = "registry.k8s.io/kube-scheduler:${version}";
+  # };
 
   podLib = import ./pod-lib.nix {inherit lib pkgs;};
   manifests = {
     "etcd.json" =
       podLib.manifestFile "etcd.json"
-      (podLib.mkEtcdPod pki images.etcd);
+      {};
+    # podLib.manifestFile "etcd.json"
+    # (podLib.mkEtcdPod pki images.etcd);
 
     # "kube-apiserver.json" =
     #   podLib.manifestFile "kube-apiserver.json"
