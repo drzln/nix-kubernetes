@@ -1,5 +1,5 @@
 # modules/kubernetes/services/kubelet/pod-lib.nix
-{...}: let
+{pkgs, ...}: let
   mkStaticPodVolumes = pki: extra:
     [
       {
@@ -28,6 +28,7 @@
       }
     ]
     ++ extra;
+
   mkPod = pki: name: args: image: extra: {
     apiVersion = "v1";
     kind = "Pod";
@@ -46,9 +47,9 @@
       ];
     };
   };
-  manifestFile = filename: pod: {
-    environment.etc."kubernetes/manifests/${filename}".text = builtins.toJSON pod;
-  };
+
+  manifestFile = filename: pod:
+    pkgs.writeText filename (builtins.toJSON pod); # Directly returns the file path derivation
 in {
   inherit mkPod manifestFile;
 }
