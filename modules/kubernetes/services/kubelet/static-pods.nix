@@ -4,7 +4,7 @@
   lib,
   ...
 }: let
-  cfg = config.blackmatter.components.kubernetes.services.kubelet.staticControlPlane;
+  cfg = config.blackmatter.components.kubernetes.kubelet.static-pods;
   scr = "/run/secrets/kubernetes";
   pki = "/var/lib/blackmatter/certs";
   svcCIDR = cfg.serviceCIDR;
@@ -17,7 +17,7 @@
   };
   podLib = import ./pod-lib.nix {inherit lib;};
 in {
-  options.blackmatter.components.kubernetes.services.kubelet.staticControlPlane = {
+  options.blackmatter.components.kubernetes.kubelet.static-pods = {
     enable = lib.mkEnableOption "Generate static pod manifests for etcd and control plane components";
     kubernetesVersion = lib.mkOption {
       type = lib.types.str;
