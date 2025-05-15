@@ -34,6 +34,21 @@
     # "kube-scheduler.json" = podLib.manifestFile "kube-scheduler.json"
     #   (podLib.mkSchedulerPod scr images.kubeScheduler);
   };
+
+  manifestsDir = "/etc/kubernetes/manifests";
+
+  copyCmds = lib.concatStringsSep "\n" (
+    lib.mapAttrsToList (
+      file: derivation: "${pkgs.coreutils}/bin/install -m644 ${derivation} ${manifestsDir}/${file}"
+    )
+    manifests
+  );
+
+  # Write the commands to a script file to handle quoting reliably
+  setupScript = pkgs.writeShellScript "setup-static-pods.sh" ''
+    ${pkgs.coreutils}/bin/mkdir -p ${manifestsDir}
+    ${copyCmds}
+  '';
 in {
   options.blackmatter.components.kubernetes.kubelet.static-pods = {
     enable = lib.mkEnableOption "Generate static pod manifests for kubelet";
@@ -58,21 +73,7 @@ in {
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-
-        ExecStart = let
-          manifestsDir = "/etc/kubernetes/manifests";
-          copyCmds = lib.concatStringsSep "\n" (
-            lib.mapAttrsToList (
-              file: derivation: "${pkgs.coreutils}/bin/install -m644 ${derivation} ${manifestsDir}/${file}"
-            )
-            manifests
-          );
-        in ''
-          ${pkgs.runtimeShell} -c '
-            ${pkgs.coreutils}/bin/mkdir -p ${manifestsDir}
-            ${copyCmds}
-          '
-        '';
+        ExecStart = "${setupScript}";
       };
     };
   };
