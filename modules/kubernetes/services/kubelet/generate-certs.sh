@@ -1,15 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+# Cleanup old certs
 rm -rf /var/lib/kubelet/pki/*
 rm -rf /var/lib/kubelet/*.crt
 rm -rf /var/lib/kubelet/*.key
 rm -rf /var/lib/kubelet/cache/*
+
+# Cert output directory
 OUTDIR="/var/lib/blackmatter/certs"
 rm -rf "$OUTDIR"
 mkdir -p "$OUTDIR"
+
 NODE_IP="$(ip route get 1 | awk '{print $(NF-2); exit}')"
 NODE_HOST="$(hostname -s)"
+
 echo "[+] Generating SAN config with IP=${NODE_IP}, Hostname=${NODE_HOST}"
+
 cat >"$OUTDIR/san.cnf" <<EOF
 [ req ]
 default_bits = 2048
@@ -66,6 +73,12 @@ generate_cert() {
     -extfile "$OUTDIR/san.cnf" -extensions v3_req
 }
 
+generate_service_account_key() {
+  echo "[+] Generating Service Account signing key"
+  openssl genrsa -out "$OUTDIR/sa.key" 2048
+  openssl rsa -in "$OUTDIR/sa.key" -pubout -out "$OUTDIR/sa.pub"
+}
+
 main() {
   generate_cert apiserver "kube-apiserver" "kubernetes"
   generate_cert kubelet "system:node:${NODE_HOST}" "system:nodes"
@@ -73,9 +86,14 @@ main() {
   generate_cert admin "admin" "system:masters"
   generate_cert controller-manager "system:kube-controller-manager" "system:masters"
   generate_cert scheduler "system:kube-scheduler" "system:masters"
-  chmod 644 /var/lib/blackmatter/certs/*.crt
+
+  generate_service_account_key
+
+  chmod 644 /var/lib/blackmatter/certs/*.crt /var/lib/blackmatter/certs/*.pub
   chmod 600 /var/lib/blackmatter/certs/*.key
   chown root:root /var/lib/blackmatter/certs/*
+
   echo "[✓] Cert generation complete. Output written to: $OUTDIR"
 }
+
 main
