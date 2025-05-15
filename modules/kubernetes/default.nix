@@ -34,11 +34,14 @@ in {
       environment.sessionVariables = {
         KUBECONFIG = "/run/secrets/kubernetes/configs/admin/kubeconfig";
       };
-      environment.systemPackages = [
+      environment.systemPackages = with pkgs;[
         blackmatterPkgs.blackmatter.k8s.kubectl
         blackmatterPkgs.blackmatter.k8s.containerd
-        pkgs.runc
-        pkgs.cri-tools
+        runc
+        cri-tools
+        go
+        delve
+        gopls
       ];
       _module.args.blackmatterPkgs = blackmatterPkgs;
     }
