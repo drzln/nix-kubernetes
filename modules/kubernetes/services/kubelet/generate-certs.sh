@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
+rm -rf /var/lib/kubelet/pki/*
+rm -rf /var/lib/kubelet/*.crt
+rm -rf /var/lib/kubelet/*.key
+rm -rf /var/lib/kubelet/cache/*
 OUTDIR="/var/lib/blackmatter/certs"
 rm -rf "$OUTDIR"
 mkdir -p "$OUTDIR"
@@ -51,25 +55,27 @@ generate_cert() {
   local name="$1"
   local cn="$2"
   local org="$3"
-
   echo "[+] Generating cert for $name (CN=$cn, O=$org)"
-
   openssl genrsa -out "$OUTDIR/${name}.key" 2048
   openssl req -new -key "$OUTDIR/${name}.key" \
     -subj "/CN=${cn}/O=${org}" \
     -out "$OUTDIR/${name}.csr"
-
   openssl x509 -req -in "$OUTDIR/${name}.csr" \
     -CA "$OUTDIR/ca.crt" -CAkey "$OUTDIR/ca.key" -CAcreateserial \
     -out "$OUTDIR/${name}.crt" -days 365 \
     -extfile "$OUTDIR/san.cnf" -extensions v3_req
 }
 
-generate_cert apiserver "kube-apiserver" "kubernetes"
-generate_cert kubelet "system:node:${NODE_HOST}" "system:nodes"
-generate_cert etcd "etcd" "kubernetes"
-generate_cert admin "admin" "system:masters"
-generate_cert controller-manager "system:kube-controller-manager" "system:masters"
-generate_cert scheduler "system:kube-scheduler" "system:masters"
-
-echo "[✓] Cert generation complete. Output written to: $OUTDIR"
+main() {
+  generate_cert apiserver "kube-apiserver" "kubernetes"
+  generate_cert kubelet "system:node:${NODE_HOST}" "system:nodes"
+  generate_cert etcd "etcd" "kubernetes"
+  generate_cert admin "admin" "system:masters"
+  generate_cert controller-manager "system:kube-controller-manager" "system:masters"
+  generate_cert scheduler "system:kube-scheduler" "system:masters"
+  chmod 644 /var/lib/blackmatter/certs/*.crt
+  chmod 600 /var/lib/blackmatter/certs/*.key
+  chown root:root /var/lib/blackmatter/certs/*
+  echo "[✓] Cert generation complete. Output written to: $OUTDIR"
+}
+main
