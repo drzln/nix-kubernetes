@@ -11,11 +11,8 @@ with lib; let
   # Internal encapsulation of your custom packages via your overlay
   blackmatterPkgs = import ../../overlays/blackmatter-k8s.nix pkgs pkgs;
 
-  # Simple helper function to import service modules cleanly
-  service = name:
-    import (./services + "/${name}") {
-      inherit lib config pkgs blackmatterPkgs;
-    };
+  # Helper function now simplified (no need to explicitly pass args here)
+  service = name: ./services + "/${name}";
 in {
   imports = [
     (service "containerd")
@@ -32,7 +29,7 @@ in {
     };
   };
 
-  # Pass internal packages explicitly to modules, fully encapsulated
+  # Pass internal packages explicitly down to all imported modules
   config = mkIf cfg.enable (mkMerge [
     {
       assertions = [
@@ -48,6 +45,9 @@ in {
         pkgs.runc
         pkgs.cri-tools
       ];
+
+      # Explicitly expose blackmatterPkgs internally via _module.args
+      _module.args.blackmatterPkgs = blackmatterPkgs;
     }
 
     # Node role-specific configuration
