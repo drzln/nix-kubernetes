@@ -15,8 +15,7 @@
         lib.recursiveUpdate {
           containers = [
             {
-              name = name;
-              image = image;
+              inherit name image;
               command = args;
               volumeMounts = [
                 {
@@ -75,12 +74,46 @@
       "--root-ca-file=${pki}/ca.crt"
       "--service-account-private-key-file=${pki}/ca.key"
     ]
-    image {};
+    image {
+      volumes = [
+        {
+          name = "kubeconfig";
+          hostPath = {
+            path = "${scr}/configs/controller-manager/kubeconfig";
+            type = "File";
+          };
+        }
+      ];
+      volumeMounts = [
+        {
+          name = "kubeconfig";
+          mountPath = "${scr}/configs/controller-manager/kubeconfig";
+          readOnly = true;
+        }
+      ];
+    };
 
   mkSchedulerPod = scr: image:
     mkPod "/dev/null" "kube-scheduler" [
       "kube-scheduler"
       "--kubeconfig=${scr}/configs/scheduler/kubeconfig"
     ]
-    image {};
+    image {
+      volumes = [
+        {
+          name = "kubeconfig";
+          hostPath = {
+            path = "${scr}/configs/scheduler/kubeconfig";
+            type = "File";
+          };
+        }
+      ];
+      volumeMounts = [
+        {
+          name = "kubeconfig";
+          mountPath = "${scr}/configs/scheduler/kubeconfig";
+          readOnly = true;
+        }
+      ];
+    };
 }
