@@ -13,25 +13,7 @@ in {
     type = lib.types.package;
     description = "The generated static pod manifest for kube-controller-manager";
   };
-
   config.manifest = podLib.manifestFile "kube-controller-manager.json" (
-    podLib.mkControllerManagerPod pki scr image {
-      volumes = [
-        {
-          name = "kubeconfig";
-          hostPath = {
-            path = "${scr}/configs/controller-manager/kubeconfig";
-            type = "File";
-          };
-        }
-      ];
-      volumeMounts = [
-        {
-          name = "kubeconfig";
-          mountPath = "${scr}/configs/controller-manager/kubeconfig";
-          readOnly = true;
-        }
-      ];
-    }
+    podLib.mkControllerManagerPod pki scr image
   );
 }
