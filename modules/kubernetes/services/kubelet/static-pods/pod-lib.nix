@@ -103,7 +103,7 @@ in {
         "kube-apiserver"
         "--advertise-address=0.0.0.0"
         "--secure-port=6443"
-        "--etcd-servers=https://0.0.0.0:2379"
+        "--etcd-servers=https://127.0.0.1:2379"
         "--etcd-cafile=${pki}/ca.crt"
         "--etcd-certfile=${pki}/apiserver.crt"
         "--etcd-keyfile=${pki}/apiserver.key"
