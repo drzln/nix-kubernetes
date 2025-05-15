@@ -80,7 +80,7 @@ in {
         "--name=node0"
         "--data-dir=/var/run/etcd"
         "--advertise-client-urls=https://0.0.0.0:2379"
-        "--listen-client-urls=https://0.0.0.0:2379"
+        "--listen-client-urls=https://127.0.0.1:2379"
         "--client-cert-auth=true"
         "--trusted-ca-file=${pki}/ca.crt"
         "--cert-file=${pki}/etcd.crt"
