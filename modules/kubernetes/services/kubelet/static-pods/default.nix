@@ -1,4 +1,4 @@
-# modules/kubernetes/services/kubelet/static-pods.nix
+# modules/kubernetes/services/kubelet/static-pods/default.nix
 {
   config,
   pkgs,
@@ -6,8 +6,8 @@
   ...
 }: let
   cfg = config.blackmatter.components.kubernetes.kubelet.static-pods;
-  # scr = "/run/secrets/kubernetes";
   pki = "/var/lib/blackmatter/certs";
+  # scr = "/run/secrets/kubernetes";
   # svcCIDR = cfg.serviceCIDR;
   # version = cfg.kubernetesVersion;
 

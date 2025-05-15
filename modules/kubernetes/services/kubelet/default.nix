@@ -9,7 +9,7 @@ in {
   imports = [
     ./certs.nix
     ./service.nix
-    ./static-pods.nix
+    ./static-pods
   ];
   options.blackmatter.components.kubernetes.kubelet = {
     enable = lib.mkEnableOption "Run the kubelet service";
