@@ -66,9 +66,7 @@ in {
           manifestsDir = "/etc/kubernetes/manifests";
           copyCmds = lib.concatStringsSep "\n" (
             lib.mapAttrsToList (
-              file: drv:
-              # Correctly use the derivation directly instead of JSON conversion
-              "${pkgs.coreutils}/bin/install -m644 ${drv} ${manifestsDir}/${file}"
+              file: derivation: "${pkgs.coreutils}/bin/install -m644 ${toString derivation} ${manifestsDir}/${file}"
             )
             manifests
           );
