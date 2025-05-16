@@ -7,8 +7,8 @@
   ...
 }: let
   cfg = config.blackmatter.components.kubernetes.kubelet.service;
-  scr = "/run/secrets/kubernetes";
   pkg = blackmatterPkgs.blackmatter.k8s.kubelet;
+  scr = "/run/secrets/kubernetes";
 in
   lib.mkIf cfg.enable {
     environment.systemPackages = [pkg];
