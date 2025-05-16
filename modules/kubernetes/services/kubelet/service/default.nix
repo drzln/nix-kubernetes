@@ -2,8 +2,8 @@
 {...}: {
   imports = [
     ./config.nix
-    ./tmpfiles.nix
     ./service.nix
+    ./tmpfiles.nix
     ./activation.nix
   ];
 }
