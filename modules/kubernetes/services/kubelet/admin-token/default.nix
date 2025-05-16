@@ -13,6 +13,7 @@
       echo "[✓] Admin token already exists. Skipping generation."
       exit 0
     fi
+    export KUBECONFIG=/run/secrets/kubernetes/configs/admin/kubeconfig
     echo "[+] Creating Kubernetes service account 'admin'..."
     ${pkgs.kubernetes}/bin/kubectl apply -f - <<EOF
     apiVersion: v1
