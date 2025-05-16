@@ -8,8 +8,8 @@
 in {
   imports = [
     ./certs.nix
-    ./service.nix
     ./static-pods
+    ./service
     ./cleanup
     # ./admin-token
   ];
