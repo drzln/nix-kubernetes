@@ -22,6 +22,13 @@
             - --enable-ipv6=false
             - --kube-proxy-replacement=strict
           securityContext:
+            sysctls:
+              - name: net.ipv4.conf.all.forwarding
+                value: "1"
+              - name: net.ipv4.conf.default.rp_filter
+                value: "0"
+              - name: net.ipv4.conf.all.send_redirects
+                value: "0"
             capabilities:
               add:
                 - NET_ADMIN
