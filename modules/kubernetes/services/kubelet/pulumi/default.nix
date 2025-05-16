@@ -45,7 +45,7 @@ in {
       wantedBy = ["multi-user.target"];
       after = [
         "kubelet.service"
-        "static-pods.service"
+        "static-assets.service"
         "network-online.target"
       ];
       wants = ["kubelet.service" "network-online.target"];
