@@ -21,12 +21,14 @@ in {
     ./kube-apiserver
     ./kube-scheduler
     ./kube-controller-manager
+    ./cilium
   ];
 
   options.blackmatter.components.kubernetes.kubelet.static-pods.enable =
     lib.mkEnableOption "Enable static pods for Kubernetes components";
 
   config = lib.mkIf cfg.enable {
+    blackmatter.components.kubernetes.kubelet.static-pods.cilium.enable = true;
     system.activationScripts.restart-static-pods = ''
       echo "[+] Restarting static-pods service..."
       ${pkgs.systemd}/bin/systemctl restart static-pods.service
