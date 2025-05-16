@@ -7,11 +7,11 @@
   cfg = config.blackmatter.components.kubernetes.kubelet;
 in {
   imports = [
+    ./cleanup
+    ./service
     ./certs.nix
     ./static-pods
-    ./service
-    ./cleanup
-    # ./admin-token
+    ./admin-account
   ];
   options.blackmatter.components.kubernetes.kubelet = {
     enable = lib.mkEnableOption "Run the kubelet service";
