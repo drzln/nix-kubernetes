@@ -1,62 +1,53 @@
-# modules/kubernetes/services/kubelet/admin-token/default.nix
+# modules/kubernetes/services/kubelet/admin-account/default.nix
 {
   config,
   pkgs,
   lib,
   ...
 }: let
-  cfg = config.blackmatter.components.kubernetes.kubelet.admin-token;
-  provisionScript = pkgs.writeShellScriptBin "generate-admin-token" ''
+  cfg = config.blackmatter.components.kubernetes.kubelet.admin-account;
+  provisionScript = pkgs.writeShellScriptBin "generate-admin-account" ''
     set -euo pipefail
-    TOKEN_FILE="/var/lib/blackmatter/secrets/admin.token"
-    if [ -f "$TOKEN_FILE" ]; then
-      echo "[✓] Admin token already exists. Skipping generation."
-      exit 0
-    fi
+
     export KUBECONFIG=/run/secrets/kubernetes/configs/admin/kubeconfig
+
     # Wait until the API server is up
     echo "[+] Waiting for Kubernetes API server at https://192.168.50.2:6443 to become available..."
     until curl -k -s https://192.168.50.2:6443/healthz >/dev/null; do
       echo "[-] Kubernetes API server not yet available. Retrying in 5 seconds..."
       sleep 5
     done
-    echo "[+] Creating Kubernetes service account 'admin'..."
-    ${pkgs.kubernetes}/bin/kubectl apply -f - <<EOF
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      name: admin
-      namespace: default
-    EOF
-    echo "[+] Binding cluster-admin role to 'admin' service account..."
-    ${pkgs.kubernetes}/bin/kubectl create clusterrolebinding admin-binding \
+
+    if ${pkgs.kubernetes}/bin/kubectl get secret admin-basic-auth -n kube-system >/dev/null 2>&1; then
+      echo "[✓] Admin account already exists. Skipping."
+      exit 0
+    fi
+
+    echo "[+] Creating admin user with basic auth credentials..."
+    ${pkgs.kubernetes}/bin/kubectl -n kube-system create secret generic admin-basic-auth \
+      --from-literal=username=admin \
+      --from-literal=password=admin
+
+    echo "[+] Binding cluster-admin role to 'admin' basic-auth user..."
+    ${pkgs.kubernetes}/bin/kubectl create clusterrolebinding admin-basic-auth-binding \
       --clusterrole=cluster-admin \
-      --serviceaccount=default:admin \
+      --user=admin \
       --dry-run=client -o yaml | ${pkgs.kubernetes}/bin/kubectl apply -f -
-    echo "[+] Extracting token for 'admin' service account..."
-    SECRET=$(${pkgs.kubernetes}/bin/kubectl get sa admin -o jsonpath='{.secrets[0].name}')
-    TOKEN=$(${pkgs.kubernetes}/bin/kubectl get secret "$SECRET" -o jsonpath='{.data.token}' | ${pkgs.coreutils}/bin/base64 --decode)
-    echo "[+] Saving token securely..."
-    mkdir -p /var/lib/blackmatter/secrets
-    echo "$TOKEN" > "$TOKEN_FILE"
-    chmod 600 "$TOKEN_FILE"
-    echo "[✓] Token generated and saved at $TOKEN_FILE"
+
+    echo "[✓] Admin account provisioned with username/password: admin/admin"
   '';
 in {
-  options.blackmatter.components.kubernetes.kubelet.admin-token.enable =
-    lib.mkEnableOption "Enable provisioning of admin service account and token.";
+  options.blackmatter.components.kubernetes.kubelet.admin-account.enable =
+    lib.mkEnableOption "Enable provisioning of admin basic-auth account.";
+
   config = lib.mkIf cfg.enable {
-    # system.activationScripts.restart-admin-token = ''
-    #   echo "[+] Restarting admin-token service..."
-    #   ${pkgs.systemd}/bin/systemctl restart admin-token.service
-    # '';
-    systemd.services.admin-token = {
-      description = "Provision Kubernetes admin service account and token";
+    systemd.services.kubelet-admin-account = {
+      description = "Provision Kubernetes admin basic-auth account";
       after = ["kubelet.service" "static-pods.service"];
       wantedBy = ["multi-user.target"];
       serviceConfig = {
         Type = "oneshot";
-        ExecStart = "${provisionScript}/bin/generate-admin-token";
+        ExecStart = "${provisionScript}/bin/generate-admin-account";
       };
     };
   };
