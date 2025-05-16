@@ -1,4 +1,4 @@
-# modules/kubernetes/services/kubelet/static-pods/cilium/default.nix
+# modules/kubernetes/services/kubelet/static-assets/cilium/default.nix
 {pkgs, ...}: let
   manifest = pkgs.writeText "cilium.yaml" ''
     apiVersion: v1
