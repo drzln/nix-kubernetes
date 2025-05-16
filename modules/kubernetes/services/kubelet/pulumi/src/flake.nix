@@ -1,12 +1,10 @@
 # flake.nix
 {
   description = "Flake for Golang-based Pulumi Kubernetes provisioning";
-
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
-
   outputs = {
     nixpkgs,
     flake-utils,
@@ -19,17 +17,11 @@
         packages.default = pkgs.buildGoModule {
           pname = "kubelet-provisioning";
           version = "0.1.0";
-
           src = ./.;
-
           vendorHash = null;
-
           nativeBuildInputs = [pkgs.pulumi pkgs.git];
-
-          # Let buildGoModule handle the phases correctly
           ldflags = ["-s" "-w"];
         };
-
         devShells.default = pkgs.mkShell {
           buildInputs = [
             pkgs.go
@@ -39,7 +31,6 @@
             # pkgs.pulumiPackages.pulumi-kubernetes
             pkgs.kubectl
           ];
-
           shellHook = ''
             export KUBECONFIG=/run/secrets/kubernetes/configs/admin/kubeconfig
           '';
