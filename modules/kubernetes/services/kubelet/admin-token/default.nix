@@ -40,10 +40,10 @@ in {
   options.blackmatter.components.kubernetes.kubelet.admin-token.enable =
     lib.mkEnableOption "Enable provisioning of admin service account and token.";
   config = lib.mkIf cfg.enable {
-    system.activationScripts.restart-admin-token = ''
-      echo "[+] Restarting admin-token service..."
-      ${pkgs.systemd}/bin/systemctl restart admin-token.service
-    '';
+    # system.activationScripts.restart-admin-token = ''
+    #   echo "[+] Restarting admin-token service..."
+    #   ${pkgs.systemd}/bin/systemctl restart admin-token.service
+    # '';
     systemd.services.admin-token = {
       description = "Provision Kubernetes admin service account and token";
       after = ["kubelet.service" "static-pods.service"];
