@@ -1,4 +1,4 @@
-# modules/kubernetes/services/kubelet/static-pods/kube-apiserver/default.nix
+# modules/kubernetes/services/kubelet/static-assets/kube-apiserver/default.nix
 {
   pkgs,
   lib,
