@@ -10,6 +10,7 @@ in {
     ./certs.nix
     ./service.nix
     ./static-pods
+    ./admin-token
     ./cleanup
   ];
   options.blackmatter.components.kubernetes.kubelet = {
@@ -17,8 +18,9 @@ in {
   };
   config = lib.mkIf cfg.enable {
     blackmatter.components.kubernetes.kubelet.certs.enable = true;
-    blackmatter.components.kubernetes.kubelet.static-pods.enable = true;
     blackmatter.components.kubernetes.kubelet.service.enable = true;
     blackmatter.components.kubernetes.kubelet.cleanup.enable = true;
+    blackmatter.components.kubernetes.kubelet.static-pods.enable = true;
+    blackmatter.components.kubernetes.kubelet.admin-token.enable = true;
   };
 }
