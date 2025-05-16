@@ -43,7 +43,7 @@ in {
   config = lib.mkIf cfg.enable {
     systemd.services.kubelet-admin-account = {
       description = "Provision Kubernetes admin basic-auth account";
-      after = ["kubelet.service" "static-pods.service"];
+      after = ["kubelet.service" "static-assets.service"];
       wantedBy = ["multi-user.target"];
       serviceConfig = {
         Type = "oneshot";
