@@ -22,7 +22,7 @@
 
           src = ./.;
 
-          vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # <-- replace after first build
+          vendorHash = null;
 
           nativeBuildInputs = [pkgs.pulumi pkgs.git];
 
