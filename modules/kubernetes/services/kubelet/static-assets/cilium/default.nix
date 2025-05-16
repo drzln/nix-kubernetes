@@ -26,6 +26,8 @@
               add:
                 - NET_ADMIN
                 - SYS_MODULE
+                - SYS_RESOURCE
+                - SYS_ADMIN
           volumeMounts:
             - name: bpf-maps
               mountPath: /sys/fs/bpf
