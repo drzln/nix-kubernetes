@@ -1,11 +1,11 @@
-# modules/kubernetes/services/kubelet/static-pods/cilium/manifest.nix
+# modules/kubernetes/services/kubelet/static-assets/cilium/manifest.nix
 {
   config,
   pkgs,
   lib,
   ...
 }: let
-  cfg = config.blackmatter.components.kubernetes.kubelet.static-pods.cilium;
+  cfg = config.blackmatter.components.kubernetes.kubelet.static-assets.cilium;
 
   ciliumManifest = pkgs.writeText "cilium.yaml" (builtins.toJSON {
     apiVersion = "v1";
@@ -95,7 +95,7 @@
     };
   });
 in {
-  options.blackmatter.components.kubernetes.kubelet.static-pods.cilium.enable =
+  options.blackmatter.components.kubernetes.kubelet.static-assets.cilium.enable =
     lib.mkEnableOption "Enable Cilium static pod";
 
   config = lib.mkIf cfg.enable {
