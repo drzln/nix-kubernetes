@@ -1,4 +1,4 @@
-#  modules/kubernetes/services/kubelet/static-pods/kube-scheduler/default.nix
+#  modules/kubernetes/services/kubelet/static-assets/kube-scheduler/default.nix
 {
   pkgs,
   lib,
