@@ -1,9 +1,9 @@
 # service/service.nix
 {
-  config,
-  lib,
-  pkgs,
   blackmatterPkgs,
+  config,
+  pkgs,
+  lib,
   ...
 }: let
   cfg = config.blackmatter.components.kubernetes.kubelet.service;
