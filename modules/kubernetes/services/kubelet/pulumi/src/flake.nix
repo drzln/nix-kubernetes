@@ -31,13 +31,12 @@
         packages.default = pulumi-go-env;
         devShells.default = pkgs.mkShell {
           buildInputs = [
+            # pkgs.pulumiPackages.pulumi-kubernetes
             pkgs.go
             pkgs.gopls
             pkgs.gotools
             pkgs.pulumi
-            # pkgs.pulumiPackages.pulumi-kubernetes
             pkgs.kubectl
-            pulumi-go-env
           ];
           shellHook = ''
             export KUBECONFIG=/run/secrets/kubernetes/configs/admin/kubeconfig
