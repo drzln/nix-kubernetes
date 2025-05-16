@@ -1,4 +1,4 @@
-# modules/kubernetes/services/kubelet/static-pods/etcd/default.nix
+# modules/kubernetes/services/kubelet/static-assets/etcd/default.nix
 {
   pkgs,
   lib,

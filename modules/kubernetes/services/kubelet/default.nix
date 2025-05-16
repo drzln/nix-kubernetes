@@ -10,7 +10,7 @@ in {
     ./cleanup
     ./service
     ./certs.nix
-    ./static-pods
+    ./static-assets
   ];
   options.blackmatter.components.kubernetes.kubelet = {
     enable = lib.mkEnableOption "Run the kubelet service";
@@ -19,6 +19,6 @@ in {
     blackmatter.components.kubernetes.kubelet.certs.enable = true;
     blackmatter.components.kubernetes.kubelet.service.enable = true;
     blackmatter.components.kubernetes.kubelet.cleanup.enable = true;
-    blackmatter.components.kubernetes.kubelet.static-pods.enable = true;
+    blackmatter.components.kubernetes.kubelet.static-assets.enable = true;
   };
 }
