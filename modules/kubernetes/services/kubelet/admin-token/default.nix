@@ -14,6 +14,12 @@
       exit 0
     fi
     export KUBECONFIG=/run/secrets/kubernetes/configs/admin/kubeconfig
+    # Wait until the API server is up
+    echo "[+] Waiting for Kubernetes API server at https://192.168.50.2:6443 to become available..."
+    until curl -k -s https://192.168.50.2:6443/healthz >/dev/null; do
+      echo "[-] Kubernetes API server not yet available. Retrying in 5 seconds..."
+      sleep 5
+    done
     echo "[+] Creating Kubernetes service account 'admin'..."
     ${pkgs.kubernetes}/bin/kubectl apply -f - <<EOF
     apiVersion: v1
