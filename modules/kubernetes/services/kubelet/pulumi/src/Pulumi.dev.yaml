@@ -1,0 +1,3 @@
+config:
+  kubernetes:context: "admin@kubernetes"
+  kubernetes:kubeconfig: "/run/secrets/kubernetes/configs/admin/kubeconfig"

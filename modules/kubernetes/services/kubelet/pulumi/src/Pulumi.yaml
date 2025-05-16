@@ -1,0 +1,3 @@
+name: kubelet-provisioning
+runtime: go
+description: Kubernetes cluster provisioning managed via Pulumi & Golang
