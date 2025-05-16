@@ -45,7 +45,7 @@ in
         KillMode = "process";
         Restart = "always";
         Delegate = true;
-        RestartSec = 2;
+        RestartSec = 10;
         User = "root";
         ExecStart = lib.concatStringsSep " " [
           "${pkg}/bin/kubelet"
