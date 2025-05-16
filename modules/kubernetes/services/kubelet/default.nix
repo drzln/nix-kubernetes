@@ -20,6 +20,5 @@ in {
     blackmatter.components.kubernetes.kubelet.service.enable = true;
     blackmatter.components.kubernetes.kubelet.cleanup.enable = true;
     blackmatter.components.kubernetes.kubelet.static-pods.enable = true;
-    blackmatter.components.kubernetes.kubelet.admin-account.enable = true;
   };
 }
