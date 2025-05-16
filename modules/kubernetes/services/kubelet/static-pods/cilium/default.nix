@@ -1,13 +1,48 @@
 # modules/kubernetes/services/kubelet/static-pods/cilium/default.nix
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}: {
-  options.blackmatter.components.kubernetes.kubelet.static-pods.cilium.enable =
-    lib.mkEnableOption "Enable Cilium as static pod";
-  config = lib.mkIf config.blackmatter.components.kubernetes.kubelet.static-pods.cilium.enable {
-    environment.etc."kubernetes/manifests/cilium.yaml".source = import ./manifest.nix {inherit config pkgs lib;};
-  };
+{pkgs, ...}: let
+  manifest = pkgs.writeText "cilium.yaml" ''
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: cilium
+      namespace: kube-system
+      labels:
+        k8s-app: cilium
+    spec:
+      hostNetwork: true
+      priorityClassName: system-node-critical
+      containers:
+        - name: cilium-agent
+          image: quay.io/cilium/cilium:v1.17.3
+          command:
+            - cilium-agent
+          args:
+            - --debug=$(CILIUM_DEBUG)
+            - --enable-ipv4
+            - --enable-ipv6=false
+            - --ipv4-cluster-cidr=10.96.0.0/12
+            - --kube-proxy-replacement=strict
+            - --tunnel=vxlan
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - SYS_MODULE
+          volumeMounts:
+            - name: bpf-maps
+              mountPath: /sys/fs/bpf
+            - name: cilium-run
+              mountPath: /var/run/cilium
+      volumes:
+        - name: bpf-maps
+          hostPath:
+            path: /sys/fs/bpf
+            type: DirectoryOrCreate
+        - name: cilium-run
+          hostPath:
+            path: /var/run/cilium
+            type: DirectoryOrCreate
+  '';
+in {
+  config.manifest = manifest;
 }
