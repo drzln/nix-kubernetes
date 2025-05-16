@@ -21,7 +21,6 @@
             - --enable-ipv4
             - --enable-ipv6=false
             - --kube-proxy-replacement=strict
-            - --tunnel=vxlan
           securityContext:
             capabilities:
               add:
