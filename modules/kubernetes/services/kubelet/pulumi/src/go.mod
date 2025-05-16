@@ -9,3 +9,4 @@ require (
 
 require (
 	k8s.io/apimachinery v0.30.1
+)
