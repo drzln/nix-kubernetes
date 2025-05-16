@@ -1,11 +1,11 @@
-# modules/kubernetes/services/kubelet/static-pods/default.nix
+# modules/kubernetes/services/kubelet/static-assets/default.nix
 {
   config,
   pkgs,
   lib,
   ...
 }: let
-  cfg = config.blackmatter.components.kubernetes.kubelet.static-pods;
+  cfg = config.blackmatter.components.kubernetes.kubelet.static-assets;
 
   script = pkgs.writeShellScriptBin "setup-manifests" (builtins.readFile ./setup-manifests.sh);
 
@@ -24,14 +24,14 @@ in {
     ./kube-controller-manager
     ./cilium
   ];
-  options.blackmatter.components.kubernetes.kubelet.static-pods.enable =
+  options.blackmatter.components.kubernetes.kubelet.static-assets.enable =
     lib.mkEnableOption "Enable static pods for Kubernetes components";
   config = lib.mkIf cfg.enable {
-    system.activationScripts.restart-static-pods = ''
-      echo "[+] Restarting static-pods service..."
-      ${pkgs.systemd}/bin/systemctl restart static-pods.service
+    system.activationScripts.restart-static-assets = ''
+      echo "[+] Restarting static-assets service..."
+      ${pkgs.systemd}/bin/systemctl restart static-assets.service
     '';
-    systemd.services.static-pods = {
+    systemd.services.static-assets = {
       description = "Setup static pod manifests";
       wants = [
         "kubelet-generate-certs.service"
