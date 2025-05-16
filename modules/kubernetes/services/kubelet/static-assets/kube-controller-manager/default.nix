@@ -1,4 +1,4 @@
-# modules/kubernetes/services/kubelet/static-pods/kube-controller-manager/default.nix
+# modules/kubernetes/services/kubelet/static-assets/kube-controller-manager/default.nix
 {
   pkgs,
   lib,
