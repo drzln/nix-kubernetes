@@ -11,7 +11,6 @@ in {
     ./service
     ./certs.nix
     ./static-pods
-    ./admin-account
   ];
   options.blackmatter.components.kubernetes.kubelet = {
     enable = lib.mkEnableOption "Run the kubelet service";
