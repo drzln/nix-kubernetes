@@ -21,6 +21,10 @@ in {
   options.blackmatter.components.kubernetes.kubelet.cleanup.enable = lib.mkEnableOption "Enable cleanup of Kubernetes CRI state before kubelet starts.";
 
   config = lib.mkIf cfg.enable {
+    system.activationScripts.restart-kubelet-cleanup = ''
+      echo "[+] Restarting kubelet-cleanup service..."
+      ${pkgs.systemd}/bin/systemctl restart kubelet-cleanup.service
+    '';
     systemd.services.kubelet-cleanup = {
       description = "Cleanup Kubernetes CRI state";
       before = ["kubelet.service"];
