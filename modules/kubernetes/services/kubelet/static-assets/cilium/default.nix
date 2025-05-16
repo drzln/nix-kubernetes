@@ -17,7 +17,7 @@
           command:
             - cilium-agent
           args:
-            - --debug=$(CILIUM_DEBUG)
+            - --debug=true
             - --enable-ipv4
             - --enable-ipv6=false
             - --ipv4-cluster-cidr=10.96.0.0/12
