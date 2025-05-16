@@ -20,7 +20,6 @@
             - --debug=true
             - --enable-ipv4
             - --enable-ipv6=false
-            - --ipv4-cluster-cidr=10.96.0.0/12
             - --kube-proxy-replacement=strict
             - --tunnel=vxlan
           securityContext:
