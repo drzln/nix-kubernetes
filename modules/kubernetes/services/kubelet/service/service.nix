@@ -12,11 +12,9 @@
 in
   lib.mkIf cfg.enable {
     environment.systemPackages = [pkg];
-
     systemd.services.kubelet = {
       description = "blackmatter.kubelet";
       wantedBy = ["multi-user.target"];
-
       environment.PATH = lib.mkForce (lib.makeBinPath [
         blackmatterPkgs.blackmatter.k8s.cilium-cni
         pkgs.containerd
@@ -26,7 +24,6 @@ in
         pkgs.runc
         pkg
       ]);
-
       serviceConfig = {
         Wants = [
           "kubelet-generate-certs.service"
