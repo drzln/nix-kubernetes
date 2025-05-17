@@ -86,6 +86,7 @@ in {
   config = mkIf cfg.enable {
     environment.systemPackages = [pkgs.fluxcd pkgs.kubectl fluxBootstrapScript];
     systemd.services.fluxcd-bootstrap = mkIf cfg.runAtBoot {
+      wantedBy = lib.mkForce [];
       description = "FluxCD Bootstrap (one-time)";
       wants = ["network-online.target"];
       after = ["network-online.target"];
@@ -100,7 +101,6 @@ in {
         ExecStartPost = "${pkgs.coreutils}/bin/touch ${cfg.lockFile}";
         TimeoutStartSec = "300s";
       };
-      wantedBy = ["multi-user.target"];
     };
   };
 }
