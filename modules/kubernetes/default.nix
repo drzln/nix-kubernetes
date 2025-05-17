@@ -101,15 +101,15 @@ in {
       blackmatter.components.kubernetes.containerd.enable = true;
       blackmatter.components.kubernetes.kubelet.enable = true;
       blackmatter.components.kubernetes.services.fluxcd = {
-        enable = config.blackmatter.componnts.kubernetes.fluxcd.enable;
-        owner = config.blackmatter.componnts.kubernetes.fluxcd.owner;
-        repo = config.blackmatter.componnts.kubernetes.fluxcd.repo;
-        branch = config.blackmatter.componnts.kubernetes.fluxcd.branch;
-        path = config.blackmatter.componnts.kubernetes.fluxcd.path;
-        personal = config.blackmatter.componnts.kubernetes.fluxcd.personal;
-        patFile = config.blackmatter.componnts.kubernetes.fluxcd.patFile;
-        runAtBoot = config.blackmatter.componnts.kubernetes.fluxcd.runAtBoot;
-        lockFile = config.blackmatter.componnts.kubernetes.fluxcd.lockFile;
+        enable = config.blackmatter.components.kubernetes.fluxcd.enable;
+        owner = config.blackmatter.components.kubernetes.fluxcd.owner;
+        repo = config.blackmatter.components.kubernetes.fluxcd.repo;
+        branch = config.blackmatter.components.kubernetes.fluxcd.branch;
+        path = config.blackmatter.components.kubernetes.fluxcd.path;
+        personal = config.blackmatter.components.kubernetes.fluxcd.personal;
+        patFile = config.blackmatter.components.kubernetes.fluxcd.patFile;
+        runAtBoot = config.blackmatter.components.kubernetes.fluxcd.runAtBoot;
+        lockFile = config.blackmatter.components.kubernetes.fluxcd.lockFile;
       };
     })
   ]);
