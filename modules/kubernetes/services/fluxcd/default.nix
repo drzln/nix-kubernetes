@@ -66,6 +66,7 @@ in {
         ExecStart = "${fluxBootstrapScript}/bin/fluxcd-bootstrap";
         ExecStartPost = "${pkgs.coreutils}/bin/touch ${cfg.lockFile}";
         TimeoutStartSec = "300s";
+        Environment = "GITHUB_TOKEN=${builtins.readFile cfg.patFile}";
       };
     };
   };
