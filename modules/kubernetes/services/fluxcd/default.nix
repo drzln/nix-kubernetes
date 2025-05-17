@@ -10,7 +10,9 @@ with lib; let
   fluxBootstrapScript = pkgs.writeShellScriptBin "fluxcd-bootstrap" ''
     #!/usr/bin/env bash
     set -euo pipefail
+
     export KUBECONFIG="/run/secrets/kubernetes/configs/admin/kubeconfig"
+
     retries=60
     until ${pkgs.kubectl}/bin/kubectl cluster-info &>/dev/null; do
       retries=$((retries-1))
@@ -21,6 +23,7 @@ with lib; let
       echo "[fluxcd-bootstrap] Waiting for Kubernetes API..."
       sleep 5
     done
+
     if ! ${pkgs.kubectl}/bin/kubectl get namespace flux-system &>/dev/null; then
       if [ -z "$GITHUB_TOKEN" ]; then
         if [ -f "${cfg.patFile}" ]; then
@@ -30,6 +33,7 @@ with lib; let
           exit 1
         fi
       fi
+
       echo "[fluxcd-bootstrap] Bootstrapping FluxCD..."
       ${pkgs.fluxcd}/bin/flux bootstrap github \
         --token-auth \
@@ -69,6 +73,7 @@ in {
     };
     patFile = mkOption {
       type = types.str;
+      default = "/run/secrets/fluxcd/kube-clusters/pat";
       description = "Path to SOPS-decrypted GitHub PAT file.";
     };
     runAtBoot = mkOption {
