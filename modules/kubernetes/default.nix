@@ -57,7 +57,17 @@ in {
     (mkIf (cfg.role == "single") {
       blackmatter.components.kubernetes.containerd.enable = true;
       blackmatter.components.kubernetes.kubelet.enable = true;
-      blackmatter.components.kubernetes.fluxcd.enable = true;
+      blackmatter.components.kubernetes.fluxcd = {
+        enable = config.kubernetes.fluxcd.enable;
+        owner = config.kubernetes.fluxcd.owner;
+        repo = config.kubernetes.fluxcd.repo;
+        branch = config.kubernetes.fluxcd.branch;
+        path = config.kubernetes.fluxcd.path;
+        personal = config.kubernetes.fluxcd.personal;
+        patFile = config.kubernetes.fluxcd.patFile;
+        runAtBoot = config.kubernetes.fluxcd.runAtBoot;
+        lockFile = config.kubernetes.fluxcd.lockFile;
+      };
     })
   ]);
 }
