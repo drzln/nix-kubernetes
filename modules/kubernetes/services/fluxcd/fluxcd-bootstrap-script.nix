@@ -6,9 +6,7 @@
 pkgs.writeShellScriptBin "fluxcd-bootstrap" ''
   #!/usr/bin/env bash
   set -euo pipefail
-
   export KUBECONFIG="/run/secrets/kubernetes/configs/admin/kubeconfig"
-
   retries=60
   until ${pkgs.kubectl}/bin/kubectl cluster-info &>/dev/null; do
     retries=$((retries-1))
@@ -19,13 +17,11 @@ pkgs.writeShellScriptBin "fluxcd-bootstrap" ''
     echo "[fluxcd-bootstrap] Waiting for Kubernetes API..."
     sleep 5
   done
-
   if ! ${pkgs.kubectl}/bin/kubectl get namespace flux-system &>/dev/null; then
     if [ ! -f "${cfg.patFile}" ]; then
       echo "GitHub token file missing at ${cfg.patFile}. Exiting."
       exit 1
     fi
-
     echo "[fluxcd-bootstrap] Bootstrapping FluxCD..."
     ${pkgs.fluxcd}/bin/flux bootstrap github \
       --token-auth \
