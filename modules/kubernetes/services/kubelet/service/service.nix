@@ -24,7 +24,7 @@ in
         pkgs.runc
         pkg
       ]);
-      serviceConfig = {
+      unitConfig = {
         Wants = [
           "kubelet-generate-certs.service"
           "static-assets.service"
@@ -36,6 +36,8 @@ in
           "kubelet-generate-certs.service"
           "static-assets.service"
         ];
+      };
+      serviceConfig = {
         CapabilityBoundingSet = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
         AmbientCapabilities = ["CAP_SYSLOG" "CAP_SYS_ADMIN"];
         DeviceAllow = ["/dev/kmsg r"];
