@@ -1,3 +1,4 @@
+# modules/kubernetes/services/fluxcd/default.nix
 {
   config,
   pkgs,
