@@ -7,45 +7,7 @@
 }:
 with lib; let
   cfg = config.blackmatter.components.kubernetes.services.fluxcd;
-  fluxBootstrapScript = pkgs.writeShellScriptBin "fluxcd-bootstrap" ''
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    export KUBECONFIG="/run/secrets/kubernetes/configs/admin/kubeconfig"
-
-    retries=60
-    until ${pkgs.kubectl}/bin/kubectl cluster-info &>/dev/null; do
-      retries=$((retries-1))
-      if [ $retries -le 0 ]; then
-        echo "[fluxcd-bootstrap] Kubernetes API not responding in time"
-        exit 1
-      fi
-      echo "[fluxcd-bootstrap] Waiting for Kubernetes API..."
-      sleep 5
-    done
-
-    if ! ${pkgs.kubectl}/bin/kubectl get namespace flux-system &>/dev/null; then
-      if [ -z "$GITHUB_TOKEN" ]; then
-        if [ -f "${cfg.patFile}" ]; then
-          export GITHUB_TOKEN=$(cat "${cfg.patFile}")
-        else
-          echo "GitHub token file missing at ${cfg.patFile}. Exiting."
-          exit 1
-        fi
-      fi
-
-      echo "[fluxcd-bootstrap] Bootstrapping FluxCD..."
-      ${pkgs.fluxcd}/bin/flux bootstrap github \
-        --token-auth \
-        --owner=${cfg.owner} \
-        --repository=${cfg.repo} \
-        --branch=${cfg.branch} \
-        --path=${cfg.path} \
-        ${optionalString cfg.personal "--personal"}
-    else
-      echo "[fluxcd-bootstrap] FluxCD already bootstrapped; skipping."
-    fi
-  '';
+  fluxBootstrapScript = import ./fluxcd-bootstrap-script.nix {inherit pkgs cfg;};
 in {
   options.blackmatter.components.kubernetes.services.fluxcd = {
     enable = mkEnableOption "Enable FluxCD bootstrap module.";
