@@ -22,7 +22,7 @@ in {
     ./kube-apiserver
     ./kube-scheduler
     ./kube-controller-manager
-    ./cilium
+    # ./cilium
   ];
   options.blackmatter.components.kubernetes.kubelet.static-assets.enable =
     lib.mkEnableOption "Enable static pods for Kubernetes components";
