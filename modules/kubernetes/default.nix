@@ -13,6 +13,7 @@ in {
   imports = [
     (service "containerd")
     (service "kubelet")
+    (service "fluxcd")
     ./crictl.nix
   ];
   options.blackmatter.components.kubernetes = {
@@ -56,6 +57,7 @@ in {
     (mkIf (cfg.role == "single") {
       blackmatter.components.kubernetes.containerd.enable = true;
       blackmatter.components.kubernetes.kubelet.enable = true;
+      blackmatter.components.kubernetes.fluxcd.enable = true;
     })
   ]);
 }
