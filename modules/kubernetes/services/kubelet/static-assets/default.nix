@@ -14,7 +14,7 @@
     (import ./kube-apiserver {inherit config pkgs lib;}).config.manifest
     (import ./kube-scheduler {inherit config pkgs lib;}).config.manifest
     (import ./kube-controller-manager {inherit config pkgs lib;}).config.manifest
-    (import ./cilium {inherit config pkgs lib;}).config.manifest
+    # (import ./cilium {inherit config pkgs lib;}).config.manifest
   ];
 in {
   imports = [
