@@ -5,7 +5,7 @@
   ...
 }:
 with lib; let
-  cfg = config.blackmatter.components.kubernetes.fluxcd;
+  cfg = config.blackmatter.components.kubernetes.services.fluxcd;
   fluxBootstrapScript = pkgs.writeShellScriptBin "fluxcd-bootstrap" ''
     #!/usr/bin/env bash
     set -euo pipefail
@@ -44,7 +44,7 @@ with lib; let
     fi
   '';
 in {
-  options.blackmatter.components.kubernetes.fluxcd = {
+  options.blackmatter.components.kubernetes.services.fluxcd = {
     enable = mkEnableOption "Enable FluxCD bootstrap module.";
     owner = mkOption {
       type = types.str;
