@@ -9,6 +9,8 @@
       labels:
         k8s-app: cilium
     spec:
+      serviceAccountName: cilium
+      automountServiceAccountToken: true
       hostNetwork: true
       priorityClassName: system-node-critical
       containers:
