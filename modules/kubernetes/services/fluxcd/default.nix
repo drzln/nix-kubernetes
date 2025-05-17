@@ -87,9 +87,12 @@ in {
     environment.systemPackages = [pkgs.fluxcd pkgs.kubectl fluxBootstrapScript];
     systemd.services.fluxcd-bootstrap = mkIf cfg.runAtBoot {
       description = "FluxCD Bootstrap (one-time)";
-      wants = ["network-online.target"];
-      after = ["network-online.target"];
-      unitConfig.ConditionPathExists = "!${cfg.lockFile}";
+      wants = ["network-online.target" "multi-user.target"];
+      after = ["network-online.target" "multi-user.target"];
+      unitConfig = {
+        ConditionPathExists = "!${cfg.lockFile}";
+        ConditionKernelCommandLine = "!systemd.unit=sysinit-reactivation.target";
+      };
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
